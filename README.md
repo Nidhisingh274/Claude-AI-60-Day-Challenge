@@ -1,7 +1,7 @@
 # My 60 Days of AI Challenge - Nidhi 🚀
 
 ## Introduction & Goals
-Hi, I am Nidhi! I am an AI/ML Engineer transitioning into building robust Agentic workflows and RAG pipelines. My goal for the next 60 days is to build in public and document my journey from an AI practitioner to a full-stack AI systems architect.
+Hi, I am Nidhi! I am an AI/ML Engineer building robust Agentic workflows and RAG pipelines. My goal for the next 60 days is to build in public and document my journey from an AI practitioner to a full-stack AI systems architect.
 
 ---
 
