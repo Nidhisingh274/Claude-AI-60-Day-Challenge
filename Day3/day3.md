@@ -7,15 +7,15 @@ To demonstrate how persona assignment drastically alters an LLM's approach to co
 
 ### 1. Vanilla Prompt (No Role)
 * **Prompt Used:** "What are the biggest challenges in transitioning a multi-agent AI system from a local prototype to a production environment? Specifically, explain how to prevent hallucination cascades when agents are executing multi step tasks autonomously."
-* **Output Observation:** Provided a textbook overview of generic mitigation strategies, such as using structured output contracts and injecting grounding checkpoints. It lacked specific technical implementation details or business context.
+* **Output Observation:** Outlined 7 core strategies to prevent cascades, such as using structured output contracts, confidence propagation, and grounding checkpoints. While solid, it did not adapt to specific business or deep architectural code-level constraints.
 
 ### 2. The Founder Persona
 * **Prompt Used:** "Act as a Tech Startup Founder who is building an enterprise SaaS product... Frame your answer around business risks, maintaining customer trust, system reliability, and minimizing operational costs."
-* **Output Observation:** The system shifted its focus entirely to business risk, prioritizing customer trust, SLA penalties, and operational cost reduction. It emphasized that a hallucination cascade in a financial workflow can trigger immediate contract reviews[cite: 2].
+* **Output Observation:** The system shifted its focus entirely to business risk, prioritizing customer trust, SLA penalties, and operational cost reduction. It emphasized that a hallucination cascade in a financial workflow can trigger immediate contract reviews.
 
 ### 3. The Lead AI Engineer Persona
 * **Prompt Used:** "Act as a Lead AI/ML Engineer... Focus your answer on architectural design, managing context windows in RAG pipelines, implementing fallback mechanisms (e.g., using LangGraph), and ensuring system observability for debugging."
-* **Output Observation:** Delivered highly actionable architectural depth, detailing Pydantic schemas for inter-agent contracts, LangGraph state routing, and setting strict RAG context budgets. It highlighted the need for hierarchical retrieval and explicit verification layers[cite: 3].
+* **Output Observation:** Delivered highly actionable architectural depth, detailing Pydantic schemas for inter-agent contracts, LangGraph state routing, and setting strict RAG context budgets. It highlighted the need for hierarchical retrieval and explicit verification layers.
 
 ## 🧠 The Meta-Learning
 An LLM's output is bounded by the lens it is given. The same core question yields completely different value depending on the persona constraint. **To extract scalable architecture designs, prompt like an engineer; to assess deployment viability, prompt like a founder.**
