@@ -21,7 +21,7 @@ An LLM's output is bounded by the lens it is given. The same core question yield
 
 ## 🛠️ Tool of the Day: Claude Usage Counter & MetaPrompt Workflow
 * **Usage Counter:** Installed and monitored API limits across these heavy context queries. Tracking token consumption is a non-negotiable skill for scaling multi-agent systems. (Screenshots attached).
-* **MetaPrompt to Gemini Workflow:** Used the MetaPrompt extension to generate a highly structured visual concept prompt for "Role-Based Prompting", which was then rendered using Gemini to create the professional infographic attached in this repository (`A.png`).
+* **MetaPrompt to Gemini Workflow:** Used the MetaPrompt extension to generate a highly structured visual concept prompt for "Role-Based Prompting", which was then rendered using ChatGpt to create the professional infographic attached in this repository (`OutputImage.png`).
 
 ## 🖼️ Deliverables Uploaded
 * `OutputImage.png` (Professional Image Concept)
