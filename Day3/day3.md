@@ -6,6 +6,7 @@ To demonstrate how persona assignment drastically alters an LLM's approach to co
 ## 🔬 The Persona Experiment: Shaping LLM Logic
 
 ### 1. Vanilla Prompt (No Role)
+* **Prompt Used:** "What are the biggest challenges in transitioning a multi-agent AI system from a local prototype to a production environment? Specifically, explain how to prevent hallucination cascades when agents are executing multi step tasks autonomously."
 * **Output Observation:** Provided a textbook overview of generic mitigation strategies, such as using structured output contracts and injecting grounding checkpoints. It lacked specific technical implementation details or business context.
 
 ### 2. The Founder Persona
