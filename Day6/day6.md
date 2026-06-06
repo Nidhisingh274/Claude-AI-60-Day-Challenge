@@ -45,8 +45,10 @@ Used Claude as an ATS Optimization Expert to analyze, score, and rewrite my resu
 > **ATS Score Card:**
 <img width="681" height="848" alt="ats score" src="https://github.com/user-attachments/assets/74d7be0d-b3c3-483f-a9b1-61601bd1c720" />
 
+
 > **Optimized Resume Preview:**
 <img width="763" height="828" alt="res" src="https://github.com/user-attachments/assets/a5caf01d-76cd-48cd-ba85-25379962a620" />
+
 
 > **Original Resume Preview:**
 <img width="513" height="718" alt="resume" src="https://github.com/user-attachments/assets/0968dfde-60ad-4be6-9cf6-2fadc1e1111b" />
