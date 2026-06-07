@@ -9,7 +9,7 @@ Explored and integrated **Claude Counter**, a browser extension that helps monit
 ---
 
 ## 📝 The Prompt Used
-To generate a personalized usage strategy, I designed and executed the following prompt in Claude:
+To generate a personalized usage strategy, I executed the following prompt in Claude:
 
 > **System Prompt & Instructions:**
 > You are a Claude AI Expert, Productivity Consultant, and AI Workflow Architect.
