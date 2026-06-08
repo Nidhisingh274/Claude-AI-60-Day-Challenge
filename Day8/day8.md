@@ -48,7 +48,7 @@ I modified the prompt to implement a strict verification gate:
 
 ## 📸 Dashboard Visuals
 
-*(Refer to the video demo in my LinkedIn post to see the live filter animations and hover states!)*
+*(Refer to the html document in the repository to see the live filter animations and hover states!)*
 
 ### 1. Main Header & Health Metrics
 <img width="1897" height="763" alt="Main Header   Health Metrics" src="https://github.com/user-attachments/assets/0de17d1f-0f8c-4fdd-a3d3-566dbeef1ec8" />
@@ -60,9 +60,6 @@ I modified the prompt to implement a strict verification gate:
 <img width="1902" height="577" alt="Personal Environmental Report Card" src="https://github.com/user-attachments/assets/88b4a572-ada7-4cc1-9b5f-a660aa13443c" />
 
 ---
-
-## 🔗 Try It Out
-* **HTML File:** `index.html` (Available in this repository. Download and open it in any browser to test the interactive filters).
 
 ## 🔗 Try It Out
 * **HTML File:** `index.html` (Available in this repository. Download and open it in any browser to test the interactive filters).
