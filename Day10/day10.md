@@ -8,6 +8,8 @@ https://tranquil-florentine-a1f828.netlify.app/
 ## 📸 Screenshots
 
 <img width="1880" height="897" alt="aa" src="https://github.com/user-attachments/assets/df7fcd53-8bb4-495b-8239-ed594751bcfa" />
+<img width="1888" height="898" alt="bb" src="https://github.com/user-attachments/assets/143900cc-4dcc-4fe5-b270-3033feaff8b8" />
+<img width="1896" height="900" alt="cc" src="https://github.com/user-attachments/assets/5a6b6400-4944-48ec-84a2-7c2f2458fef5" />
 
 ## 💡 Key Learnings
 Building this portfolio helped me understand:
