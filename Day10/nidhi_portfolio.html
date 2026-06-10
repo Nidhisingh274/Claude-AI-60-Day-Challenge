@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nidhi Singh – AI & Agentic AI Engineer</title>
+  <meta name="description" content="Nidhi Singh is an AI Engineer with ~2 years of experience building Agentic AI systems, RAG pipelines, and LLM-powered applications. Open to full-time roles in Generative AI." />
+  <meta name="keywords" content="AI Engineer, Generative AI, Agentic AI, RAG, LangChain, LangGraph, LLMs, Machine Learning, Python" />
+  <meta property="og:title" content="Nidhi Singh – AI & Agentic AI Engineer" />
+  <meta property="og:description" content="Building intelligent, autonomous AI systems with LangChain, LangGraph, RAG, and LLMs." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Space Grotesk', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            purple: {
+              450: '#8B5CF6',
+              500: '#7C3AED',
+              600: '#6D28D9',
+              700: '#5B21B6',
+            },
+            blue: {
+              400: '#38BDF8',
+              500: '#0EA5E9',
+              600: '#0284C7',
+            }
+          },
+          animation: {
+            'fade-up': 'fadeUp 0.6s ease forwards',
+            'glow-pulse': 'glowPulse 3s ease-in-out infinite',
+            'cursor-blink': 'cursorBlink 1s step-end infinite',
+          },
+          keyframes: {
+            fadeUp: {
+              '0%': { opacity: 0, transform: 'translateY(24px)' },
+              '100%': { opacity: 1, transform: 'translateY(0)' },
+            },
+            glowPulse: {
+              '0%, 100%': { opacity: 0.5 },
+              '50%': { opacity: 1 },
+            },
+            cursorBlink: {
+              '0%, 100%': { opacity: 1 },
+              '50%': { opacity: 0 },
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --purple-glow: rgba(124, 58, 237, 0.35);
+      --blue-glow: rgba(14, 165, 233, 0.25);
+    }
+
+    * { font-family: 'Space Grotesk', sans-serif; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #7C3AED; border-radius: 99px; }
+
+    /* Animated gradient background */
+    .hero-bg {
+      background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(124,58,237,0.18) 0%, transparent 70%),
+                  radial-gradient(ellipse 50% 40% at 90% 80%, rgba(14,165,233,0.12) 0%, transparent 60%);
+    }
+    .dark .hero-bg {
+      background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(124,58,237,0.28) 0%, transparent 70%),
+                  radial-gradient(ellipse 50% 40% at 90% 80%, rgba(14,165,233,0.18) 0%, transparent 60%);
+    }
+
+    /* Grid dots */
+    .dot-grid {
+      background-image: radial-gradient(circle, rgba(124,58,237,0.18) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+    .dark .dot-grid {
+      background-image: radial-gradient(circle, rgba(124,58,237,0.28) 1px, transparent 1px);
+    }
+
+    /* Glow card */
+    .glow-card {
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+    .glow-card:hover {
+      box-shadow: 0 0 32px var(--purple-glow), 0 8px 32px rgba(0,0,0,0.12);
+      transform: translateY(-4px);
+    }
+
+    /* Nav link active */
+    .nav-link.active { color: #7C3AED; }
+    .dark .nav-link.active { color: #A78BFA; }
+
+    /* Typing cursor */
+    #typed-cursor { animation: cursorBlink 1s step-end infinite; }
+
+    /* Gradient text */
+    .grad-text {
+      background: linear-gradient(135deg, #7C3AED 0%, #38BDF8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Reveal on scroll */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.65s ease, transform 0.65s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* Skill pill hover */
+    .skill-pill { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .skill-pill:hover { transform: translateY(-2px); box-shadow: 0 4px 16px var(--purple-glow); }
+
+    /* Timeline line */
+    .timeline-line { background: linear-gradient(to bottom, #7C3AED, #0EA5E9); }
+
+    /* Section divider */
+    .section-div {
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(124,58,237,0.4), rgba(14,165,233,0.4), transparent);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-[#0A0A12] dark:text-slate-100 transition-colors duration-300 font-display">
+
+  <!-- ░░ NAVBAR ░░ -->
+  <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+    <div class="max-w-6xl mx-auto px-5 py-3 flex items-center justify-between">
+      <!-- Logo -->
+      <a href="#hero" class="font-mono text-sm font-medium tracking-widest grad-text select-none">NS/</a>
+
+      <!-- Desktop links -->
+      <ul class="hidden md:flex items-center gap-7 text-sm font-medium">
+        <li><a href="#about" class="nav-link text-slate-500 hover:text-violet-600 dark:text-slate-400 dark:hover:text-violet-400 transition-colors">About</a></li>
+        <li><a href="#skills" class="nav-link text-slate-500 hover:text-violet-600 dark:text-slate-400 dark:hover:text-violet-400 transition-colors">Skills</a></li>
+        <li><a href="#projects" class="nav-link text-slate-500 hover:text-violet-600 dark:text-slate-400 dark:hover:text-violet-400 transition-colors">Projects</a></li>
+        <li><a href="#experience" class="nav-link text-slate-500 hover:text-violet-600 dark:text-slate-400 dark:hover:text-violet-400 transition-colors">Experience</a></li>
+        <li><a href="#achievements" class="nav-link text-slate-500 hover:text-violet-600 dark:text-slate-400 dark:hover:text-violet-400 transition-colors">Achievements</a></li>
+        <li><a href="#contact" class="nav-link text-slate-500 hover:text-violet-600 dark:text-slate-400 dark:hover:text-violet-400 transition-colors">Contact</a></li>
+      </ul>
+
+      <div class="flex items-center gap-3">
+        <!-- Dark mode toggle -->
+        <button id="themeToggle" aria-label="Toggle dark mode"
+          class="w-9 h-9 rounded-xl flex items-center justify-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-violet-400 transition-all">
+          <span id="themeIcon" class="text-base">🌙</span>
+        </button>
+
+        <!-- Mobile menu -->
+        <button id="mobileMenuBtn" aria-label="Open menu"
+          class="md:hidden w-9 h-9 rounded-xl flex flex-col items-center justify-center gap-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+          <span class="w-4.5 h-0.5 bg-slate-700 dark:bg-slate-300 rounded block w-[18px]"></span>
+          <span class="w-4.5 h-0.5 bg-slate-700 dark:bg-slate-300 rounded block w-[18px]"></span>
+          <span class="w-4.5 h-0.5 bg-slate-700 dark:bg-slate-300 rounded block w-[14px]"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile dropdown -->
+    <div id="mobileMenu" class="hidden md:hidden bg-white dark:bg-[#0F0F1A] border-t border-slate-100 dark:border-slate-800 px-5 py-4">
+      <ul class="flex flex-col gap-4 text-sm font-medium">
+        <li><a href="#about" class="nav-link text-slate-600 dark:text-slate-300" onclick="closeMobile()">About</a></li>
+        <li><a href="#skills" class="nav-link text-slate-600 dark:text-slate-300" onclick="closeMobile()">Skills</a></li>
+        <li><a href="#projects" class="nav-link text-slate-600 dark:text-slate-300" onclick="closeMobile()">Projects</a></li>
+        <li><a href="#experience" class="nav-link text-slate-600 dark:text-slate-300" onclick="closeMobile()">Experience</a></li>
+        <li><a href="#achievements" class="nav-link text-slate-600 dark:text-slate-300" onclick="closeMobile()">Achievements</a></li>
+        <li><a href="#contact" class="nav-link text-slate-600 dark:text-slate-300" onclick="closeMobile()">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ░░ HERO ░░ -->
+  <section id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden hero-bg">
+    <!-- Dot grid layer -->
+    <div class="absolute inset-0 dot-grid opacity-40 pointer-events-none"></div>
+
+    <!-- Decorative orbs -->
+    <div class="absolute top-24 left-8 w-64 h-64 rounded-full bg-violet-600/10 blur-3xl pointer-events-none animate-glow-pulse"></div>
+    <div class="absolute bottom-20 right-8 w-80 h-80 rounded-full bg-sky-500/10 blur-3xl pointer-events-none animate-glow-pulse" style="animation-delay:1.5s"></div>
+
+    <div class="relative z-10 max-w-4xl mx-auto px-5 pt-28 pb-20 text-center">
+      <!-- Badge -->
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-violet-400/30 bg-violet-500/10 text-violet-600 dark:text-violet-300 text-xs font-mono tracking-widest mb-8 reveal visible">
+        <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+        OPEN TO WORK · AI ENGINEER
+      </div>
+
+      <!-- Name -->
+      <h1 class="text-5xl sm:text-6xl md:text-7xl font-bold leading-tight mb-4 reveal visible" style="transition-delay:0.1s">
+        <span class="text-slate-800 dark:text-white">Nidhi</span>
+        <span class="grad-text"> Singh</span>
+      </h1>
+
+      <!-- Typing subtitle -->
+      <p class="text-lg sm:text-xl md:text-2xl font-medium text-slate-500 dark:text-slate-400 mb-8 h-8 reveal visible" style="transition-delay:0.2s">
+        <span id="typed-text" class="font-mono text-violet-600 dark:text-violet-400"></span><span id="typed-cursor" class="font-mono text-violet-600 dark:text-violet-400">|</span>
+      </p>
+
+      <!-- Tagline -->
+      <p class="max-w-xl mx-auto text-slate-500 dark:text-slate-400 text-base md:text-lg leading-relaxed mb-10 reveal visible" style="transition-delay:0.3s">
+        Building autonomous AI agents, production-grade RAG systems, and LLM-powered applications — bridging healthcare research with frontier AI engineering.
+      </p>
+
+      <!-- CTA buttons -->
+      <div class="flex flex-wrap items-center justify-center gap-4 mb-14 reveal visible" style="transition-delay:0.4s">
+        <a href="#projects"
+          class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-semibold text-sm shadow-lg shadow-violet-500/30 transition-all hover:-translate-y-0.5">
+          View Projects
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        </a>
+        <a href="#contact"
+          class="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-violet-400/40 hover:border-violet-500 text-violet-600 dark:text-violet-300 font-semibold text-sm transition-all hover:-translate-y-0.5 hover:bg-violet-500/10">
+          Let's Connect
+        </a>
+      </div>
+
+      <!-- Social links -->
+      <div class="flex items-center justify-center gap-5 reveal visible" style="transition-delay:0.5s">
+        <a href="https://linkedin.com/in/nidhisingh9" target="_blank" rel="noopener"
+          class="group flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-300 transition-colors">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          <span class="text-xs tracking-wide">LinkedIn</span>
+        </a>
+        <span class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
+        <a href="https://github.com/Nidhisingh274" target="_blank" rel="noopener"
+          class="group flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-300 transition-colors">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+          <span class="text-xs tracking-wide">GitHub</span>
+        </a>
+        <span class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
+        <span class="flex items-center gap-2 text-xs text-slate-400 dark:text-slate-500">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          Noida, India
+        </span>
+      </div>
+    </div>
+
+    <!-- Scroll indicator -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-slate-400 animate-bounce">
+      <span class="text-[10px] font-mono tracking-widest">SCROLL</span>
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+    </div>
+  </section>
+
+  <!-- Divider -->
+  <div class="section-div"></div>
+
+  <!-- ░░ ABOUT ░░ -->
+  <section id="about" class="py-20 md:py-28 px-5">
+    <div class="max-w-5xl mx-auto">
+      <div class="grid md:grid-cols-5 gap-12 items-center">
+
+        <!-- Left: avatar block -->
+        <div class="md:col-span-2 flex flex-col items-center md:items-start gap-6 reveal">
+          <!-- Avatar placeholder with initials -->
+          <div class="relative">
+            <div class="w-36 h-36 rounded-3xl bg-gradient-to-br from-violet-600 to-sky-500 flex items-center justify-center text-5xl font-bold text-white shadow-2xl shadow-violet-500/30">
+              NS
+            </div>
+            <div class="absolute -bottom-2 -right-2 w-10 h-10 rounded-xl bg-green-400 flex items-center justify-center shadow-lg">
+              <span class="text-white text-lg">🤖</span>
+            </div>
+          </div>
+
+          <!-- Stats row -->
+          <div class="grid grid-cols-2 gap-3 w-full max-w-xs">
+            <div class="rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/50 p-4 text-center">
+              <p class="text-2xl font-bold grad-text">~2</p>
+              <p class="text-xs text-slate-400 mt-0.5">Years Exp.</p>
+            </div>
+            <div class="rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/50 p-4 text-center">
+              <p class="text-2xl font-bold grad-text">30+</p>
+              <p class="text-xs text-slate-400 mt-0.5">Gen AI Apps</p>
+            </div>
+            <div class="rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/50 p-4 text-center">
+              <p class="text-2xl font-bold grad-text">75K</p>
+              <p class="text-xs text-slate-400 mt-0.5">Records/mo</p>
+            </div>
+            <div class="rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/50 p-4 text-center">
+              <p class="text-2xl font-bold grad-text">3</p>
+              <p class="text-xs text-slate-400 mt-0.5">Key Projects</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: text -->
+        <div class="md:col-span-3 reveal" style="transition-delay:0.15s">
+          <p class="text-xs font-mono tracking-widest text-violet-500 dark:text-violet-400 mb-3">// WHO I AM</p>
+          <h2 class="text-3xl md:text-4xl font-bold text-slate-800 dark:text-white mb-5">
+            AI Engineer bridging <span class="grad-text">science</span> and <span class="grad-text">intelligence</span>
+          </h2>
+          <div class="space-y-4 text-slate-600 dark:text-slate-300 text-base leading-relaxed">
+            <p>
+              With ~2 years of experience, I design and ship production-grade Generative AI systems — from autonomous multi-agent pipelines to retrieval-augmented knowledge bases. I've built 30+ Gen AI applications leveraging Agentic workflows, RAG pipelines, and LLMs.
+            </p>
+            <p>
+              My background is unusual: an Integrated B.Tech + M.Tech in Biotechnology from Gautam Buddha University, followed by frontline healthcare data work during COVID-19 at ICMR. That intersection of rigorous research discipline and domain expertise in healthcare informs how I approach AI engineering — systematic, evidence-driven, and impact-focused.
+            </p>
+            <p>
+              I'm drawn to problems where AI can genuinely automate reasoning: agents that search, synthesize, and act — not just generate text.
+            </p>
+          </div>
+
+          <!-- Interest tags -->
+          <div class="flex flex-wrap gap-2 mt-6">
+            <span class="px-3 py-1 rounded-full text-xs font-medium bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-800">Agentic AI</span>
+            <span class="px-3 py-1 rounded-full text-xs font-medium bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">RAG Systems</span>
+            <span class="px-3 py-1 rounded-full text-xs font-medium bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-800">LLM Engineering</span>
+            <span class="px-3 py-1 rounded-full text-xs font-medium bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">Healthcare AI</span>
+            <span class="px-3 py-1 rounded-full text-xs font-medium bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-800">Research</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-div mx-10 md:mx-auto max-w-5xl"></div>
+
+  <!-- ░░ SKILLS ░░ -->
+  <section id="skills" class="py-20 md:py-28 px-5">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-14 reveal">
+        <p class="text-xs font-mono tracking-widest text-violet-500 dark:text-violet-400 mb-2">// TECH STACK</p>
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-800 dark:text-white">Skills &amp; Technologies</h2>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6">
+
+        <!-- AI / LLMs -->
+        <div class="glow-card rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 p-6 reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 rounded-xl bg-violet-100 dark:bg-violet-900/50 flex items-center justify-center text-xl">🤖</div>
+            <h3 class="font-semibold text-slate-700 dark:text-slate-200">AI / LLM Engineering</h3>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <span class="skill-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-violet-600 text-white shadow-sm">LangChain</span>
+            <span class="skill-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-violet-600 text-white shadow-sm">LangGraph</span>
+            <span class="skill-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-violet-700 text-white shadow-sm">Agentic AI</span>
+            <span class="skill-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-sky-600 text-white shadow-sm">RAG</span>
+            <span class="skill-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-sky-600 text-white shadow-sm">LLMs</span>
+            <span class="skill-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-violet-500 text-white shadow-sm">Prompt Engineering</span>
+            <span class="skill-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-sky-700 text-white shadow-sm">OpenAI API</span>
+            <span class="skill-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-violet-600 text-white shadow-sm">Groq</span>
+          </div>
+        </div>
+
+        <!-- Models & Infrastructure -->
+        <div class="glow-card rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 p-6 reveal" style="transition-delay:0.1s">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 rounded-xl bg-sky-100 dark:bg-sky-900/50 flex items-center justify-center text-xl">🧠</div>
+            <h3 class="font-semibold text-slate-700 dark:text-slate-200">Models &amp; Infrastructure</h3>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <span class="skill-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-sky-600 text-white shadow-sm">Hugging Face</span>
+            <span class="skill-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-violet-600 text-white shadow-sm">FAISS</span>
+            <span class="skill-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-sky-700 text-white shadow-sm">Ollama</span>
+            <span class="skill-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-violet-500 text-white shadow-sm">FastAPI</span>
+            <span class="skill-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-sky-600 text-white shadow-sm">Langsmith</span>
+            <span class="skill-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-violet-700 text-white shadow-sm">Vector DBs</span>
+            <span class="skill-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-sky-500 text-white shadow-sm">Embeddings</span>
+          </div>
+        </div>
+
+        <!-- Core & Data -->
+        <div class="glow-card rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 p-6 reveal" style="transition-delay:0.2s">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 rounded-xl bg-violet-100 dark:bg-violet-900/50 flex items-center justify-center text-xl">⚙️</div>
+            <h3 class="font-semibold text-slate-700 dark:text-slate-200">Core &amp; Data</h3>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <span class="skill-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-violet-600 text-white shadow-sm">Python</span>
+            <span class="skill-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-sky-600 text-white shadow-sm">Machine Learning</span>
+            <span class="skill-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-violet-500 text-white shadow-sm">MySQL</span>
+            <span class="skill-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-sky-700 text-white shadow-sm">Statistics</span>
+            <span class="skill-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-violet-600 text-white shadow-sm">Analytical Thinking</span>
+            <span class="skill-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-sky-600 text-white shadow-sm">VS Code</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-div mx-10 md:mx-auto max-w-5xl"></div>
+
+  <!-- ░░ PROJECTS ░░ -->
+  <section id="projects" class="py-20 md:py-28 px-5">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-14 reveal">
+        <p class="text-xs font-mono tracking-widest text-violet-500 dark:text-violet-400 mb-2">// PORTFOLIO</p>
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-800 dark:text-white">Projects</h2>
+        <p class="mt-3 text-slate-500 dark:text-slate-400 text-sm max-w-md mx-auto">End-to-end AI systems built to solve real problems — not just demos.</p>
+      </div>
+
+      <div class="grid md:grid-cols-1 gap-6 lg:gap-8">
+
+        <!-- Project 1 -->
+        <div class="glow-card group rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 p-6 md:p-8 reveal">
+          <div class="flex flex-col md:flex-row md:items-start gap-5">
+            <!-- Icon -->
+            <div class="w-14 h-14 flex-shrink-0 rounded-2xl bg-gradient-to-br from-violet-600 to-sky-500 flex items-center justify-center text-2xl shadow-lg shadow-violet-500/25">🔬</div>
+            <div class="flex-1">
+              <div class="flex flex-wrap items-center gap-3 mb-2">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-white">Agentic AI Research Assistant</h3>
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-violet-100 dark:bg-violet-900/50 text-violet-600 dark:text-violet-300 border border-violet-200 dark:border-violet-800">FLAGSHIP</span>
+              </div>
+              <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-5">
+                An autonomous AI assistant that reasons across research databases using state-based multi-agent workflows. It independently calls tools — Arxiv for paper retrieval, Wikipedia for concept lookups — synthesizing answers without hand-holding. Built on LangGraph's stateful orchestration, the system demonstrates real agentic behavior: planning, tool selection, and iterative refinement.
+              </p>
+              <div class="flex flex-wrap gap-2">
+                <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-violet-600 text-white">LangChain</span>
+                <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-violet-700 text-white">LangGraph</span>
+                <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-sky-600 text-white">Groq LLM</span>
+                <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-sky-700 text-white">Arxiv API</span>
+                <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-violet-500 text-white">Wikipedia API</span>
+                <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-sky-500 text-white">Tool Calling</span>
+                <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-violet-600 text-white">Agentic AI</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 2 -->
+        <div class="glow-card group rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 p-6 md:p-8 reveal" style="transition-delay:0.1s">
+          <div class="flex flex-col md:flex-row md:items-start gap-5">
+            <div class="w-14 h-14 flex-shrink-0 rounded-2xl bg-gradient-to-br from-sky-500 to-violet-600 flex items-center justify-center text-2xl shadow-lg shadow-sky-500/25">📄</div>
+            <div class="flex-1">
+              <div class="flex flex-wrap items-center gap-3 mb-2">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-white">RAG Application — LangChain &amp; FAISS</h3>
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-sky-100 dark:bg-sky-900/50 text-sky-600 dark:text-sky-300 border border-sky-200 dark:border-sky-800">RAG SYSTEM</span>
+              </div>
+              <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-5">
+                A production-pattern document intelligence system that ingests PDFs, chunks and embeds content into FAISS vector stores, then answers natural-language queries with contextually grounded responses. Implements the full RAG loop — ingestion, embedding, similarity retrieval, and prompt-based reasoning — using locally-run Ollama models for privacy-safe deployment.
+              </p>
+              <div class="flex flex-wrap gap-2">
+                <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-sky-600 text-white">RAG</span>
+                <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-violet-600 text-white">LangChain</span>
+                <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-sky-700 text-white">FAISS</span>
+                <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-violet-500 text-white">Ollama</span>
+                <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-sky-600 text-white">Embeddings</span>
+                <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-violet-700 text-white">Retrieval Systems</span>
+                <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-sky-500 text-white">Python</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 3 -->
+        <div class="glow-card group rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 p-6 md:p-8 reveal" style="transition-delay:0.2s">
+          <div class="flex flex-col md:flex-row md:items-start gap-5">
+            <div class="w-14 h-14 flex-shrink-0 rounded-2xl bg-gradient-to-br from-violet-500 to-sky-600 flex items-center justify-center text-2xl shadow-lg shadow-violet-500/25">💬</div>
+            <div class="flex-1">
+              <div class="flex flex-wrap items-center gap-3 mb-2">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-white">AI Chatbot — LangChain &amp; OpenAI</h3>
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-violet-100 dark:bg-violet-900/50 text-violet-600 dark:text-violet-300 border border-violet-200 dark:border-violet-800">CONVERSATIONAL AI</span>
+              </div>
+              <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-5">
+                A production-oriented conversational AI assistant with structured output parsing, custom prompt templates, and end-to-end LLM chain construction. Integrates Langsmith for full observability — tracing, monitoring, and performance tracking across LLM calls. Demonstrates clean software engineering practices: secure API management, modular chain design, and structured data extraction from model responses.
+              </p>
+              <div class="flex flex-wrap gap-2">
+                <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-violet-600 text-white">LangChain</span>
+                <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-sky-600 text-white">OpenAI</span>
+                <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-violet-500 text-white">Langsmith</span>
+                <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-sky-700 text-white">Prompt Engineering</span>
+                <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-violet-700 text-white">Output Parsing</span>
+                <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-sky-500 text-white">LLM Chain</span>
+                <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-violet-600 text-white">Python</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="section-div mx-10 md:mx-auto max-w-5xl"></div>
+
+  <!-- ░░ EXPERIENCE ░░ -->
+  <section id="experience" class="py-20 md:py-28 px-5">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-14 reveal">
+        <p class="text-xs font-mono tracking-widest text-violet-500 dark:text-violet-400 mb-2">// WORK HISTORY</p>
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-800 dark:text-white">Experience</h2>
+      </div>
+
+      <div class="relative">
+        <!-- Timeline line -->
+        <div class="hidden md:block absolute left-[140px] top-4 bottom-4 w-px timeline-line opacity-30"></div>
+
+        <div class="space-y-8">
+
+          <!-- Entry 1 -->
+          <div class="flex flex-col md:flex-row gap-5 reveal">
+            <div class="md:w-32 flex-shrink-0 text-right">
+              <span class="inline-block text-xs font-mono text-slate-400 dark:text-slate-500 whitespace-nowrap">Oct – Nov 2024</span>
+            </div>
+            <div class="md:pl-10 relative">
+              <div class="hidden md:block absolute left-0 top-2 w-3 h-3 rounded-full bg-violet-500 ring-4 ring-violet-500/20" style="left: -6px;"></div>
+              <div class="glow-card rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 p-5">
+                <div class="flex flex-wrap items-start gap-3 mb-2">
+                  <div>
+                    <h3 class="font-bold text-slate-800 dark:text-white">Machine Learning Intern</h3>
+                    <p class="text-sm text-violet-500 dark:text-violet-400 font-medium">Mentorness · Remote</p>
+                  </div>
+                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-violet-100 dark:bg-violet-900/50 text-violet-600 dark:text-violet-300 border border-violet-200 dark:border-violet-800 ml-auto">ML</span>
+                </div>
+                <ul class="space-y-2 text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                  <li class="flex gap-2"><span class="text-violet-400 mt-0.5 flex-shrink-0">▸</span>Built a predictive ML model for customer purchase likelihood using demographic and behavioral data, enabling precision-targeted marketing and improving retention outcomes.</li>
+                  <li class="flex gap-2"><span class="text-sky-400 mt-0.5 flex-shrink-0">▸</span>Developed a stroke-risk prediction model from patient health profiles, supporting early clinical diagnosis and preventive care pathways in a healthcare ML context.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Entry 2 -->
+          <div class="flex flex-col md:flex-row gap-5 reveal" style="transition-delay:0.1s">
+            <div class="md:w-32 flex-shrink-0 text-right">
+              <span class="inline-block text-xs font-mono text-slate-400 dark:text-slate-500 whitespace-nowrap">Jan 2022 – Feb 2023</span>
+            </div>
+            <div class="md:pl-10 relative">
+              <div class="hidden md:block absolute left-0 top-2 w-3 h-3 rounded-full bg-sky-500 ring-4 ring-sky-500/20" style="left: -6px;"></div>
+              <div class="glow-card rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 p-5">
+                <div class="flex flex-wrap items-start gap-3 mb-2">
+                  <div>
+                    <h3 class="font-bold text-slate-800 dark:text-white">Research Assistant</h3>
+                    <p class="text-sm text-sky-500 dark:text-sky-400 font-medium">ICMR · New Delhi, India</p>
+                  </div>
+                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-sky-100 dark:bg-sky-900/50 text-sky-600 dark:text-sky-300 border border-sky-200 dark:border-sky-800 ml-auto">Research</span>
+                </div>
+                <ul class="space-y-2 text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                  <li class="flex gap-2"><span class="text-violet-400 mt-0.5 flex-shrink-0">▸</span>Constructed and validated analytical graphs for ~500 healthcare records monthly, identifying critical medical data trends and ensuring output accuracy for government health projects.</li>
+                  <li class="flex gap-2"><span class="text-sky-400 mt-0.5 flex-shrink-0">▸</span>Conducted primary and secondary research aligned with national healthcare project mandates; applied statistical methods to generate evidence-based insights and improve project accuracy.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Entry 3 -->
+          <div class="flex flex-col md:flex-row gap-5 reveal" style="transition-delay:0.2s">
+            <div class="md:w-32 flex-shrink-0 text-right">
+              <span class="inline-block text-xs font-mono text-slate-400 dark:text-slate-500 whitespace-nowrap">Apr – Dec 2021</span>
+            </div>
+            <div class="md:pl-10 relative">
+              <div class="hidden md:block absolute left-0 top-2 w-3 h-3 rounded-full bg-violet-600 ring-4 ring-violet-600/20" style="left: -6px;"></div>
+              <div class="glow-card rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 p-5">
+                <div class="flex flex-wrap items-start gap-3 mb-2">
+                  <div>
+                    <h3 class="font-bold text-slate-800 dark:text-white">Contract Technician</h3>
+                    <p class="text-sm text-violet-500 dark:text-violet-400 font-medium">ICMR-NICPR · Noida, India</p>
+                  </div>
+                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800 ml-auto">🏅 Corona Warrior</span>
+                </div>
+                <ul class="space-y-2 text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                  <li class="flex gap-2"><span class="text-violet-400 mt-0.5 flex-shrink-0">▸</span>Validated 75,000+ diagnostic records monthly during peak COVID-19 operations, ensuring accurate data entry into the national health portal to support pandemic response decision-making.</li>
+                  <li class="flex gap-2"><span class="text-sky-400 mt-0.5 flex-shrink-0">▸</span>Maintained strict data quality and consistency under high-pressure deadlines; recognized as a <strong class="text-slate-600 dark:text-slate-300">Corona Warrior</strong> for exceptional contribution to national health efforts.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-div mx-10 md:mx-auto max-w-5xl"></div>
+
+  <!-- ░░ ACHIEVEMENTS & EDUCATION ░░ -->
+  <section id="achievements" class="py-20 md:py-28 px-5">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-14 reveal">
+        <p class="text-xs font-mono tracking-widest text-violet-500 dark:text-violet-400 mb-2">// MILESTONES</p>
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-800 dark:text-white">Achievements &amp; Education</h2>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6">
+
+        <!-- Certifications -->
+        <div class="reveal">
+          <h3 class="text-sm font-mono text-slate-400 dark:text-slate-500 mb-4 uppercase tracking-widest">Certifications</h3>
+          <div class="space-y-3">
+
+            <div class="glow-card flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50">
+              <div class="w-10 h-10 rounded-xl bg-sky-100 dark:bg-sky-900/50 flex items-center justify-center text-lg flex-shrink-0">📊</div>
+              <div>
+                <p class="font-semibold text-slate-700 dark:text-slate-200 text-sm">Google Data Analytics Professional</p>
+                <p class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Google · Professional Certificate</p>
+              </div>
+              <span class="ml-auto px-2 py-0.5 rounded text-[10px] font-mono bg-sky-100 dark:bg-sky-900/50 text-sky-600 dark:text-sky-300">CERT</span>
+            </div>
+
+            <div class="glow-card flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50">
+              <div class="w-10 h-10 rounded-xl bg-violet-100 dark:bg-violet-900/50 flex items-center justify-center text-lg flex-shrink-0">🔬</div>
+              <div>
+                <p class="font-semibold text-slate-700 dark:text-slate-200 text-sm">Data Science Bootcamp</p>
+                <p class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Intensive program · Data Science</p>
+              </div>
+              <span class="ml-auto px-2 py-0.5 rounded text-[10px] font-mono bg-violet-100 dark:bg-violet-900/50 text-violet-600 dark:text-violet-300">CERT</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Achievements -->
+        <div class="reveal" style="transition-delay:0.1s">
+          <h3 class="text-sm font-mono text-slate-400 dark:text-slate-500 mb-4 uppercase tracking-widest">Recognition</h3>
+          <div class="space-y-3">
+
+            <div class="glow-card flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50">
+              <div class="w-10 h-10 rounded-xl bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center text-lg flex-shrink-0">🏅</div>
+              <div>
+                <p class="font-semibold text-slate-700 dark:text-slate-200 text-sm">Corona Warrior Award</p>
+                <p class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">ICMR-NICPR · National Recognition for COVID-19 efforts</p>
+              </div>
+              <span class="ml-auto px-2 py-0.5 rounded text-[10px] font-mono bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300">AWARD</span>
+            </div>
+
+            <div class="glow-card flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50">
+              <div class="w-10 h-10 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-lg flex-shrink-0">📈</div>
+              <div>
+                <p class="font-semibold text-slate-700 dark:text-slate-200 text-sm">30+ Gen AI Applications Built</p>
+                <p class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Spanning Agentic AI, RAG, and LLM-powered tools</p>
+              </div>
+              <span class="ml-auto px-2 py-0.5 rounded text-[10px] font-mono bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300">MILESTONE</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Education -->
+        <div class="md:col-span-2 reveal" style="transition-delay:0.2s">
+          <h3 class="text-sm font-mono text-slate-400 dark:text-slate-500 mb-4 uppercase tracking-widest">Education</h3>
+          <div class="glow-card flex flex-col md:flex-row md:items-center gap-5 p-6 rounded-2xl bg-gradient-to-r from-violet-600/10 to-sky-600/10 border border-violet-200/40 dark:border-violet-800/40">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-600 to-sky-500 flex items-center justify-center text-2xl flex-shrink-0 shadow-lg">🎓</div>
+            <div class="flex-1">
+              <h4 class="font-bold text-slate-800 dark:text-white text-base">Integrated Dual Degree — B.Tech + M.Tech in Biotechnology</h4>
+              <p class="text-violet-600 dark:text-violet-400 font-medium text-sm mt-0.5">Gautam Buddha University, Greater Noida</p>
+              <p class="text-slate-400 text-xs mt-1 font-mono">2016 – 2021</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-violet-100 dark:bg-violet-900/50 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-800">Biotechnology</span>
+              <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-sky-100 dark:bg-sky-900/50 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">Research</span>
+              <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-violet-100 dark:bg-violet-900/50 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-800">Dual Degree</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="section-div mx-10 md:mx-auto max-w-5xl"></div>
+
+  <!-- ░░ CONTACT ░░ -->
+  <section id="contact" class="py-20 md:py-32 px-5">
+    <div class="max-w-2xl mx-auto text-center reveal">
+      <p class="text-xs font-mono tracking-widest text-violet-500 dark:text-violet-400 mb-3">// GET IN TOUCH</p>
+      <h2 class="text-3xl md:text-4xl font-bold text-slate-800 dark:text-white mb-6">Let's Build Something Together</h2>
+
+      <!-- Exact contact text as specified -->
+      <p class="text-slate-500 dark:text-slate-400 text-base md:text-lg leading-relaxed mb-10">
+        Open to full-time Gen AI, Agentic AI, and AI Engineer roles, as well as research collaborations. Drop me a message on LinkedIn.
+      </p>
+
+      <!-- LinkedIn CTA only -->
+      <a href="https://linkedin.com/in/nidhisingh9" target="_blank" rel="noopener"
+        class="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-violet-600 to-sky-500 hover:from-violet-700 hover:to-sky-600 text-white font-semibold text-base shadow-2xl shadow-violet-500/30 transition-all hover:-translate-y-1 hover:shadow-violet-500/50">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        Message on LinkedIn
+      </a>
+
+      <!-- Location / availability note -->
+      <p class="mt-6 text-xs text-slate-400 dark:text-slate-500 font-mono flex items-center justify-center gap-2">
+        <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+        Available for opportunities · Based in Noida, India
+      </p>
+    </div>
+  </section>
+
+  <!-- ░░ FOOTER ░░ -->
+  <footer class="border-t border-slate-100 dark:border-slate-800 py-8 px-5">
+    <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <p class="text-xs font-mono text-slate-400 dark:text-slate-600">© 2024 Nidhi Singh · Built with intention</p>
+      <div class="flex items-center gap-4">
+        <a href="https://linkedin.com/in/nidhisingh9" target="_blank" rel="noopener" class="text-xs font-mono text-slate-400 hover:text-violet-500 transition-colors">LinkedIn</a>
+        <span class="text-slate-300 dark:text-slate-700">·</span>
+        <a href="https://github.com/Nidhisingh274" target="_blank" rel="noopener" class="text-xs font-mono text-slate-400 hover:text-violet-500 transition-colors">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ░░ SCRIPTS ░░ -->
+  <script>
+    // ── Dark mode ──
+    const html = document.documentElement;
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+
+    function setDark(on) {
+      if (on) {
+        html.classList.add('dark');
+        themeIcon.textContent = '☀️';
+        localStorage.setItem('theme', 'dark');
+      } else {
+        html.classList.remove('dark');
+        themeIcon.textContent = '🌙';
+        localStorage.setItem('theme', 'light');
+      }
+    }
+
+    // Init
+    const saved = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setDark(saved === 'dark' || (!saved && prefersDark));
+
+    themeToggle.addEventListener('click', () => setDark(!html.classList.contains('dark')));
+
+    // ── Mobile menu ──
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    mobileMenuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+    function closeMobile() { mobileMenu.classList.add('hidden'); }
+
+    // ── Navbar scroll effect ──
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 20) {
+        navbar.classList.add('bg-white/80', 'dark:bg-[#0A0A12]/80', 'backdrop-blur-md', 'shadow-sm', 'border-b', 'border-slate-100', 'dark:border-slate-800/60');
+      } else {
+        navbar.classList.remove('bg-white/80', 'dark:bg-[#0A0A12]/80', 'backdrop-blur-md', 'shadow-sm', 'border-b', 'border-slate-100', 'dark:border-slate-800/60');
+      }
+    });
+
+    // ── Active nav ──
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-link');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + entry.target.id) {
+              link.classList.add('active');
+            }
+          });
+        }
+      });
+    }, { rootMargin: '-40% 0px -55% 0px' });
+    sections.forEach(s => observer.observe(s));
+
+    // ── Scroll reveal ──
+    const reveals = document.querySelectorAll('.reveal');
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { rootMargin: '0px 0px -60px 0px' });
+    reveals.forEach(el => revealObserver.observe(el));
+
+    // ── Typing animation ──
+    const phrases = [
+      'AI Engineer',
+      'Agentic AI Builder',
+      'RAG Systems Developer',
+      'LLM Engineer',
+      'GenAI Problem Solver'
+    ];
+    let phraseIdx = 0, charIdx = 0, deleting = false;
+    const typedText = document.getElementById('typed-text');
+
+    function type() {
+      const current = phrases[phraseIdx];
+      if (!deleting) {
+        typedText.textContent = current.slice(0, ++charIdx);
+        if (charIdx === current.length) {
+          deleting = true;
+          setTimeout(type, 1800);
+          return;
+        }
+      } else {
+        typedText.textContent = current.slice(0, --charIdx);
+        if (charIdx === 0) {
+          deleting = false;
+          phraseIdx = (phraseIdx + 1) % phrases.length;
+        }
+      }
+      setTimeout(type, deleting ? 55 : 90);
+    }
+    type();
+
+    // ── Smooth scroll for anchor links ──
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
