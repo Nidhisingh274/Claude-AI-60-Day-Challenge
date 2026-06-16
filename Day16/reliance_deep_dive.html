@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Reliance Industries — Deep Dive</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d2e;
+    --border: #2a2d3e;
+    --accent: #6366f1;
+    --accent2: #22d3ee;
+    --green: #22c55e;
+    --red: #ef4444;
+    --yellow: #f59e0b;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --header-h: 64px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+
+  /* ── Header ── */
+  .header {
+    background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: flex-start;
+    flex-wrap: wrap; gap: 16px;
+  }
+  .header-left h1 { font-size: 1.8rem; font-weight: 700; color: #fff; }
+  .header-left p { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
+  .header-right { text-align: right; }
+  .cmp { font-size: 2rem; font-weight: 800; color: var(--accent2); }
+  .cmp-sub { font-size: 0.8rem; color: var(--muted); }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; margin-top: 6px; }
+  .badge-red { background: rgba(239,68,68,0.2); color: var(--red); border: 1px solid rgba(239,68,68,0.4); }
+  .badge-yellow { background: rgba(245,158,11,0.2); color: var(--yellow); border: 1px solid rgba(245,158,11,0.4); }
+  .badge-green { background: rgba(34,197,94,0.2); color: var(--green); border: 1px solid rgba(34,197,94,0.4); }
+
+  /* ── Tabs ── */
+  .tabs { display: flex; gap: 0; background: var(--card); border-bottom: 1px solid var(--border); overflow-x: auto; padding: 0 16px; }
+  .tab-btn {
+    padding: 14px 18px; border: none; background: transparent; color: var(--muted);
+    font-size: 0.85rem; font-weight: 600; cursor: pointer; white-space: nowrap;
+    border-bottom: 2px solid transparent; transition: all 0.2s;
+  }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-btn:hover:not(.active) { color: var(--text); }
+
+  /* ── Content ── */
+  .tab-content { display: none; padding: 28px 32px; max-width: 1100px; margin: 0 auto; }
+  .tab-content.active { display: block; }
+
+  /* ── Cards / Grid ── */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .card h3 { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  .card .val { font-size: 1.5rem; font-weight: 700; color: var(--text); }
+  .card .sub { font-size: 0.75rem; color: var(--muted); margin-top: 4px; }
+
+  .section-title { font-size: 1rem; font-weight: 700; color: var(--accent); margin: 24px 0 12px; border-left: 3px solid var(--accent); padding-left: 10px; }
+
+  /* ── Metric rows ── */
+  .metric-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .metric-row:last-child { border-bottom: none; }
+  .metric-label { color: var(--muted); font-size: 0.85rem; }
+  .metric-value { font-weight: 600; font-size: 0.9rem; }
+  .up { color: var(--green); }
+  .down { color: var(--red); }
+  .neutral { color: var(--yellow); }
+
+  /* ── Chart bars ── */
+  .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 120px; padding-top: 8px; }
+  .bar-wrap { display: flex; flex-direction: column; align-items: center; flex: 1; gap: 4px; height: 100%; justify-content: flex-end; }
+  .bar { width: 100%; border-radius: 4px 4px 0 0; transition: all 0.3s; }
+  .bar-label { font-size: 0.65rem; color: var(--muted); text-align: center; }
+  .bar-val { font-size: 0.65rem; color: var(--text); font-weight: 600; text-align: center; }
+
+  /* ── Peer table ── */
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 8px; }
+  th { background: #1e2235; color: var(--muted); padding: 10px 12px; text-align: left; font-weight: 600; }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  tr:hover td { background: rgba(99,102,241,0.05); }
+  .highlight td { background: rgba(99,102,241,0.1); font-weight: 600; }
+
+  /* ── Ownership doughnut (CSS only) ── */
+  .ownership-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; }
+  .donut-wrap { position: relative; width: 170px; height: 170px; margin: 0 auto; }
+  .donut-wrap svg { transform: rotate(-90deg); }
+  .donut-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; }
+  .donut-center .big { font-size: 1.4rem; font-weight: 700; }
+  .donut-center .sm { font-size: 0.7rem; color: var(--muted); }
+  .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  /* ── Segment bars ── */
+  .seg-row { margin-bottom: 12px; }
+  .seg-header { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 4px; }
+  .seg-bar-bg { background: var(--border); border-radius: 4px; height: 8px; }
+  .seg-bar-fill { height: 8px; border-radius: 4px; }
+
+  /* ── Strengths / Risks ── */
+  .point { display: flex; gap: 10px; margin-bottom: 12px; }
+  .point-icon { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0; margin-top: 1px; }
+  .icon-green { background: rgba(34,197,94,0.2); color: var(--green); }
+  .icon-red { background: rgba(239,68,68,0.2); color: var(--red); }
+  .point-text { font-size: 0.85rem; line-height: 1.5; }
+  .point-title { font-weight: 600; }
+  .point-desc { color: var(--muted); }
+
+  .quality-box { background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(34,211,238,0.08)); border: 1px solid rgba(99,102,241,0.3); border-radius: 12px; padding: 20px; margin-top: 20px; }
+  .quality-box h3 { color: var(--accent); font-size: 0.85rem; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .quality-label { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; }
+  .quality-box p { color: var(--muted); font-size: 0.85rem; line-height: 1.6; }
+
+  .disclaimer { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); border-radius: 8px; padding: 14px; margin-top: 24px; font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
+
+  /* ── Price Chart (SVG sparkline) ── */
+  .spark-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .spark-title { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.05em; }
+
+  @media (max-width: 680px) {
+    .grid2, .grid3, .grid4 { grid-template-columns: 1fr 1fr; }
+    .tab-content { padding: 16px; }
+    .tabs { padding: 0 8px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<div class="header">
+  <div class="header-left">
+    <h1>🔵 Reliance Industries Ltd</h1>
+    <p>NSE: RELIANCE &nbsp;|&nbsp; BSE: 500325 &nbsp;|&nbsp; ISIN: INE002A01018 &nbsp;|&nbsp; Large Cap · Conglomerate</p>
+    <p style="margin-top:6px; color:#64748b; font-size:0.78rem;">Data as of June 16, 2026 &nbsp;|&nbsp; FY26 Annual Results (April 24, 2026)</p>
+  </div>
+  <div class="header-right">
+    <div class="cmp">₹1,331</div>
+    <div class="cmp-sub">CMP (NSE) &nbsp;|&nbsp; Face Value ₹10</div>
+    <span class="badge badge-red">↓ 9.1% (1Y)</span>
+    &nbsp;
+    <span class="badge badge-yellow">52W: ₹1,253 – ₹1,612</span>
+  </div>
+</div>
+
+<!-- ═══ TABS ═══ -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('snapshot')">📊 Snapshot</button>
+  <button class="tab-btn" onclick="showTab('valuation')">💰 Valuation</button>
+  <button class="tab-btn" onclick="showTab('growth')">📈 Growth</button>
+  <button class="tab-btn" onclick="showTab('health')">🏥 Health</button>
+  <button class="tab-btn" onclick="showTab('returns')">🔄 Returns</button>
+  <button class="tab-btn" onclick="showTab('peers')">🏆 Peers</button>
+  <button class="tab-btn" onclick="showTab('ownership')">👥 Ownership</button>
+  <button class="tab-btn" onclick="showTab('view')">🔍 View</button>
+</div>
+
+<!-- ════════════════════════════════════════
+     TAB 1 — SNAPSHOT
+════════════════════════════════════════ -->
+<div id="snapshot" class="tab-content active">
+
+  <div class="grid4" style="margin-bottom:20px">
+    <div class="card">
+      <h3>Market Cap</h3>
+      <div class="val">₹17.7L Cr</div>
+      <div class="sub">~USD 207B · India #1</div>
+    </div>
+    <div class="card">
+      <h3>P/E Ratio</h3>
+      <div class="val" style="color:var(--yellow)">40.3×</div>
+      <div class="sub">Industry avg ~17–18×</div>
+    </div>
+    <div class="card">
+      <h3>EPS (FY26)</h3>
+      <div class="val" style="color:var(--green)">₹59.69</div>
+      <div class="sub">+16% YoY from ₹51.47</div>
+    </div>
+    <div class="card">
+      <h3>Dividend (FY26)</h3>
+      <div class="val">₹6/share</div>
+      <div class="sub">Yield ~0.45% · Payout ~10%</div>
+    </div>
+  </div>
+
+  <div class="section-title">Business Overview</div>
+  <div class="card" style="margin-bottom:20px">
+    <p style="font-size:0.88rem; line-height:1.75; color:var(--muted)">
+      Reliance Industries Limited (RIL) is India's largest conglomerate by revenue and market cap. Founded by Dhirubhai Ambani in 1958 and incorporated in 1973, it operates across <strong style="color:var(--text)">five key verticals</strong>: 
+      <strong style="color:var(--accent2)">Oil-to-Chemicals (O2C)</strong> — the world's largest refinery complex at Jamnagar; 
+      <strong style="color:var(--accent2)">Digital Services (Jio)</strong> — 524M+ subscribers, India's largest telecom;
+      <strong style="color:var(--accent2)">Retail</strong> — India's largest retailer (₹3.7L Cr revenue);
+      <strong style="color:var(--accent2)">Media & Entertainment</strong> — via JioStar (Disney Hotstar merger);
+      and <strong style="color:var(--accent2)">Oil & Gas E&P</strong>. 
+      In FY26, consumer businesses (Jio + Retail + Media) contributed <strong style="color:var(--green)">over 55% of consolidated EBITDA for the first time</strong>, marking completion of RIL's transformation from an energy company to a diversified consumer conglomerate.
+    </p>
+  </div>
+
+  <div class="section-title">Segment EBITDA Contribution (FY26 Estimate)</div>
+  <div class="card">
+    <div class="seg-row">
+      <div class="seg-header"><span>Digital Services (Jio)</span><span style="color:var(--accent)">~30%</span></div>
+      <div class="seg-bar-bg"><div class="seg-bar-fill" style="width:30%; background:var(--accent)"></div></div>
+    </div>
+    <div class="seg-row">
+      <div class="seg-header"><span>Retail (Reliance Retail)</span><span style="color:var(--accent2)">~25%</span></div>
+      <div class="seg-bar-bg"><div class="seg-bar-fill" style="width:25%; background:var(--accent2)"></div></div>
+    </div>
+    <div class="seg-row">
+      <div class="seg-header"><span>Oil-to-Chemicals (O2C)</span><span style="color:var(--yellow)">~38%</span></div>
+      <div class="seg-bar-bg"><div class="seg-bar-fill" style="width:38%; background:var(--yellow)"></div></div>
+    </div>
+    <div class="seg-row">
+      <div class="seg-header"><span>Oil & Gas E&P + Media</span><span style="color:var(--green)">~7%</span></div>
+      <div class="seg-bar-bg"><div class="seg-bar-fill" style="width:7%; background:var(--green)"></div></div>
+    </div>
+    <div style="font-size:0.75rem; color:var(--muted); margin-top:12px">Source: DSIJ / Univest FY26 estimates · Total EBITDA ₹2,07,911 Cr</div>
+  </div>
+
+  <div class="section-title">52-Week Price Chart (Illustrative Trend)</div>
+  <div class="spark-wrap">
+    <div class="spark-title">RELIANCE — Approximate Price Journey (Jun 2025 → Jun 2026)</div>
+    <svg viewBox="0 0 700 140" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:140px">
+      <defs>
+        <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#6366f1" stop-opacity="0.4"/>
+          <stop offset="100%" stop-color="#6366f1" stop-opacity="0.0"/>
+        </linearGradient>
+      </defs>
+      <!-- grid lines -->
+      <line x1="0" y1="30" x2="700" y2="30" stroke="#2a2d3e" stroke-width="1"/>
+      <line x1="0" y1="70" x2="700" y2="70" stroke="#2a2d3e" stroke-width="1"/>
+      <line x1="0" y1="110" x2="700" y2="110" stroke="#2a2d3e" stroke-width="1"/>
+      <!-- price labels -->
+      <text x="4" y="28" fill="#64748b" font-size="9">₹1,612</text>
+      <text x="4" y="68" fill="#64748b" font-size="9">₹1,430</text>
+      <text x="4" y="108" fill="#64748b" font-size="9">₹1,253</text>
+      <!-- area fill -->
+      <path d="M60,85 L130,60 L200,50 L270,35 L320,55 L380,75 L440,95 L500,80 L570,100 L640,88" 
+            fill="url(#lg)" stroke="none"/>
+      <!-- line -->
+      <polyline points="60,85 130,60 200,50 270,35 320,55 380,75 440,95 500,80 570,100 640,88"
+        fill="none" stroke="#6366f1" stroke-width="2.5" stroke-linejoin="round"/>
+      <!-- dots -->
+      <circle cx="270" cy="35" r="4" fill="#22d3ee"/>
+      <text x="258" y="26" fill="#22d3ee" font-size="8">52W High</text>
+      <circle cx="570" cy="100" r="4" fill="#ef4444"/>
+      <text x="558" y="118" fill="#ef4444" font-size="8">52W Low</text>
+      <circle cx="640" cy="88" r="5" fill="#6366f1"/>
+      <text x="630" y="82" fill="#6366f1" font-size="8">CMP</text>
+      <!-- x labels -->
+      <text x="50" y="132" fill="#64748b" font-size="8">Jun'25</text>
+      <text x="180" y="132" fill="#64748b" font-size="8">Sep'25</text>
+      <text x="310" y="132" fill="#64748b" font-size="8">Dec'25</text>
+      <text x="450" y="132" fill="#64748b" font-size="8">Mar'26</text>
+      <text x="600" y="132" fill="#64748b" font-size="8">Jun'26</text>
+    </svg>
+    <div style="font-size:0.72rem; color:var(--muted); margin-top:6px">📌 Approximate trend only. 52W High ₹1,611.80 · 52W Low ₹1,253.20. CMP ₹1,331 as of 16 Jun 2026. Source: Kotak Neo / INDmoney</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     TAB 2 — VALUATION
+════════════════════════════════════════ -->
+<div id="valuation" class="tab-content">
+
+  <div class="grid4" style="margin-bottom:20px">
+    <div class="card">
+      <h3>P/E (TTM)</h3>
+      <div class="val" style="color:var(--yellow)">40.3×</div>
+      <div class="sub">Industry ~17–18×; Expensive vs sector</div>
+    </div>
+    <div class="card">
+      <h3>P/B (Book Value ₹668)</h3>
+      <div class="val" style="color:var(--yellow)">~2.0×</div>
+      <div class="sub">Fair for quality conglomerate</div>
+    </div>
+    <div class="card">
+      <h3>EV/EBITDA</h3>
+      <div class="val">~11.5×</div>
+      <div class="sub">Historical avg ~12×; Near fair</div>
+    </div>
+    <div class="card">
+      <h3>Dividend Yield</h3>
+      <div class="val">~0.45%</div>
+      <div class="sub">₹6/share FY26; Low payout</div>
+    </div>
+  </div>
+
+  <div class="section-title">Valuation Assessment</div>
+  <div class="card">
+    <div class="metric-row">
+      <span class="metric-label">P/E vs Industry (17–18×)</span>
+      <span class="metric-value down">Expensive (40.3× vs 17–18×)</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-label">P/E vs 5-Year Historical Avg (~25–30×)</span>
+      <span class="metric-value neutral">Above average but EPS growing</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-label">EV/EBITDA vs historical avg (~12×)</span>
+      <span class="metric-value neutral">~11.5× — Near fair / slight discount</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-label">P/B vs asset-heavy peers</span>
+      <span class="metric-value neutral">~2× — Reasonable for quality</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-label">Conglomerate premium</span>
+      <span class="metric-value up">Historically commands 30–40% premium</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-label">Jio IPO optionality</span>
+      <span class="metric-value up">Mid-2026 IPO expected; unlocks hidden value</span>
+    </div>
+  </div>
+
+  <div class="section-title">Valuation Verdict</div>
+  <div class="card" style="background:rgba(245,158,11,0.07); border-color:rgba(245,158,11,0.3)">
+    <p style="font-size:0.88rem; line-height:1.7; color:var(--text)">
+      On a simple P/E basis, RIL looks <strong style="color:var(--red)">expensive vs sector peers</strong>. However, the conglomerate structure means each business (Jio alone could be worth ₹6–8L Cr) deserves a sum-of-parts (SOTP) lens. On EV/EBITDA, valuation is closer to fair. The Jio IPO, when it happens, could crystallise significant embedded value. At CMP, the market is pricing in a transformation story — not just current earnings.
+      <br/><br/>
+      <strong>Valuation: FAIR-TO-EXPENSIVE on earnings; FAIR on SOTP basis.</strong>
+    </p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     TAB 3 — GROWTH
+════════════════════════════════════════ -->
+<div id="growth" class="tab-content">
+
+  <div class="section-title">Annual Revenue (₹ Lakh Crore)</div>
+  <div class="card" style="margin-bottom:20px">
+    <div class="bar-chart">
+      <div class="bar-wrap"><div class="bar" style="height:40%; background:#6366f1"></div><div class="bar-val">8.91</div><div class="bar-label">FY23</div></div>
+      <div class="bar-wrap"><div class="bar" style="height:48%; background:#6366f1"></div><div class="bar-val">9.14</div><div class="bar-label">FY24</div></div>
+      <div class="bar-wrap"><div class="bar" style="height:55%; background:#6366f1"></div><div class="bar-val">9.65</div><div class="bar-label">FY25</div></div>
+      <div class="bar-wrap"><div class="bar" style="height:72%; background:#22d3ee"></div><div class="bar-val">11.76</div><div class="bar-label">FY26</div></div>
+    </div>
+    <div style="font-size:0.72rem; color:var(--muted); margin-top:10px">Source: Open The Magazine / Univest · FY26 revenue +9.8% YoY record</div>
+  </div>
+
+  <div class="section-title">Annual PAT (₹ Thousand Crore)</div>
+  <div class="card" style="margin-bottom:20px">
+    <div class="bar-chart">
+      <div class="bar-wrap"><div class="bar" style="height:50%; background:#22c55e"></div><div class="bar-val">73.9</div><div class="bar-label">FY23</div></div>
+      <div class="bar-wrap"><div class="bar" style="height:55%; background:#22c55e"></div><div class="bar-val">79.0</div><div class="bar-label">FY24</div></div>
+      <div class="bar-wrap"><div class="bar" style="height:68%; background:#22c55e"></div><div class="bar-val">81.3</div><div class="bar-label">FY25</div></div>
+      <div class="bar-wrap"><div class="bar" style="height:88%; background:#22d3ee"></div><div class="bar-val">95.8</div><div class="bar-label">FY26</div></div>
+    </div>
+    <div style="font-size:0.72rem; color:var(--muted); margin-top:10px">FY26 PAT ₹95,754 Cr · +17.8% YoY · Record high · Source: Screener / Open The Magazine</div>
+  </div>
+
+  <div class="section-title">Growth Metrics</div>
+  <div class="card">
+    <div class="metric-row"><span class="metric-label">Revenue CAGR (3Y FY23–FY26)</span><span class="metric-value up">~9.6%</span></div>
+    <div class="metric-row"><span class="metric-label">PAT CAGR (3Y FY23–FY26)</span><span class="metric-value up">~9.0%</span></div>
+    <div class="metric-row"><span class="metric-label">EPS FY25 → FY26</span><span class="metric-value up">₹51.47 → ₹59.69 (+16%)</span></div>
+    <div class="metric-row"><span class="metric-label">EBITDA Growth FY26</span><span class="metric-value up">+13.4% YoY to ₹2,07,911 Cr</span></div>
+    <div class="metric-row"><span class="metric-label">Jio Revenue Run-rate (annualized)</span><span class="metric-value up">~₹1.72L Cr · Double-digit growth</span></div>
+    <div class="metric-row"><span class="metric-label">Retail Gross Revenue FY26</span><span class="metric-value up">₹3.70L Cr · India's largest retailer</span></div>
+    <div class="metric-row"><span class="metric-label">Q4 FY26 Revenue Growth (YoY)</span><span class="metric-value up">+12.9%</span></div>
+    <div class="metric-row"><span class="metric-label">Q4 FY26 PAT Growth (YoY)</span><span class="metric-value down">-12.6% (energy segment drag)</span></div>
+    <div class="metric-row"><span class="metric-label">Sales Growth 5Y CAGR</span><span class="metric-value up">~9.6% (Screener data)</span></div>
+    <div class="metric-row"><span class="metric-label">Profit 5Y CAGR</span><span class="metric-value neutral">~12% (TradingView estimate)</span></div>
+  </div>
+
+  <div class="section-title">Jio Subscriber Growth</div>
+  <div class="card">
+    <div class="bar-chart">
+      <div class="bar-wrap"><div class="bar" style="height:55%; background:#6366f1"></div><div class="bar-val">448M</div><div class="bar-label">FY23</div></div>
+      <div class="bar-wrap"><div class="bar" style="height:64%; background:#6366f1"></div><div class="bar-val">481M</div><div class="bar-label">FY24</div></div>
+      <div class="bar-wrap"><div class="bar" style="height:74%; background:#6366f1"></div><div class="bar-val">499M</div><div class="bar-label">FY25</div></div>
+      <div class="bar-wrap"><div class="bar" style="height:88%; background:#22d3ee"></div><div class="bar-val">524M</div><div class="bar-label">FY26</div></div>
+    </div>
+    <div style="font-size:0.72rem; color:var(--muted); margin-top:10px">Source: DSIJ Q4 FY26 · Jio added 9.1M subs in Q4 FY26</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     TAB 4 — HEALTH
+════════════════════════════════════════ -->
+<div id="health" class="tab-content">
+
+  <div class="grid2" style="margin-bottom:20px">
+    <div class="card">
+      <h3>Gross Debt (Mar 2026)</h3>
+      <div class="val" style="color:var(--red)">₹3,74,421 Cr</div>
+      <div class="sub">USD 39.5B · High absolute level</div>
+    </div>
+    <div class="card">
+      <h3>Net Debt (Mar 2026)</h3>
+      <div class="val" style="color:var(--yellow)">₹1,24,717 Cr</div>
+      <div class="sub">Net D/EBITDA = 0.60× (comfortable)</div>
+    </div>
+    <div class="card">
+      <h3>Cash & Equivalents</h3>
+      <div class="val" style="color:var(--green)">₹1,45,977 Cr</div>
+      <div class="sub">+37% YoY; Strong liquidity buffer</div>
+    </div>
+    <div class="card">
+      <h3>Total Assets (FY26)</h3>
+      <div class="val">₹21.78L Cr</div>
+      <div class="sub">Up from ₹19.50L Cr (+11.7%)</div>
+    </div>
+  </div>
+
+  <div class="section-title">Balance Sheet Health Metrics</div>
+  <div class="card" style="margin-bottom:20px">
+    <div class="metric-row"><span class="metric-label">Debt-to-Equity (D/E)</span><span class="metric-value neutral">~0.44 — Safe (&lt;1)</span></div>
+    <div class="metric-row"><span class="metric-label">Net Debt / EBITDA</span><span class="metric-value up">0.60× — Very Healthy</span></div>
+    <div class="metric-row"><span class="metric-label">Interest Coverage</span><span class="metric-value up">&gt;3× — Comfortable</span></div>
+    <div class="metric-row"><span class="metric-label">Current Ratio</span><span class="metric-value neutral">Watch (large capex cycle)</span></div>
+    <div class="metric-row"><span class="metric-label">FY26 Capex</span><span class="metric-value neutral">₹1,44,271 Cr (elevated)</span></div>
+    <div class="metric-row"><span class="metric-label">FCF Generation</span><span class="metric-value neutral">Constrained (high capex); expected to improve FY27+</span></div>
+    <div class="metric-row"><span class="metric-label">Promoter Pledging</span><span class="metric-value up">0% — Zero pledge (positive signal)</span></div>
+    <div class="metric-row"><span class="metric-label">Net Profit Margin (FY26)</span><span class="metric-value neutral">~8.1% (₹95,754 Cr on ₹11.76L Cr rev)</span></div>
+    <div class="metric-row"><span class="metric-label">EBITDA Margin (Jio Q4 FY26)</span><span class="metric-value up">52.4% (expanded 230bps YoY)</span></div>
+  </div>
+
+  <div class="section-title">Key Concern: FCF Compression</div>
+  <div class="card" style="background:rgba(239,68,68,0.06); border-color:rgba(239,68,68,0.25)">
+    <p style="font-size:0.85rem; line-height:1.7; color:var(--text)">
+      RIL's high capex (₹1.44L Cr in FY26 vs ₹1.31L Cr in FY25) has been a key reason for free cash flow (FCF) being constrained. This drove significant underperformance in the stock over FY25–FY26. <strong>However</strong>, Motilal Oswal estimates that capex has likely peaked and RIL could generate ~₹1 trillion cumulative FCF over FY24–27, which would be a major re-rating catalyst.
+    </p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     TAB 5 — RETURNS
+════════════════════════════════════════ -->
+<div id="returns" class="tab-content">
+
+  <div class="grid2" style="margin-bottom:20px">
+    <div class="card">
+      <h3>ROE (FY26)</h3>
+      <div class="val" style="color:var(--yellow)">8.8%</div>
+      <div class="sub">3Y avg 8.77% · Declining from 24% peak (FY23)</div>
+    </div>
+    <div class="card">
+      <h3>ROCE (FY26)</h3>
+      <div class="val" style="color:var(--yellow)">9.18%</div>
+      <div class="sub">Below 15% threshold · Equity dilution + capex effect</div>
+    </div>
+  </div>
+
+  <div class="section-title">ROE Trend (Historical)</div>
+  <div class="card" style="margin-bottom:20px">
+    <div class="bar-chart">
+      <div class="bar-wrap"><div class="bar" style="height:85%; background:#22c55e"></div><div class="bar-val">24%</div><div class="bar-label">FY23</div></div>
+      <div class="bar-wrap"><div class="bar" style="height:68%; background:#f59e0b"></div><div class="bar-val">17%</div><div class="bar-label">FY24</div></div>
+      <div class="bar-wrap"><div class="bar" style="height:45%; background:#f59e0b"></div><div class="bar-val">11%</div><div class="bar-label">FY25</div></div>
+      <div class="bar-wrap"><div class="bar" style="height:32%; background:#ef4444"></div><div class="bar-val">8.8%</div><div class="bar-label">FY26</div></div>
+    </div>
+    <div style="font-size:0.72rem; color:var(--muted); margin-top:10px">ROE declining — large equity base + heavy capex investment cycle diluting returns. Source: Macrotrends / Dhan</div>
+  </div>
+
+  <div class="section-title">Price Returns Performance</div>
+  <div class="card">
+    <div class="metric-row"><span class="metric-label">1 Week Return</span><span class="metric-value down">-4.41%</span></div>
+    <div class="metric-row"><span class="metric-label">1 Month Return</span><span class="metric-value down">-11.76%</span></div>
+    <div class="metric-row"><span class="metric-label">3 Month Return</span><span class="metric-value down">-4.01%</span></div>
+    <div class="metric-row"><span class="metric-label">6 Month Return</span><span class="metric-value down">-15.93%</span></div>
+    <div class="metric-row"><span class="metric-label">1 Year Return</span><span class="metric-value down">-9.31%</span></div>
+    <div class="metric-row"><span class="metric-label">3 Year Return</span><span class="metric-value up">+15.84%</span></div>
+    <div class="metric-row"><span class="metric-label">5 Year Return</span><span class="metric-value up">+29.84%</span></div>
+    <div class="metric-row"><span class="metric-label">Dividend Payout Ratio</span><span class="metric-value neutral">~10.2% (low — investing heavily in growth)</span></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     TAB 6 — PEERS
+════════════════════════════════════════ -->
+<div id="peers" class="tab-content">
+  <div class="section-title">Peer Comparison (Indian Large-Cap Energy/Conglomerates)</div>
+  <div class="card" style="overflow-x:auto">
+    <table>
+      <thead>
+        <tr>
+          <th>Company</th>
+          <th>CMP (approx)</th>
+          <th>Mkt Cap</th>
+          <th>P/E</th>
+          <th>ROE</th>
+          <th>ROCE</th>
+          <th>D/E</th>
+          <th>Rev Growth</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="highlight">
+          <td>🔵 Reliance Ind.</td>
+          <td>₹1,331</td>
+          <td>₹17.7L Cr</td>
+          <td style="color:var(--yellow)">40.3×</td>
+          <td style="color:var(--red)">8.8%</td>
+          <td style="color:var(--red)">9.2%</td>
+          <td style="color:var(--green)">0.44</td>
+          <td style="color:var(--green)">+9.8%</td>
+        </tr>
+        <tr>
+          <td>ONGC</td>
+          <td>~₹240</td>
+          <td>~₹3.0L Cr</td>
+          <td style="color:var(--green)">~8×</td>
+          <td style="color:var(--green)">~14%</td>
+          <td style="color:var(--green)">~16%</td>
+          <td style="color:var(--green)">0.1</td>
+          <td style="color:var(--neutral)">~4%</td>
+        </tr>
+        <tr>
+          <td>Indian Oil Corp</td>
+          <td>~₹135</td>
+          <td>~₹1.9L Cr</td>
+          <td style="color:var(--green)">~6×</td>
+          <td style="color:var(--green)">~12%</td>
+          <td style="color:var(--green)">~13%</td>
+          <td style="color:var(--yellow)">0.8</td>
+          <td style="color:var(--neutral)">~3%</td>
+        </tr>
+        <tr>
+          <td>Bharti Airtel</td>
+          <td>~₹1,890</td>
+          <td>~₹11L Cr</td>
+          <td style="color:var(--red)">~55×</td>
+          <td style="color:var(--yellow)">~20%</td>
+          <td style="color:var(--yellow)">~15%</td>
+          <td style="color:var(--yellow)">1.5</td>
+          <td style="color:var(--green)">~15%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="font-size:0.75rem; color:var(--muted); margin-top:10px; padding: 0 4px">⚠️ Peer data approximate. Verify at Screener/Tickertape. Direct P/E comparison to IOC/ONGC is misleading — RIL carries Jio + Retail growth premium. Airtel comparison more relevant for Digital business valuation.</div>
+
+  <div class="section-title">Where RIL Leads vs Peers</div>
+  <div class="grid2">
+    <div class="card">
+      <p style="font-size:0.8rem; font-weight:700; color:var(--green); margin-bottom:8px">✅ RIL Advantages</p>
+      <ul style="font-size:0.82rem; line-height:1.7; padding-left:16px; color:var(--muted)">
+        <li>Diversification across telecom, retail, energy, media</li>
+        <li>Jio — largest telecom with ARPU expansion</li>
+        <li>Zero promoter pledging</li>
+        <li>₹1.46L Cr cash war chest</li>
+        <li>Best-in-class refinery complexity (Jamnagar)</li>
+        <li>Jio IPO optionality — hidden value unlock</li>
+      </ul>
+    </div>
+    <div class="card">
+      <p style="font-size:0.8rem; font-weight:700; color:var(--red); margin-bottom:8px">⚠️ Peer Advantages over RIL</p>
+      <ul style="font-size:0.82rem; line-height:1.7; padding-left:16px; color:var(--muted)">
+        <li>ONGC/IOC: Much cheaper on P/E, better ROE/ROCE</li>
+        <li>Airtel: Higher ROE in core telecom vs Jio</li>
+        <li>PSU OMCs: Higher dividend yield (4–6% vs 0.45%)</li>
+        <li>Simpler business — easier to value</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     TAB 7 — OWNERSHIP
+════════════════════════════════════════ -->
+<div id="ownership" class="tab-content">
+
+  <div class="section-title">Shareholding Pattern (March 2026)</div>
+  <div class="ownership-grid" style="margin-bottom:20px">
+    <div>
+      <div class="donut-wrap">
+        <svg viewBox="0 0 36 36" width="170" height="170">
+          <!-- Promoter 50% -->
+          <circle cx="18" cy="18" r="15.9" fill="none" stroke="#6366f1" stroke-width="3.5" stroke-dasharray="50 50" stroke-dashoffset="0"/>
+          <!-- DII 20.55% -->
+          <circle cx="18" cy="18" r="15.9" fill="none" stroke="#22d3ee" stroke-width="3.5" stroke-dasharray="20.55 79.45" stroke-dashoffset="-50"/>
+          <!-- FII 18.67% -->
+          <circle cx="18" cy="18" r="15.9" fill="none" stroke="#22c55e" stroke-width="3.5" stroke-dasharray="18.67 81.33" stroke-dashoffset="-70.55"/>
+          <!-- Public ~10% -->
+          <circle cx="18" cy="18" r="15.9" fill="none" stroke="#f59e0b" stroke-width="3.5" stroke-dasharray="10 90" stroke-dashoffset="-89.22"/>
+        </svg>
+        <div class="donut-center"><div class="big">50%</div><div class="sm">Promoter</div></div>
+      </div>
+    </div>
+    <div>
+      <div class="legend-item"><div class="legend-dot" style="background:#6366f1"></div><div style="font-size:0.85rem"><strong>Promoters: 50.0%</strong> <span style="color:var(--muted)">(Mukesh Ambani family)</span></div></div>
+      <div class="legend-item"><div class="legend-dot" style="background:#22d3ee"></div><div style="font-size:0.85rem"><strong>DII: 20.55%</strong> <span style="color:var(--muted)">(MF ~9.78%, Insurance etc)</span></div></div>
+      <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div><div style="font-size:0.85rem"><strong>FII/FPI: 18.67%</strong> <span style="color:var(--muted)">(down from 27% peak in 2020)</span></div></div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div><div style="font-size:0.85rem"><strong>Public/Retail: ~10.8%</strong></div></div>
+      <div class="legend-item"><div class="legend-dot" style="background:#64748b"></div><div style="font-size:0.85rem"><strong>Govt: 0.1%</strong></div></div>
+    </div>
+  </div>
+
+  <div class="section-title">Ownership Analysis</div>
+  <div class="card">
+    <div class="metric-row"><span class="metric-label">Promoter Holding (Mar-26)</span><span class="metric-value up">50.00% — Stable, strong family control</span></div>
+    <div class="metric-row"><span class="metric-label">Promoter Pledging</span><span class="metric-value up">0.00% — Zero pledge; clean governance</span></div>
+    <div class="metric-row"><span class="metric-label">FII/FPI Holding</span><span class="metric-value neutral">18.67% (declining from 27% peak in 2020)</span></div>
+    <div class="metric-row"><span class="metric-label">DII Holding</span><span class="metric-value up">20.55% (domestic funds supportive)</span></div>
+    <div class="metric-row"><span class="metric-label">Mutual Fund Holding</span><span class="metric-value up">9.78% (large MF base)</span></div>
+    <div class="metric-row"><span class="metric-label">Retail Investor Holding</span><span class="metric-value neutral">~10.8% (broad retail participation)</span></div>
+  </div>
+
+  <div class="section-title">Governance Notes</div>
+  <div class="card" style="background:rgba(34,197,94,0.05); border-color:rgba(34,197,94,0.2)">
+    <ul style="font-size:0.83rem; line-height:1.8; padding-left:16px; color:var(--muted)">
+      <li>Board includes KV Kamath, Arundhati Bhattacharya, Shumeet Banerji — strong independent directors</li>
+      <li>Next-gen (Akash, Isha, Anant Ambani) joining board — smooth succession in progress</li>
+      <li>Great Place to Work certified 5 consecutive years</li>
+      <li>Ranked #45 Forbes Global 2000 · #1 Indian company on Burgundy Private Hurun India 500</li>
+      <li>FII decline from peak reflects global energy sector caution — not company-specific issues</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     TAB 8 — VIEW
+════════════════════════════════════════ -->
+<div id="view" class="tab-content">
+
+  <div class="section-title">Strengths (Evidence-Backed)</div>
+  <div class="card" style="margin-bottom:20px">
+    <div class="point">
+      <div class="point-icon icon-green">✓</div>
+      <div class="point-text">
+        <div class="point-title">India's Consumer Economy in One Stock</div>
+        <div class="point-desc">Jio (524M subs), Reliance Retail (₹3.7L Cr revenue), JioStar (post Disney merger) — RIL is arguably the best way to play India's consumption story in a single listed entity.</div>
+      </div>
+    </div>
+    <div class="point">
+      <div class="point-icon icon-green">✓</div>
+      <div class="point-text">
+        <div class="point-title">Record FY26 Revenue, EBITDA and PAT</div>
+        <div class="point-desc">FY26 saw all three hit new highs simultaneously (revenue ₹11.76L Cr +9.8%, EBITDA +13.4%, PAT ₹95,754 Cr +17.8%). Demonstrates compounding at scale.</div>
+      </div>
+    </div>
+    <div class="point">
+      <div class="point-icon icon-green">✓</div>
+      <div class="point-text">
+        <div class="point-title">Jio IPO Optionality (Mid-2026 Target)</div>
+        <div class="point-desc">Jio generates ~₹7,900 Cr quarterly PAT on ₹1.72L Cr revenue run-rate. A separate listing could unlock enormous value currently hidden in the conglomerate structure.</div>
+      </div>
+    </div>
+    <div class="point">
+      <div class="point-icon icon-green">✓</div>
+      <div class="point-text">
+        <div class="point-title">Zero Promoter Pledging + Strong Cash Reserves</div>
+        <div class="point-desc">₹1.46L Cr cash (up 37% YoY) with zero promoter pledging signals financial strength and clean governance.</div>
+      </div>
+    </div>
+    <div class="point">
+      <div class="point-icon icon-green">✓</div>
+      <div class="point-text">
+        <div class="point-title">Comfortable Leverage (Net D/EBITDA 0.60×)</div>
+        <div class="point-desc">Despite gross debt of ₹3.74L Cr, net debt is only ₹1.25L Cr and net D/EBITDA at 0.60× is very manageable. D/E ratio of 0.44 classifies as safe.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Watch-Points (Risks)</div>
+  <div class="card" style="margin-bottom:20px">
+    <div class="point">
+      <div class="point-icon icon-red">!</div>
+      <div class="point-text">
+        <div class="point-title">ROE/ROCE Compression</div>
+        <div class="point-desc">ROE has fallen from 24% (FY23) to 8.8% (FY26) — well below the 15%+ threshold. Heavy equity dilution and capex are the cause, but this metric needs recovery for re-rating.</div>
+      </div>
+    </div>
+    <div class="point">
+      <div class="point-icon icon-red">!</div>
+      <div class="point-text">
+        <div class="point-title">Free Cash Flow (FCF) Pressure</div>
+        <div class="point-desc">Capex of ₹1.44L Cr in FY26 is consuming operating cash flows. FCF has been the primary reason for stock underperformance (-9.1% in 1 year). If capex doesn't moderate, this risk persists.</div>
+      </div>
+    </div>
+    <div class="point">
+      <div class="point-icon icon-red">!</div>
+      <div class="point-text">
+        <div class="point-title">O2C Segment Vulnerability</div>
+        <div class="point-desc">Q4 FY26 PAT fell 12.6% YoY largely due to O2C weakness (geopolitics, freight/insurance costs, GRM volatility). ~38% of EBITDA still tied to global commodity cycles.</div>
+      </div>
+    </div>
+    <div class="point">
+      <div class="point-icon icon-red">!</div>
+      <div class="point-text">
+        <div class="point-title">Expensive Headline P/E</div>
+        <div class="point-desc">At 40× P/E vs sector average of 17–18×, any earnings disappointment or macro disruption could lead to significant de-rating.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Key Metric to Track</div>
+  <div class="card" style="border-color:var(--accent)">
+    <ul style="font-size:0.85rem; line-height:1.8; padding-left:16px; color:var(--text)">
+      <li><strong>FCF Generation:</strong> Watch for FCF turning strongly positive — the biggest re-rating trigger</li>
+      <li><strong>Jio ARPU:</strong> Rising from ~₹200 to ₹250+ → Jio revenue compounding</li>
+      <li><strong>Jio IPO Timeline:</strong> Any confirmation of mid-2026 listing is value unlock signal</li>
+      <li><strong>ROE Recovery:</strong> Needs to trend back toward 12–15% for premium to justify</li>
+      <li><strong>O2C Margins (GRM):</strong> Gross Refining Margin sensitivity to crude spreads</li>
+    </ul>
+  </div>
+
+  <div class="quality-box">
+    <h3>Overall Fundamental Quality</h3>
+    <div class="quality-label" style="color:var(--yellow)">⚡ MODERATE-TO-STRONG</div>
+    <p>
+      RIL is an undeniably powerful franchise — India's largest company with diversified, growing businesses and zero promoter pledging. The transformation toward consumer-led earnings (55%+ EBITDA from Jio/Retail in FY26) is a positive structural shift. <strong>However</strong>, ROE below 10%, heavy capex, FCF compression, and a demanding P/E multiple make the near-term risk-reward nuanced. The Jio IPO is the key optionality event. Long-term structural thesis remains intact; short-term is dependent on FCF inflection and O2C margin recovery.
+    </p>
+  </div>
+
+  <div style="margin-top:20px" class="card">
+    <p style="font-size:0.82rem; font-weight:700; color:var(--muted); margin-bottom:4px">Data Confidence</p>
+    <p style="font-size:0.85rem; color:var(--green)">🟢 HIGH — FY26 results officially declared April 24, 2026. Data cross-checked across Screener, Dhan, Kotak Neo, INDmoney, Open The Magazine, Univest, and DSIJ.</p>
+  </div>
+
+  <div class="disclaimer">
+    ⚠️ <strong>Disclaimer:</strong> This is a view of the fundamentals for educational purposes only. It is <strong>not investment advice</strong> and not a buy/sell/hold recommendation. Verify all figures independently at Screener.in, Tickertape, or BSE/NSE filings. The final decision is yours. Past performance is not indicative of future results.
+  </div>
+</div>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
