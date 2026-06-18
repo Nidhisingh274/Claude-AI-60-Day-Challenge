@@ -1,0 +1,688 @@
+<style>
+  :root{
+    --ink:#1c2128;
+    --paper:#fbfaf7;
+    --panel:#ffffff;
+    --line:#e4e1d8;
+    --rust:#b5482e;
+    --gold:#c08a2e;
+    --moss:#5a7d52;
+    --slate:#5b6b78;
+    --muted:#8a8578;
+    --high:#b5482e;
+    --med:#c08a2e;
+    --low:#5a7d52;
+    --conflict:#b5482e;
+    --question:#5b6b78;
+    --done:#5a7d52;
+    --pending:#c08a2e;
+    font-family: 'Source Serif 4', Georgia, serif;
+  }
+
+  *{box-sizing:border-box;}
+
+  .dash-root{
+    background:var(--paper);
+    color:var(--ink);
+    font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    padding:0;
+    max-width:1100px;
+    margin:0 auto;
+    line-height:1.5;
+  }
+
+  .dash-root *{font-family: inherit;}
+  .mono{font-family:'IBM Plex Mono','SF Mono',Consolas,monospace;}
+
+  /* MASTHEAD */
+  .masthead{
+    border-bottom:3px double var(--ink);
+    padding:28px 28px 18px;
+    margin-bottom:6px;
+  }
+  .masthead-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:14px;
+  }
+  .masthead h1{
+    font-size:34px;
+    font-weight:700;
+    margin:0 0 6px 0;
+    letter-spacing:-0.01em;
+  }
+  .masthead .deck{
+    font-size:15px;
+    color:var(--slate);
+    font-style:italic;
+  }
+  .masthead-meta{
+    display:flex;
+    gap:24px;
+    margin-top:16px;
+    flex-wrap:wrap;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--muted);
+  }
+  .masthead-meta span b{color:var(--ink); font-weight:600;}
+
+  .section{
+    padding:24px 28px;
+    border-bottom:1px solid var(--line);
+  }
+  .section:last-child{border-bottom:none;}
+
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .section-num{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--rust);
+    border:1px solid var(--rust);
+    border-radius:3px;
+    padding:1px 6px;
+  }
+  .section-head h2{
+    font-size:20px;
+    font-weight:700;
+    margin:0;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+  }
+
+  /* SUMMARY */
+  .summary-text{
+    font-size:16px;
+    color:#33373e;
+    max-width:760px;
+  }
+
+  /* KEY TAKEAWAYS - cards */
+  .takeaway-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+  }
+  @media(max-width:760px){.takeaway-grid{grid-template-columns:1fr;}}
+  .takeaway-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-left:4px solid var(--gold);
+    border-radius:4px;
+    padding:16px;
+    box-shadow:0 1px 3px rgba(0,0,0,0.04);
+    transition:box-shadow .2s, transform .2s;
+  }
+  .takeaway-card:hover{
+    box-shadow:0 4px 14px rgba(0,0,0,0.08);
+    transform:translateY(-1px);
+  }
+  .takeaway-card .tag{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--muted);
+    display:block;
+    margin-bottom:8px;
+  }
+  .takeaway-card p{margin:0; font-size:14.5px; color:#2a2e34;}
+
+  /* BADGES */
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    font-weight:600;
+    letter-spacing:0.03em;
+    padding:3px 8px;
+    border-radius:20px;
+    white-space:nowrap;
+    text-transform:uppercase;
+  }
+  .badge-high{background:#fbeae6; color:var(--high); border:1px solid #e8c4ba;}
+  .badge-med{background:#fbf1e1; color:var(--med); border:1px solid #ead9b8;}
+  .badge-low{background:#eaf1e8; color:var(--low); border:1px solid #c9dcc3;}
+  .badge-conflict{background:#fbeae6; color:var(--conflict); border:1px solid #e8c4ba;}
+  .badge-question{background:#eef1f3; color:var(--question); border:1px solid #cdd5db;}
+  .badge-done{background:#eaf1e8; color:var(--done); border:1px solid #c9dcc3;}
+  .badge-pending{background:#fbf1e1; color:var(--pending); border:1px solid #ead9b8;}
+
+  /* ACTION TABLE */
+  .table-wrap{
+    overflow-x:auto;
+    border:1px solid var(--line);
+    border-radius:6px;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    background:var(--panel);
+    font-size:14px;
+  }
+  thead tr{background:#f1efe7;}
+  th{
+    text-align:left;
+    padding:10px 14px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--slate);
+    border-bottom:2px solid var(--line);
+  }
+  td{
+    padding:12px 14px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:#faf8f2;}
+  .owner-pill{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    font-weight:600;
+    color:var(--ink);
+    background:#f1efe7;
+    border-radius:4px;
+    padding:2px 8px;
+    display:inline-block;
+  }
+  .deadline{font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:#33373e;}
+
+  /* OPEN QUESTIONS / RISKS / CONFLICTS - list cards */
+  .item-list{display:flex; flex-direction:column; gap:10px;}
+  .item-card{
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:5px;
+    padding:13px 16px;
+  }
+  .item-card .badge{flex-shrink:0; margin-top:1px;}
+  .item-card p{margin:0; font-size:14.5px; color:#2a2e34;}
+  .item-card .who{
+    display:block;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--muted);
+    margin-top:4px;
+  }
+
+  /* COLLAPSIBLE */
+  details.collapse{
+    border:1px solid var(--line);
+    border-radius:6px;
+    background:var(--panel);
+    margin-top:6px;
+  }
+  details.collapse summary{
+    cursor:pointer;
+    padding:13px 16px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:var(--rust);
+    list-style:none;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  details.collapse summary::-webkit-details-marker{display:none;}
+  details.collapse summary::after{
+    content:"+";
+    font-size:16px;
+    color:var(--muted);
+    transition:transform .2s;
+  }
+  details.collapse[open] summary::after{content:"–";}
+  details.collapse .collapse-body{
+    padding:4px 16px 16px;
+    border-top:1px solid var(--line);
+  }
+
+  /* SPEAKER SUMMARY */
+  .speaker-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:14px;
+  }
+  @media(max-width:760px){.speaker-grid{grid-template-columns:1fr;}}
+  .speaker-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:16px;
+  }
+  .speaker-card h3{
+    margin:0 0 4px 0;
+    font-size:16px;
+    font-weight:700;
+  }
+  .speaker-card .role{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    margin-bottom:10px;
+    display:block;
+  }
+  .speaker-card ul{
+    margin:0;
+    padding-left:18px;
+    font-size:13.5px;
+    color:#33373e;
+  }
+  .speaker-card li{margin-bottom:5px;}
+  .speaker-card .subhead{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin:10px 0 4px;
+    letter-spacing:0.05em;
+  }
+  .speaker-card .subhead:first-of-type{margin-top:0;}
+
+  .attribution-note{
+    font-size:13px;
+    color:var(--muted);
+    font-style:italic;
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px dashed var(--line);
+  }
+
+  /* ADDITIONAL NOTES */
+  .notes-text{font-size:14.5px; color:#33373e;}
+  .notes-text ul{padding-left:20px;}
+  .notes-text li{margin-bottom:6px;}
+
+  @media(max-width:600px){
+    .section{padding:18px 16px;}
+    .masthead{padding:20px 16px 16px;}
+    .masthead h1{font-size:26px;}
+    th, td{padding:9px 10px; font-size:13px;}
+  }
+</style>
+
+<div class="dash-root">
+
+  <div class="masthead">
+    <div class="masthead-top">
+      <span>Meeting Record</span>
+      <span>Transcript Mode</span>
+    </div>
+    <h1>Q3 Cross-Functional Alignment & AI Roadmap Review</h1>
+    <div class="deck">Q3 Strategic Core Sync & Infrastructure Audit</div>
+    <div class="masthead-meta">
+      <span><b>Date</b> — June 18, 2026</span>
+      <span><b>Participants</b> — Arjun (CEO), Sarah (VP of Product), Vikram (CTO), Elena (Head of Growth & Marketing), Rahul (CFO)</span>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="section">
+    <div class="section-head">
+      <span class="section-num">01</span>
+      <h2>Summary</h2>
+    </div>
+    <p class="summary-text">
+      The team reviewed three blocking issues: the delayed AI Analytics module launch (caused by latency on datasets over 10GB), a 40% spike in cloud infrastructure costs ($85,000 last month), and the European market expansion ahead of EU AI Act compliance deadlines. Engineering capacity, budget runway, and legal compliance are all interlinked and create competing pressures across Product, Engineering, Finance, and Growth.
+    </p>
+  </div>
+
+  <!-- KEY TAKEAWAYS -->
+  <div class="section">
+    <div class="section-head">
+      <span class="section-num">02</span>
+      <h2>Key Takeaways</h2>
+    </div>
+    <div class="takeaway-grid">
+      <div class="takeaway-card">
+        <span class="tag">Product / Engineering</span>
+        <p>AI Analytics module missed its July 15th target due to 15-second latency on datasets larger than 10GB, tied to database indexing and the LLM orchestration layer.</p>
+      </div>
+      <div class="takeaway-card">
+        <span class="tag">Finance</span>
+        <p>Last month's cloud bill was $85,000 — 40% over budget — largely attributed to unoptimized API calls in the beta testing environment.</p>
+      </div>
+      <div class="takeaway-card">
+        <span class="tag">Growth</span>
+        <p>$20,000 already spent on pre-launch campaigns; 5,000+ waitlist leads expecting a July launch are at risk of going cold if delay extends past August.</p>
+      </div>
+      <div class="takeaway-card">
+        <span class="tag">Engineering</span>
+        <p>Vikram requested 2 senior backend contractors for at least 6 weeks to address both latency fixes and security compliance work simultaneously.</p>
+      </div>
+      <div class="takeaway-card">
+        <span class="tag">Finance Condition</span>
+        <p>Rahul will approve contractor budget only if Vikram can cut the cloud bill by $15,000/month.</p>
+      </div>
+      <div class="takeaway-card">
+        <span class="tag">EU Expansion</span>
+        <p>EU campaign launch is ready for July 1st but paused pending Legal's sign-off on data residency compliance ahead of EU AI Act clauses rolling out in October.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTION ITEMS -->
+  <div class="section">
+    <div class="section-head">
+      <span class="section-num">03</span>
+      <h2>Action Items</h2>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Task</th>
+            <th>Owner</th>
+            <th>Deadline</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Audit infrastructure cost leak; assess if optimizing current code can free budget for contractors</td>
+            <td><span class="owner-pill">Rahul &amp; Vikram</span></td>
+            <td class="deadline">This Friday</td>
+            <td><span class="badge badge-pending">⏳ Pending</span></td>
+          </tr>
+          <tr>
+            <td>Coordinate with Legal to produce a definitive EU AI Act compliance checklist</td>
+            <td><span class="owner-pill">Sarah</span></td>
+            <td class="deadline">Next Tuesday</td>
+            <td><span class="badge badge-pending">⏳ Pending</span></td>
+          </tr>
+          <tr>
+            <td>Get clarification from Legal on whether EU user data must be stored on sovereign EU servers or if encryption-in-transit is sufficient</td>
+            <td><span class="owner-pill">Sarah</span></td>
+            <td class="deadline">Tuesday (same as compliance checklist)</td>
+            <td><span class="badge badge-pending">⏳ Pending</span></td>
+          </tr>
+          <tr>
+            <td>Pause EU localized marketing campaign launch until formal Legal sign-off received</td>
+            <td><span class="owner-pill">Elena</span></td>
+            <td class="deadline">Not specified</td>
+            <td><span class="badge badge-pending">⏳ Pending</span></td>
+          </tr>
+          <tr>
+            <td>Submit finalized department budget requests for Q4</td>
+            <td><span class="owner-pill">Everyone</span></td>
+            <td class="deadline">June 25th — no extensions</td>
+            <td><span class="badge badge-pending">⏳ Pending</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- OPEN QUESTIONS -->
+  <div class="section">
+    <div class="section-head">
+      <span class="section-num">04</span>
+      <h2>Open Questions</h2>
+    </div>
+    <div class="item-list">
+      <div class="item-card">
+        <span class="badge badge-question">❓ Open</span>
+        <div>
+          <p>Does European user data need to be stored on sovereign EU servers, or is encryption-in-transit sufficient?</p>
+          <span class="who">Raised by Vikram (CTO) — Sarah noted Legal did not clarify this in the last memo</span>
+        </div>
+      </div>
+      <div class="item-card">
+        <span class="badge badge-question">❓ Open</span>
+        <div>
+          <p>Whether Vikram can cut the cloud bill by $15,000/month — outcome determines if Rahul approves the contractor budget</p>
+          <span class="who">Owners: Rahul &amp; Vikram</span>
+        </div>
+      </div>
+      <div class="item-card">
+        <span class="badge badge-question">❓ Open</span>
+        <div>
+          <p>What resources Vikram needs to address both the latency fix and the Core Security compliance update without one sliding</p>
+          <span class="who">Owner: Vikram — stated need: 2 senior backend contractors for at least 6 weeks</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RISKS / BLOCKERS -->
+  <div class="section">
+    <div class="section-head">
+      <span class="section-num">05</span>
+      <h2>Risks / Blockers</h2>
+    </div>
+    <div class="item-list">
+      <div class="item-card">
+        <span class="badge badge-high">🔴 High Priority</span>
+        <div>
+          <p>AI Analytics module blocked by latency issues (15-second wait times) on datasets larger than 10GB, tied to database indexing and the LLM orchestration layer.</p>
+          <span class="who">Raised by Sarah &amp; Vikram</span>
+        </div>
+      </div>
+      <div class="item-card">
+        <span class="badge badge-high">🔴 High Priority</span>
+        <div>
+          <p>Engineering team is stretched thin; pivoting to fix latency would cause the Core Security compliance update for enterprise clients to slide.</p>
+          <span class="who">Raised by Vikram</span>
+        </div>
+      </div>
+      <div class="item-card">
+        <span class="badge badge-high">🔴 High Priority</span>
+        <div>
+          <p>Infrastructure burn rate is unsustainable — cloud bill was $85,000 last month, 40% over budget. Adding contractors without cost reduction risks breaching the Q3 operational runway.</p>
+          <span class="who">Raised by Rahul</span>
+        </div>
+      </div>
+      <div class="item-card">
+        <span class="badge badge-med">🟠 Medium Priority</span>
+        <div>
+          <p>5,000+ waitlist leads expecting a July launch may go cold or move to competitors if the AI Analytics delay extends past August.</p>
+          <span class="who">Raised by Elena</span>
+        </div>
+      </div>
+      <div class="item-card">
+        <span class="badge badge-med">🟠 Medium Priority</span>
+        <div>
+          <p>Missing the July 1st window for the EU marketing campaign means losing the summer acquisition cycle in Europe.</p>
+          <span class="who">Raised by Elena</span>
+        </div>
+      </div>
+      <div class="item-card">
+        <span class="badge badge-high">🔴 High Priority</span>
+        <div>
+          <p>Current data processing agreement does not comply with updated EU AI Act clauses rolling out in October.</p>
+          <span class="who">Flagged by Legal team, raised by Sarah</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFLICTS -->
+  <div class="section">
+    <div class="section-head">
+      <span class="section-num">06</span>
+      <h2>Conflicts</h2>
+    </div>
+    <div class="item-list">
+      <div class="item-card">
+        <span class="badge badge-conflict">⚠️ Conflict</span>
+        <div>
+          <p>Product readiness vs. engineering capacity vs. financial runway: fixing AI Analytics latency requires contractors, but Rahul will only approve the budget if Vikram first cuts the cloud bill by $15,000/month — while Elena's leads risk going cold the longer the fix is delayed.</p>
+          <span class="who">Parties: Sarah, Vikram, Rahul, Elena — acknowledged by Arjun as "a clear conflict"</span>
+        </div>
+      </div>
+      <div class="item-card">
+        <span class="badge badge-conflict">⚠️ Conflict</span>
+        <div>
+          <p>Engineering bandwidth conflict: fixing the AI Analytics latency issue versus completing the Core Security compliance update for enterprise clients — both compete for the same stretched engineering team.</p>
+          <span class="who">Parties: Vikram, Arjun</span>
+        </div>
+      </div>
+      <div class="item-card">
+        <span class="badge badge-conflict">⚠️ Conflict</span>
+        <div>
+          <p>Marketing timeline vs. legal compliance: Elena's EU campaign is ready to launch July 1st, but is paused pending Legal's data residency sign-off, risking the loss of the summer acquisition cycle.</p>
+          <span class="who">Parties: Elena, Sarah (coordinating with Legal), Legal team</span>
+        </div>
+      </div>
+      <div class="item-card">
+        <span class="badge badge-conflict">⚠️ Conflict</span>
+        <div>
+          <p>Attribution of the cloud cost overage: Rahul attributes the $85,000 bill (40% over budget) mostly to unoptimized API calls in Sarah's beta testing environment — this was stated by Rahul but not confirmed or addressed by Sarah in the transcript.</p>
+          <span class="who">Raised by Rahul; unconfirmed by Sarah</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADDITIONAL NOTES -->
+  <div class="section">
+    <div class="section-head">
+      <span class="section-num">07</span>
+      <h2>Additional Notes</h2>
+    </div>
+    <div class="notes-text">
+      <ul>
+        <li>Meeting framed by Arjun around three main items: the delayed AI Analytics module, the 40% infrastructure cost spike, and finalizing the European expansion strategy ahead of the EU AI Act compliance deadline.</li>
+        <li>Arjun directed that security compliance work cannot be allowed to slide, given enterprise clients are described as "our bread and butter."</li>
+        <li>Arjun closed the meeting by directing Vikram and Rahul to focus on the infra-cost audit first.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- TRANSCRIPT MODE: SPEAKER SUMMARY -->
+  <div class="section">
+    <div class="section-head">
+      <span class="section-num">08</span>
+      <h2>Speaker Summary</h2>
+    </div>
+    <div class="speaker-grid">
+      <div class="speaker-card">
+        <h3>Arjun</h3>
+        <span class="role">CEO</span>
+        <div class="subhead">Decisions</div>
+        <ul>
+          <li>Directed Rahul and Vikram to audit the infrastructure leak by Friday before approving contractor budget.</li>
+          <li>Decided to pause the EU campaign launch until formal Legal sign-off is received.</li>
+          <li>Confirmed security compliance work must not slide.</li>
+        </ul>
+        <div class="subhead">Action Items</div>
+        <ul>
+          <li>None directly assigned to himself; assigned and directed tasks to others.</li>
+        </ul>
+      </div>
+
+      <div class="speaker-card">
+        <h3>Sarah</h3>
+        <span class="role">VP of Product</span>
+        <div class="subhead">Decisions</div>
+        <ul>
+          <li>None directly stated by Sarah; raised the EU compliance issue to the group.</li>
+        </ul>
+        <div class="subhead">Action Items</div>
+        <ul>
+          <li>Coordinate with Legal to get a definitive compliance checklist by next Tuesday.</li>
+          <li>Get clarification from Legal on EU server data storage vs. encryption-in-transit requirement, due Tuesday.</li>
+        </ul>
+      </div>
+
+      <div class="speaker-card">
+        <h3>Vikram</h3>
+        <span class="role">CTO</span>
+        <div class="subhead">Decisions</div>
+        <ul>
+          <li>None directly stated; identified the latency root cause and resourcing need.</li>
+        </ul>
+        <div class="subhead">Action Items</div>
+        <ul>
+          <li>Sit down with Rahul by Friday to audit the infrastructure leak.</li>
+          <li>Requested 2 senior backend contractors for at least 6 weeks (pending Rahul's cost-cut condition).</li>
+        </ul>
+      </div>
+
+      <div class="speaker-card">
+        <h3>Elena</h3>
+        <span class="role">Head of Growth &amp; Marketing</span>
+        <div class="subhead">Decisions</div>
+        <ul>
+          <li>None directly stated; flagged risk of delay on AI Analytics and EU campaign.</li>
+        </ul>
+        <div class="subhead">Action Items</div>
+        <ul>
+          <li>Pause the EU campaign launch until Legal sign-off is received (per Arjun's directive).</li>
+        </ul>
+      </div>
+
+      <div class="speaker-card">
+        <h3>Rahul</h3>
+        <span class="role">CFO</span>
+        <div class="subhead">Decisions</div>
+        <ul>
+          <li>Will approve contractor budget only if Vikram cuts the cloud bill by $15,000/month.</li>
+          <li>Set a hard deadline of June 25th for Q4 department budget requests, with no extensions.</li>
+        </ul>
+        <div class="subhead">Action Items</div>
+        <ul>
+          <li>Sit down with Vikram by Friday to audit the infrastructure leak.</li>
+          <li>Collect finalized Q4 department budget requests from everyone by June 25th.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="attribution-note">
+      Attribution Note: The action item "submit finalized Q4 department budget requests" was directed at "everyone" by Rahul — individual ownership beyond the group is not specified in the transcript.
+    </div>
+  </div>
+
+  <!-- COLLAPSIBLE: Decisions by Speaker (detailed) -->
+  <div class="section">
+    <div class="section-head">
+      <span class="section-num">09</span>
+      <h2>Detailed Records</h2>
+    </div>
+    <details class="collapse">
+      <summary>Decisions by Speaker</summary>
+      <div class="collapse-body">
+        <ul>
+          <li><b>Arjun:</b> Cannot let security compliance slide; pause EU campaign until Legal sign-off; Vikram and Rahul to audit infra-cost first.</li>
+          <li><b>Rahul:</b> Will approve contractor budget contingent on a $15,000/month cloud bill reduction; Q4 budget requests due June 25th with no extensions.</li>
+          <li><b>Sarah, Vikram, Elena:</b> No unilateral decisions stated; each raised issues or proposed conditions for Arjun and Rahul to decide on.</li>
+        </ul>
+      </div>
+    </details>
+    <details class="collapse">
+      <summary>Action Items by Speaker (raw list)</summary>
+      <div class="collapse-body">
+        <ul>
+          <li>Rahul &amp; Vikram — audit the infrastructure leak by Friday.</li>
+          <li>Sarah — get a definitive EU AI Act compliance checklist from Legal by Tuesday.</li>
+          <li>Sarah — get clarification from Legal on EU data storage location requirement by Tuesday.</li>
+          <li>Elena — pause the EU campaign launch until Legal sign-off.</li>
+          <li>Everyone — submit finalized Q4 department budget requests by June 25th.</li>
+        </ul>
+      </div>
+    </details>
+  </div>
+
+</div>
