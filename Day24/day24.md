@@ -418,7 +418,7 @@ The 30-day smoke test is not optional — it **is** the business. If ≥15% of a
 
 6. **Pricing needs a real payment ask, not a survey.** Stated interest ("I would pay") is noise. Actual deposits are signal. The ₹1,999 Sprint Pack with a 7-day money-back guarantee is the right instrument.
 
-7. **Claude as AI Co-Founder generates institutional-quality analysis.** In under an hour, I had a Business Model Canvas, competitive moat analysis, CAC by channel, reverse SWOT, investment scorecard, and a 12-page PDF report — equivalent to what a consulting firm would charge ₹5–10L for.
+7. **Claude as AI Co-Founder generates institutional-quality analysis.** In under an hour, I had a Business Model Canvas, competitive moat analysis, CAC by channel, reverse SWOT, investment scorecard, and a 16-page PDF report — equivalent to what a consulting firm would charge ₹5–10L for.
 
 ### Real-World Applications
 - Use this framework for any startup — not just AI/tech
