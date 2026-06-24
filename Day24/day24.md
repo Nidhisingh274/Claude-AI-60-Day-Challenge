@@ -433,4 +433,4 @@ The 30-day smoke test is not optional — it **is** the business. If ≥15% of a
 - **Tool:** Claude Sonnet 4.6 (claude.ai)
 - **Input:** Day 23 Customer & MVP Blueprint
 - **Prompt:** Business Strategy Report prompt
-- **Output:** 12-page PDF Business Viability Report
+- **Output:** 16-page PDF Business Viability Report
