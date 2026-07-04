@@ -14,8 +14,6 @@ A fully interactive **Marketing Detective** application game where you investiga
 
 <img width="1881" height="897" alt="board" src="https://github.com/user-attachments/assets/e47c4de7-f680-4312-af0b-7c69e96e595d" />
 
-<img width="1882" height="762" alt="evidence_modal" src="https://github.com/user-attachments/assets/c4395779-edf8-4de7-85c4-d38687e62f38" />
-
 <img width="1882" height="762" alt="suspect_lineup" src="https://github.com/user-attachments/assets/560c76b6-19c5-47e8-bf28-d190ce3dc90a" />
 
 <img width="1891" height="897" alt="learning-report" src="https://github.com/user-attachments/assets/443b0155-c11f-460c-b8d8-48da6623a42c" />
