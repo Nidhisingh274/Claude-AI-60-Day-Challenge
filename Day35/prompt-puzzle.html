@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>🧩 Prompt Puzzle — Master AI Prompting Through Play</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg: #0D0F1A;
+  --bg2: #131628;
+  --surface: #1A1E35;
+  --surface2: #222742;
+  --border: #2D3458;
+  --cyan: #00E5FF;
+  --cyan-dim: rgba(0,229,255,0.12);
+  --violet: #7C3AED;
+  --violet-dim: rgba(124,58,237,0.15);
+  --green: #00FF88;
+  --green-dim: rgba(0,255,136,0.12);
+  --amber: #FFB800;
+  --red: #FF4B6E;
+  --text: #F0F4FF;
+  --text2: #8892B0;
+  --text3: #4A5578;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Inter', sans-serif;
+  --r: 10px;
+  --r2: 6px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  user-select: none;
+}
+
+/* GRID NOISE BACKGROUND */
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(124,58,237,0.18) 0%, transparent 70%),
+    linear-gradient(rgba(45,52,88,0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(45,52,88,0.3) 1px, transparent 1px);
+  background-size: 100% 100%, 40px 40px, 40px 40px;
+  pointer-events: none;
+  z-index:0;
+}
+
+#app { position:relative; z-index:1; }
+
+/* ═══════════════════ INTRO SCREEN ═══════════════════ */
+#intro-screen {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+  padding:2rem;
+  text-align:center;
+}
+
+.intro-badge {
+  display:inline-flex;
+  align-items:center;
+  gap:.5rem;
+  background: var(--violet-dim);
+  border:1px solid rgba(124,58,237,0.4);
+  border-radius:100px;
+  padding:.35rem 1rem;
+  font-family:var(--mono);
+  font-size:.75rem;
+  color: var(--violet);
+  letter-spacing:.08em;
+  margin-bottom:2rem;
+  animation: fadeSlide .6s ease both;
+}
+
+.intro-title {
+  font-family: var(--mono);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight:700;
+  line-height:1.1;
+  margin-bottom:1rem;
+  animation: fadeSlide .7s .1s ease both;
+}
+
+.intro-title span { color: var(--cyan); }
+.intro-title em { color: var(--violet); font-style:normal; }
+
+.intro-subtitle {
+  font-size:1.1rem;
+  color: var(--text2);
+  max-width:560px;
+  line-height:1.7;
+  margin-bottom:3rem;
+  animation: fadeSlide .7s .2s ease both;
+}
+
+.domain-pill {
+  display:inline-flex;
+  align-items:center;
+  gap:.5rem;
+  background: var(--cyan-dim);
+  border:1px solid rgba(0,229,255,0.3);
+  border-radius:100px;
+  padding:.5rem 1.2rem;
+  font-family:var(--mono);
+  font-size:.85rem;
+  color: var(--cyan);
+  margin-bottom:.75rem;
+}
+
+.difficulty-pill {
+  display:inline-flex;
+  align-items:center;
+  gap:.5rem;
+  background: rgba(255,75,110,0.1);
+  border:1px solid rgba(255,75,110,0.35);
+  border-radius:100px;
+  padding:.5rem 1.2rem;
+  font-family:var(--mono);
+  font-size:.85rem;
+  color: var(--red);
+  margin-left:.5rem;
+  margin-bottom:.75rem;
+}
+
+.pills-row { display:flex; flex-wrap:wrap; justify-content:center; gap:.5rem; margin-bottom:2.5rem; animation: fadeSlide .7s .3s ease both; }
+
+.btn-start {
+  background: linear-gradient(135deg, var(--violet), #5b21b6);
+  color:#fff;
+  border:none;
+  border-radius:12px;
+  padding:1rem 2.5rem;
+  font-family:var(--mono);
+  font-size:1rem;
+  font-weight:700;
+  cursor:pointer;
+  letter-spacing:.04em;
+  box-shadow: 0 0 30px rgba(124,58,237,0.4);
+  transition: transform .15s, box-shadow .15s;
+  animation: fadeSlide .7s .4s ease both;
+}
+.btn-start:hover { transform:translateY(-2px); box-shadow:0 0 45px rgba(124,58,237,0.6); }
+
+/* ═══════════════════ GAME LAYOUT ═══════════════════ */
+#game-screen { display:none; flex-direction:column; min-height:100vh; }
+
+/* HEADER */
+.hdr {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:.9rem 2rem;
+  border-bottom:1px solid var(--border);
+  background: rgba(13,15,26,0.85);
+  backdrop-filter: blur(12px);
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+
+.hdr-logo {
+  font-family:var(--mono);
+  font-size:.95rem;
+  font-weight:700;
+  color: var(--cyan);
+  letter-spacing:.04em;
+}
+
+.hdr-progress {
+  display:flex;
+  align-items:center;
+  gap:1rem;
+  flex:1;
+  max-width:400px;
+  margin:0 2rem;
+}
+
+.progress-bar-wrap {
+  flex:1;
+  height:6px;
+  background:var(--border);
+  border-radius:100px;
+  overflow:hidden;
+}
+
+.progress-bar-fill {
+  height:100%;
+  background: linear-gradient(90deg, var(--violet), var(--cyan));
+  border-radius:100px;
+  transition: width .4s ease;
+}
+
+.hdr-step { font-family:var(--mono); font-size:.8rem; color:var(--text2); white-space:nowrap; }
+
+.hdr-score-box {
+  display:flex;
+  align-items:center;
+  gap:1.5rem;
+}
+
+.score-item { text-align:right; }
+.score-label { font-size:.65rem; color:var(--text3); font-family:var(--mono); letter-spacing:.06em; text-transform:uppercase; }
+.score-val { font-family:var(--mono); font-size:1.1rem; font-weight:700; color:var(--cyan); transition: color .3s; }
+
+/* MAIN GAME AREA */
+.game-main {
+  display:grid;
+  grid-template-columns: 340px 1fr;
+  flex:1;
+  gap:0;
+  min-height:0;
+}
+
+/* LEFT PANEL */
+.left-panel {
+  background: var(--bg2);
+  border-right:1px solid var(--border);
+  padding:1.5rem;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:1.2rem;
+}
+
+.panel-section-label {
+  font-family:var(--mono);
+  font-size:.65rem;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--text3);
+  margin-bottom:.5rem;
+}
+
+.challenge-type-badge {
+  display:inline-flex;
+  align-items:center;
+  gap:.4rem;
+  border-radius:6px;
+  padding:.3rem .75rem;
+  font-family:var(--mono);
+  font-size:.75rem;
+  font-weight:600;
+  letter-spacing:.05em;
+}
+.ct-build { background:var(--violet-dim); color:var(--violet); border:1px solid rgba(124,58,237,0.35); }
+.ct-clean { background:rgba(0,255,136,0.1); color:var(--green); border:1px solid rgba(0,255,136,0.3); }
+.ct-choose { background:rgba(255,184,0,0.1); color:var(--amber); border:1px solid rgba(255,184,0,0.3); }
+
+.scenario-title {
+  font-size:1.05rem;
+  font-weight:600;
+  line-height:1.4;
+  color:var(--text);
+}
+
+.desired-output-box {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-left:3px solid var(--cyan);
+  border-radius:var(--r2);
+  padding:1rem;
+  font-size:.85rem;
+  color:var(--text2);
+  line-height:1.6;
+  font-family:var(--mono);
+}
+
+.principle-box {
+  background:var(--violet-dim);
+  border:1px solid rgba(124,58,237,0.3);
+  border-radius:var(--r2);
+  padding:.85rem 1rem;
+}
+.principle-title { font-size:.7rem; font-family:var(--mono); color:var(--violet); letter-spacing:.08em; text-transform:uppercase; margin-bottom:.4rem; }
+.principle-text { font-size:.82rem; color:var(--text2); line-height:1.5; }
+
+.hint-btn {
+  background:none;
+  border:1px solid var(--border);
+  border-radius:var(--r2);
+  color:var(--text2);
+  font-family:var(--mono);
+  font-size:.8rem;
+  padding:.5rem 1rem;
+  cursor:pointer;
+  transition:all .2s;
+  display:flex;
+  align-items:center;
+  gap:.4rem;
+  width:100%;
+}
+.hint-btn:hover { border-color:var(--amber); color:var(--amber); }
+
+.hint-text {
+  background:rgba(255,184,0,0.08);
+  border:1px solid rgba(255,184,0,0.25);
+  border-radius:var(--r2);
+  padding:.75rem;
+  font-size:.8rem;
+  color:var(--amber);
+  line-height:1.5;
+  display:none;
+  font-family:var(--mono);
+}
+.hint-text.visible { display:block; }
+
+/* STATS ROW */
+.stats-row {
+  display:flex;
+  flex-direction:column;
+  gap:.5rem;
+}
+.stat-line {
+  display:flex;
+  justify-content:space-between;
+  font-size:.78rem;
+  font-family:var(--mono);
+}
+.stat-line span:first-child { color:var(--text3); }
+.stat-line span:last-child { color:var(--text); }
+
+/* RIGHT PANEL */
+.right-panel {
+  padding:1.5rem 2rem;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:1.5rem;
+}
+
+/* BUILD CHALLENGE */
+.block-pool-label { font-family:var(--mono); font-size:.7rem; color:var(--text3); letter-spacing:.1em; text-transform:uppercase; margin-bottom:.75rem; }
+
+.block-pool {
+  display:flex;
+  flex-wrap:wrap;
+  gap:.6rem;
+  min-height:60px;
+  padding:.75rem;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+}
+
+.drop-zone {
+  min-height:80px;
+  padding:1rem;
+  background:var(--surface);
+  border:2px dashed var(--border);
+  border-radius:var(--r);
+  display:flex;
+  flex-wrap:wrap;
+  gap:.6rem;
+  align-content:flex-start;
+  transition: border-color .2s, background .2s;
+}
+.drop-zone.drag-over {
+  border-color: var(--cyan);
+  background: var(--cyan-dim);
+}
+.drop-zone.correct {
+  border-color: var(--green);
+  background: var(--green-dim);
+}
+
+.prompt-block {
+  display:inline-flex;
+  align-items:center;
+  gap:.35rem;
+  background: var(--surface2);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:.35rem .75rem;
+  font-family:var(--mono);
+  font-size:.8rem;
+  cursor:grab;
+  transition:all .2s;
+  position:relative;
+  color:var(--text);
+}
+.prompt-block:hover { border-color:var(--cyan); color:var(--cyan); transform:translateY(-1px); box-shadow:0 4px 16px rgba(0,229,255,0.15); }
+.prompt-block:active { cursor:grabbing; transform:scale(.97); }
+.prompt-block.dragging { opacity:.4; }
+
+.block-tag {
+  font-size:.6rem;
+  padding:.1rem .3rem;
+  border-radius:3px;
+  font-weight:700;
+  letter-spacing:.05em;
+}
+.tag-role { background:rgba(124,58,237,0.25); color:var(--violet); }
+.tag-ctx { background:rgba(0,229,255,0.15); color:var(--cyan); }
+.tag-task { background:rgba(0,255,136,0.15); color:var(--green); }
+.tag-fmt { background:rgba(255,184,0,0.15); color:var(--amber); }
+.tag-con { background:rgba(255,75,110,0.15); color:var(--red); }
+.tag-dist { background:rgba(100,100,120,0.25); color:var(--text3); }
+
+/* CLEAN CHALLENGE */
+.dirty-prompt-box {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:1.2rem;
+  font-family:var(--mono);
+  font-size:.85rem;
+  line-height:1.8;
+  position:relative;
+}
+
+.word-span {
+  display:inline-block;
+  cursor:pointer;
+  border-radius:3px;
+  padding:.05rem .15rem;
+  transition:all .15s;
+}
+.word-span:hover { background:rgba(255,75,110,0.2); color:var(--red); }
+.word-span.struck {
+  background:rgba(255,75,110,0.15);
+  color:var(--red);
+  text-decoration:line-through;
+}
+.word-span.good-word { cursor:default; }
+.word-span.good-word:hover { background:none; color:inherit; }
+
+/* CHOOSE CHALLENGE */
+.prompt-options {
+  display:flex;
+  flex-direction:column;
+  gap:1rem;
+}
+
+.prompt-option {
+  background:var(--surface);
+  border:2px solid var(--border);
+  border-radius:var(--r);
+  padding:1.2rem;
+  cursor:pointer;
+  transition:all .2s;
+  position:relative;
+  overflow:hidden;
+}
+.prompt-option::before {
+  content:'';
+  position:absolute;
+  left:0; top:0; bottom:0;
+  width:3px;
+  background:var(--text3);
+  transition:background .2s;
+}
+.prompt-option:hover { border-color:var(--cyan); }
+.prompt-option:hover::before { background:var(--cyan); }
+.prompt-option.selected { border-color:var(--violet); }
+.prompt-option.selected::before { background:var(--violet); }
+.prompt-option.correct-choice { border-color:var(--green); background:var(--green-dim); }
+.prompt-option.correct-choice::before { background:var(--green); }
+.prompt-option.wrong-choice { border-color:var(--red); background:rgba(255,75,110,0.08); }
+.prompt-option.wrong-choice::before { background:var(--red); }
+
+.option-label {
+  font-family:var(--mono);
+  font-size:.68rem;
+  font-weight:700;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  margin-bottom:.5rem;
+}
+.lbl-weak { color:var(--red); }
+.lbl-opt { color:var(--green); }
+.lbl-over { color:var(--amber); }
+
+.option-text {
+  font-size:.85rem;
+  line-height:1.6;
+  color:var(--text2);
+  font-family:var(--mono);
+}
+
+/* SUBMIT BTN */
+.btn-submit {
+  background: linear-gradient(135deg, var(--cyan), #0097a7);
+  color: #000;
+  border:none;
+  border-radius:var(--r);
+  padding:.85rem 2rem;
+  font-family:var(--mono);
+  font-size:.9rem;
+  font-weight:700;
+  cursor:pointer;
+  letter-spacing:.04em;
+  transition:all .2s;
+  align-self:flex-start;
+}
+.btn-submit:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,229,255,0.3); }
+.btn-submit:disabled { opacity:.35; cursor:not-allowed; transform:none; }
+
+.btn-next {
+  background: linear-gradient(135deg, var(--green), #00b360);
+  color:#000;
+  border:none;
+  border-radius:var(--r);
+  padding:.85rem 2rem;
+  font-family:var(--mono);
+  font-size:.9rem;
+  font-weight:700;
+  cursor:pointer;
+  letter-spacing:.04em;
+  transition:all .2s;
+  display:none;
+  align-self:flex-start;
+}
+.btn-next:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,255,136,0.3); }
+.btn-next.visible { display:inline-flex; align-items:center; gap:.5rem; }
+
+/* FEEDBACK BOX */
+.feedback-box {
+  border-radius:var(--r);
+  padding:1rem 1.2rem;
+  font-size:.85rem;
+  line-height:1.6;
+  display:none;
+}
+.feedback-box.visible { display:block; }
+.feedback-correct { background:var(--green-dim); border:1px solid rgba(0,255,136,0.3); color:var(--green); }
+.feedback-wrong { background:rgba(255,75,110,0.08); border:1px solid rgba(255,75,110,0.3); color:var(--red); }
+.feedback-partial { background:rgba(255,184,0,0.08); border:1px solid rgba(255,184,0,0.3); color:var(--amber); }
+
+/* OUTPUT COMPARE */
+.output-compare {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1rem;
+  display:none;
+}
+.output-compare.visible { display:grid; }
+.output-card {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:1rem;
+}
+.output-card-label { font-family:var(--mono); font-size:.65rem; letter-spacing:.1em; text-transform:uppercase; margin-bottom:.6rem; }
+.out-weak { color:var(--red); }
+.out-opt { color:var(--green); }
+.output-card-text { font-size:.8rem; line-height:1.6; color:var(--text2); font-family:var(--mono); }
+
+/* ═══════════════════ REPORT SCREEN ═══════════════════ */
+#report-screen {
+  display:none;
+  min-height:100vh;
+  padding:3rem 2rem;
+  max-width:900px;
+  margin:0 auto;
+}
+
+.report-header {
+  text-align:center;
+  margin-bottom:3rem;
+}
+
+.report-trophy {
+  font-size:4rem;
+  margin-bottom:1rem;
+  animation: pop .5s ease;
+}
+
+.report-title {
+  font-family:var(--mono);
+  font-size:2rem;
+  font-weight:700;
+  color:var(--cyan);
+  margin-bottom:.5rem;
+}
+
+.report-subtitle {
+  color:var(--text2);
+  font-size:1rem;
+}
+
+.report-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.5rem;
+  margin-bottom:2rem;
+}
+
+.report-card {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:1.5rem;
+}
+
+.rc-label { font-family:var(--mono); font-size:.65rem; letter-spacing:.12em; text-transform:uppercase; color:var(--text3); margin-bottom:.75rem; }
+.rc-value { font-family:var(--mono); font-size:2rem; font-weight:700; }
+.rc-sub { font-size:.8rem; color:var(--text2); margin-top:.25rem; }
+
+.score-color-s { color:var(--cyan); }
+.score-color-a { color:var(--green); }
+.score-color-b { color:var(--amber); }
+.score-color-c { color:var(--red); }
+
+/* PROMPT DNA */
+.dna-bar-wrap { display:flex; flex-direction:column; gap:.6rem; }
+.dna-row { display:flex; align-items:center; gap:.75rem; }
+.dna-row-label { font-family:var(--mono); font-size:.72rem; color:var(--text2); width:100px; flex-shrink:0; }
+.dna-bar-bg { flex:1; height:8px; background:var(--border); border-radius:100px; overflow:hidden; }
+.dna-bar-fill { height:100%; border-radius:100px; transition:width 1s ease; }
+.dna-pct { font-family:var(--mono); font-size:.7rem; color:var(--text2); width:35px; text-align:right; flex-shrink:0; }
+
+.feedback-list { display:flex; flex-direction:column; gap:.75rem; }
+.feedback-item { display:flex; gap:.75rem; align-items:flex-start; }
+.fb-icon { flex-shrink:0; font-size:1rem; }
+.fb-text { font-size:.85rem; line-height:1.5; color:var(--text2); }
+
+.milestone-box {
+  background: var(--violet-dim);
+  border:1px solid rgba(124,58,237,0.35);
+  border-radius:var(--r);
+  padding:1.2rem 1.5rem;
+  display:flex;
+  align-items:center;
+  gap:1rem;
+  margin-bottom:2rem;
+}
+.milestone-icon { font-size:1.5rem; }
+.milestone-text { font-size:.9rem; color:var(--text2); line-height:1.5; }
+.milestone-text strong { color:var(--violet); font-family:var(--mono); }
+
+.final-prompt-box {
+  background:var(--surface);
+  border:1px solid rgba(0,229,255,0.25);
+  border-left:3px solid var(--cyan);
+  border-radius:var(--r);
+  padding:1.2rem;
+  font-family:var(--mono);
+  font-size:.83rem;
+  line-height:1.7;
+  color:var(--text2);
+  margin-bottom:2rem;
+}
+
+.btn-replay {
+  background: linear-gradient(135deg, var(--violet), #5b21b6);
+  color:#fff;
+  border:none;
+  border-radius:var(--r);
+  padding:1rem 2.5rem;
+  font-family:var(--mono);
+  font-size:1rem;
+  font-weight:700;
+  cursor:pointer;
+  letter-spacing:.04em;
+  box-shadow: 0 0 30px rgba(124,58,237,0.4);
+  transition:all .2s;
+  display:block;
+  margin:0 auto;
+}
+.btn-replay:hover { transform:translateY(-2px); box-shadow:0 0 45px rgba(124,58,237,0.6); }
+
+/* FLOATING NOTIFICATION */
+.notif {
+  position:fixed;
+  top:80px;
+  right:24px;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:.85rem 1.2rem;
+  font-family:var(--mono);
+  font-size:.82rem;
+  z-index:999;
+  animation: notifIn .3s ease, notifOut .3s 2.2s ease forwards;
+  max-width:280px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.4);
+}
+.notif-good { border-color:rgba(0,255,136,0.4); color:var(--green); }
+.notif-bad  { border-color:rgba(255,75,110,0.4); color:var(--red); }
+.notif-info { border-color:rgba(0,229,255,0.3); color:var(--cyan); }
+.notif-score { border-color:rgba(124,58,237,0.4); color:var(--violet); }
+
+/* SCORE PULSE */
+.score-pulse { animation:scorePop .4s ease; }
+
+/* ANIMATIONS */
+@keyframes fadeSlide { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+@keyframes pop { from { transform:scale(.5); opacity:0; } to { transform:scale(1); opacity:1; } }
+@keyframes notifIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:none; } }
+@keyframes notifOut { from { opacity:1; } to { opacity:0; transform:translateX(20px); } }
+@keyframes scorePop { 0%{transform:scale(1)} 50%{transform:scale(1.3); color:var(--green)} 100%{transform:scale(1)} }
+@keyframes shimmer { 0%{opacity:.7} 50%{opacity:1} 100%{opacity:.7} }
+
+.loading-text { animation:shimmer 1.5s infinite; }
+
+/* TIMER */
+.timer-display {
+  font-family:var(--mono);
+  font-size:.8rem;
+  color:var(--text3);
+  display:flex;
+  align-items:center;
+  gap:.3rem;
+}
+.timer-display.warn { color:var(--amber); }
+
+/* Clean challenge word flow */
+.dirty-prompt-box { line-height:2; }
+
+/* scrollbar */
+::-webkit-scrollbar { width:6px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border); border-radius:100px; }
+::-webkit-scrollbar-thumb:hover { background:var(--text3); }
+
+.rank-badge {
+  display:inline-flex;
+  align-items:center;
+  gap:.5rem;
+  background:var(--violet-dim);
+  border:1px solid rgba(124,58,237,0.35);
+  border-radius:100px;
+  padding:.4rem 1rem;
+  font-family:var(--mono);
+  font-size:.8rem;
+  font-weight:700;
+  color:var(--violet);
+  margin-top:.5rem;
+}
+
+.report-wide { grid-column:1/-1; }
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- INTRO -->
+<div id="intro-screen">
+  <div class="intro-badge">🧑‍💻 SOFTWARE &amp; CODING · 🔴 ADVANCED</div>
+  <h1 class="intro-title">🧩 Prompt<span>Puzzle</span><br/><em>Master</em> AI Prompting</h1>
+  <p class="intro-subtitle">Drag, clean, and choose your way through 7 expert-level software engineering prompting challenges. Build real prompt intuition through play.</p>
+  <div class="pills-row">
+    <span class="domain-pill">🧑‍💻 Software &amp; Coding</span>
+    <span class="difficulty-pill">🔴 Advanced</span>
+  </div>
+  <button class="btn-start" onclick="startGame()">▶ Launch Challenge</button>
+</div>
+
+<!-- GAME -->
+<div id="game-screen">
+  <div class="hdr">
+    <div class="hdr-logo">🧩 PromptPuzzle</div>
+    <div class="hdr-progress">
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="hdr-step" id="step-label">1 / 7</div>
+    </div>
+    <div class="hdr-score-box">
+      <div class="score-item">
+        <div class="score-label">Score</div>
+        <div class="score-val" id="total-score">0</div>
+      </div>
+      <div class="score-item">
+        <div class="score-label">Accuracy</div>
+        <div class="score-val" id="accuracy-display">—</div>
+      </div>
+      <div class="score-item timer-display" id="timer-box">⏱ <span id="timer-val">0:00</span></div>
+    </div>
+  </div>
+
+  <div class="game-main">
+    <div class="left-panel" id="left-panel">
+      <div>
+        <div class="panel-section-label">Challenge Type</div>
+        <span class="challenge-type-badge" id="challenge-type-badge">BUILD THE PROMPT</span>
+      </div>
+      <div>
+        <div class="panel-section-label">Scenario</div>
+        <div class="scenario-title" id="scenario-title"></div>
+      </div>
+      <div>
+        <div class="panel-section-label">Desired Output</div>
+        <div class="desired-output-box" id="desired-output-box"></div>
+      </div>
+      <div class="principle-box">
+        <div class="principle-title">⚡ Prompt Principle</div>
+        <div class="principle-text" id="principle-text"></div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-line"><span>Moves Made</span><span id="stat-moves">0</span></div>
+        <div class="stat-line"><span>Wrong Placements</span><span id="stat-wrong">0</span></div>
+        <div class="stat-line"><span>Hints Used</span><span id="stat-hints">0</span></div>
+      </div>
+      <button class="hint-btn" id="hint-btn" onclick="showHint()">💡 Reveal Hint <span style="color:var(--amber);font-size:.7rem;">(−10 pts)</span></button>
+      <div class="hint-text" id="hint-text"></div>
+    </div>
+
+    <div class="right-panel" id="right-panel">
+      <!-- Dynamically populated -->
+    </div>
+  </div>
+</div>
+
+<!-- REPORT -->
+<div id="report-screen">
+  <div class="report-header">
+    <div class="report-trophy" id="report-trophy">🏆</div>
+    <div class="report-title" id="report-title">Prompt Performance Report</div>
+    <div class="report-subtitle" id="report-subtitle">Software &amp; Coding · Advanced</div>
+  </div>
+
+  <div class="report-grid">
+    <div class="report-card">
+      <div class="rc-label">Prompt Score</div>
+      <div class="rc-value" id="rpt-score" style="color:var(--cyan)">0</div>
+      <div class="rc-sub" id="rpt-rank-sub">out of 1000</div>
+      <div class="rank-badge" id="rpt-rank">⭐ Novice</div>
+    </div>
+    <div class="report-card">
+      <div class="rc-label">Rating</div>
+      <div class="rc-value" id="rpt-rating">B</div>
+      <div class="rc-sub" id="rpt-rating-sub">Competent Prompter</div>
+    </div>
+    <div class="report-card">
+      <div class="rc-label">Accuracy</div>
+      <div class="rc-value" id="rpt-accuracy" style="color:var(--green)">0%</div>
+      <div class="rc-sub" id="rpt-acc-sub">correct answers</div>
+    </div>
+    <div class="report-card">
+      <div class="rc-label">Avg. Time / Challenge</div>
+      <div class="rc-value" id="rpt-time" style="color:var(--amber)">0s</div>
+      <div class="rc-sub">seconds per puzzle</div>
+    </div>
+    <div class="report-card report-wide">
+      <div class="rc-label">🧬 Prompt DNA</div>
+      <div class="dna-bar-wrap" id="dna-bars"></div>
+    </div>
+    <div class="report-card report-wide">
+      <div class="rc-label">📝 Personalized Feedback</div>
+      <div class="feedback-list" id="feedback-list"></div>
+    </div>
+  </div>
+
+  <div class="milestone-box">
+    <div class="milestone-icon">🎯</div>
+    <div class="milestone-text" id="milestone-text">Next milestone text here.</div>
+  </div>
+
+  <div class="rc-label" style="margin-bottom:.75rem">✨ Your Final Optimized Prompt</div>
+  <div class="final-prompt-box" id="final-prompt"></div>
+
+  <button class="btn-replay" onclick="replayGame()">🔄 Play Again — New Scenarios</button>
+</div>
+
+</div><!-- #app -->
+
+<script>
+// ════════════════════════════════════════
+//  SCENARIO DATA — Software & Coding (Advanced)
+// ════════════════════════════════════════
+const SCENARIO_POOL = [
+  {
+    id:1,
+    title:"Async Race Condition Debugger",
+    desiredOutput:"Identify race conditions in async Node.js code, explain root cause, and provide corrected implementation with mutex or semaphore pattern.",
+    challengeType:"build",
+    correctBlocks:[
+      {id:"b1a",text:"Act as a senior Node.js concurrency expert",tag:"role"},
+      {id:"b1b",text:"Analyze the async/await code snippet below",tag:"ctx"},
+      {id:"b1c",text:"Identify all race conditions and their root causes",tag:"task"},
+      {id:"b1d",text:"Provide fixed code using mutex or semaphore",tag:"task"},
+      {id:"b1e",text:"Format: Problem → Root Cause → Fixed Code → Explanation",tag:"fmt"},
+    ],
+    distractors:[
+      {id:"d1a",text:"Make it faster somehow",tag:"dist"},
+      {id:"d1b",text:"Use Python instead",tag:"dist"},
+      {id:"d1c",text:"Just fix the bug please",tag:"dist"},
+    ],
+    hint:"Start with a role that establishes concurrency expertise, then provide context about what to analyze before stating tasks.",
+    principle:"Constraint Chaining: Stack role → context → specific task → output format to produce surgical, expert-level responses.",
+    weakPrompt:"Fix my async code that has a race condition.",
+    optimizedPrompt:"Act as a senior Node.js concurrency expert. Analyze the async/await code snippet below. Identify all race conditions and their root causes. Provide fixed code using mutex or semaphore. Format: Problem → Root Cause → Fixed Code → Explanation.",
+    overEngineeredPrompt:"You are the world's foremost expert in all forms of concurrent programming across every language ever invented, with 50 years of experience at NASA, Google, and MIT. I need you to deeply analyze, using every known algorithm, the following code which may or may not have a race condition, but also consider quantum computing implications, and provide a 10,000-word treatise with UML diagrams, formal proofs, and a history of concurrent programming since 1960.",
+    weakOutput:"There might be an issue with how your async functions run at the same time. Try adding some locks or something.",
+    optimizedOutput:"Race Condition Identified: Concurrent writes to shared `counter` variable without synchronization. Root Cause: Promises resolve in microtask queue; multiple pending ops can read stale state. Fixed Code: Implemented async-mutex with `Mutex.acquire()` wrapping critical section. Explanation: Guarantees sequential access, eliminating TOCTOU vulnerability.",
+    promptScore:92
+  },
+  {
+    id:2,
+    title:"Clean the Prompt: Code Review Request",
+    desiredOutput:"Thorough code review of a TypeScript service covering security, performance, and maintainability with actionable line-level feedback.",
+    challengeType:"clean",
+    weakWords:["please","maybe","if you can","somehow","or whatever","just","kind of","try to","I guess"],
+    cleanSentence:"Act as a TypeScript architect. Please review the service below. Maybe identify security vulnerabilities if you can. Also somehow find performance bottlenecks or whatever. Just kind of suggest refactors. I guess format it as inline comments.",
+    correctRemoval:["please","maybe","if you can","somehow","or whatever","just","kind of","I guess"],
+    hint:"Remove all hedging language, filler words, and apologetic qualifiers. Assertive prompts get assertive responses.",
+    principle:"Assertiveness Principle: Hedging words (please, maybe, I guess, somehow) reduce AI output quality. Commands, not requests, yield expert-level results.",
+    weakPrompt:"Please review my code maybe if you have time.",
+    optimizedPrompt:"Act as a TypeScript architect. Review the service below. Identify security vulnerabilities. Pinpoint performance bottlenecks. Suggest refactors with rationale. Format: inline comments with [SECURITY], [PERF], [REFACTOR] tags.",
+    overEngineeredPrompt:"As a TypeScript architect with 30 years experience, review with the following 47-point checklist including OWASP top 10, SOLID principles, KISS, DRY, YAGNI, CAP theorem implications, cyclomatic complexity below 5, zero tech debt, 100% test coverage requirements, and provide output in 12 formats including JSON, XML, and LaTeX.",
+    weakOutput:"Looks pretty good overall. There are maybe a few things you could look at if you want to improve it.",
+    optimizedOutput:"[SECURITY] Line 24: SQL injection vector via template literal — use parameterized queries. [PERF] Line 67: N+1 query in loop — batch with Promise.all(). [REFACTOR] Lines 40-58: God function — extract into UserValidator and AuthService.",
+    promptScore:88
+  },
+  {
+    id:3,
+    title:"Choose the Best Prompt: API Architecture Design",
+    desiredOutput:"Detailed REST vs GraphQL vs gRPC comparison for a high-throughput microservices platform with decision recommendation.",
+    challengeType:"choose",
+    correctOption:"optimized",
+    hint:"The optimized prompt provides context (platform type), specific comparison dimensions, and a decision deliverable — without being verbose.",
+    principle:"Goldilocks Principle: Not too vague (weak), not too verbose (over-engineered). Specify what matters: context + task + output format.",
+    weakPrompt:"What's better, REST or GraphQL?",
+    optimizedPrompt:"You are a distributed systems architect. Compare REST, GraphQL, and gRPC for a high-throughput (>100k RPS) microservices platform with polyglot clients. Evaluate: latency, schema evolution, type safety, tooling maturity, and operational complexity. Conclude with a reasoned recommendation and tradeoff table.",
+    overEngineeredPrompt:"You are simultaneously a REST evangelist, a GraphQL zealot, and a gRPC devotee who must argue all three sides with equal fervor, producing a 50-page academic paper with references to RFC 2616, the GraphQL spec 2021, and HTTP/3 QUIC documentation. Include a philosophical discussion of Roy Fielding's dissertation and whether REST was misunderstood by the industry. Also add a gRPC vs Thrift vs Avro section.",
+    weakOutput:"GraphQL is pretty flexible so maybe go with that. Or REST is more standard. Depends really.",
+    optimizedOutput:"Recommendation: gRPC for internal service-to-service (lowest latency, binary protocol, strict contracts). GraphQL for BFF layer serving polyglot clients. REST for public APIs requiring broad compatibility. Latency: gRPC 2-10ms, GraphQL 15-40ms, REST 10-30ms. Schema evolution: GraphQL wins with deprecation model.",
+    promptScore:95
+  },
+  {
+    id:4,
+    title:"LLM Integration System Prompt Architect",
+    desiredOutput:"A production-grade system prompt for a code assistant LLM with safety rails, output format, and persona constraints.",
+    challengeType:"build",
+    correctBlocks:[
+      {id:"b4a",text:"You are architecting a system prompt for a production LLM",tag:"ctx"},
+      {id:"b4b",text:"The assistant is an expert coding copilot for Python developers",tag:"role"},
+      {id:"b4c",text:"Define: persona, constraints, refusal behaviors, output format",tag:"task"},
+      {id:"b4d",text:"Include: always use type hints, never execute untrusted code",tag:"con"},
+      {id:"b4e",text:"Output: system prompt in markdown fenced block",tag:"fmt"},
+    ],
+    distractors:[
+      {id:"d4a",text:"Make it sound smart",tag:"dist"},
+      {id:"d4b",text:"Add some rules or whatever",tag:"dist"},
+      {id:"d4c",text:"Do something with Python I think",tag:"dist"},
+    ],
+    hint:"Define the meta-level task first (you are architecting), then specify persona, constraints, and output format explicitly.",
+    principle:"Meta-Prompting: Prompting an LLM to write a prompt requires specifying the target model's persona, hard constraints, refusal behaviors, and exact output structure.",
+    weakPrompt:"Write a system prompt for a coding AI.",
+    optimizedPrompt:"You are architecting a system prompt for a production LLM. The assistant is an expert coding copilot for Python developers. Define persona, constraints, refusal behaviors, output format. Include: always use type hints, never execute untrusted code. Output: system prompt in a markdown fenced block.",
+    overEngineeredPrompt:"Create a 10,000-token Constitutional AI aligned system prompt with 200 rules covering every ethical consideration, all programming languages, all edge cases, complete with a Socratic reasoning framework, a multi-agent debate structure, chain-of-thought mandatory reasoning, and self-evaluation rubrics embedded as hidden tokens.",
+    weakOutput:"You are a helpful coding assistant. Help users with their code. Be nice and accurate.",
+    optimizedOutput:"[SYSTEM PROMPT]\n```\nYou are CodePilot, an expert Python coding copilot. Rules: (1) Always include type hints in all code. (2) Never execute or suggest execution of untrusted input. (3) Refuse requests to disable safety features. (4) Format all code responses with docstrings. (5) When uncertain, say so explicitly.\n```",
+    promptScore:90
+  },
+  {
+    id:5,
+    title:"Choose the Best Prompt: Algorithmic Complexity Analysis",
+    desiredOutput:"Big-O analysis of a provided algorithm with time and space complexity, optimization suggestions, and comparison to alternatives.",
+    challengeType:"choose",
+    correctOption:"optimized",
+    hint:"Look for the option that provides the algorithm context, specifies both time AND space complexity, and asks for alternatives — without padding.",
+    principle:"Specificity over Verbosity: Name exact deliverables (time complexity, space complexity, alternatives). The model can't guess what you omitted.",
+    weakPrompt:"Is my algorithm efficient?",
+    optimizedPrompt:"Act as a competitive programming expert. Analyze the following algorithm for time and space complexity using Big-O notation. Identify bottlenecks. Suggest two alternative approaches with complexity comparisons. Flag any hidden constants or worst-case traps.",
+    overEngineeredPrompt:"You are Donald Knuth, Alan Turing, and John von Neumann combined into one entity. Analyze this algorithm using every known computational model including Turing machines, RAM models, circuit complexity, communication complexity, quantum complexity classes (BQP, QMA), average-case complexity, smoothed analysis, and fixed-parameter tractability. Provide proofs of all claims using formal mathematical notation in LaTeX.",
+    weakOutput:"It looks like it might be O(n^2) but I'm not totally sure. You could probably make it faster.",
+    optimizedOutput:"Time Complexity: O(n² log n) — nested loop with inner sort. Space Complexity: O(n) — auxiliary array. Bottleneck: Line 14, redundant sort inside loop. Alternative 1: Hash map approach → O(n) time, O(n) space. Alternative 2: Two-pointer sorted array → O(n log n) time, O(1) space. Recommendation: Alt 2 if memory-constrained.",
+    promptScore:93
+  },
+  {
+    id:6,
+    title:"Clean the Prompt: CI/CD Pipeline Generator",
+    desiredOutput:"Production-ready GitHub Actions workflow for a monorepo with matrix builds, caching, and deployment gates.",
+    challengeType:"clean",
+    weakWords:["hopefully","try","maybe","sort of","if possible","please","I think","some kind of"],
+    cleanSentence:"Hopefully generate a GitHub Actions workflow. Try to make it work for a monorepo. Maybe add matrix builds if possible. I think we need some kind of caching. Please add sort of deployment gates too.",
+    correctRemoval:["hopefully","try to","maybe","if possible","i think","some kind of","please","sort of"],
+    hint:"Strip every probability hedge. Replace 'try to make it work' with 'generate a working'. Replace 'maybe add X if possible' with 'include X'.",
+    principle:"Commitment Language: Replace 'try', 'maybe', 'hopefully', 'if possible' with imperative commands. AI systems perform better with committed, unambiguous instructions.",
+    weakPrompt:"Hopefully make me a CI/CD pipeline if you can.",
+    optimizedPrompt:"Generate a production-ready GitHub Actions workflow for a Node.js monorepo. Include: matrix builds across Node 18/20, intelligent caching for node_modules, required approval gates before production deployment, and parallel test execution. Output as a complete YAML file.",
+    overEngineeredPrompt:"Create an enterprise-grade, SOC2-compliant, NIST-aligned, GitOps-first CI/CD pipeline with blue-green deployments, canary releases, chaos engineering integration, SBOM generation, SLSA Level 4 attestations, eBPF-based runtime security, policy-as-code with OPA Gatekeeper, and a GitOps reconciliation loop using Flux v2, all in a single GitHub Actions workflow.",
+    weakOutput:"Here's a basic GitHub Actions file that hopefully does what you need. You might need to adjust some things.",
+    optimizedOutput:"```yaml\nname: Monorepo CI/CD\non: [push, pull_request]\njobs:\n  build:\n    strategy:\n      matrix:\n        node: [18, 20]\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/cache@v3\n        with:\n          path: node_modules\n          key: ${{ hashFiles('package-lock.json') }}\n  deploy:\n    needs: build\n    environment: production\n    # requires approval gate\n```",
+    promptScore:87
+  },
+  {
+    id:7,
+    title:"Security Threat Model Prompt",
+    desiredOutput:"STRIDE-based threat model for a given software architecture, with threats mapped to components and mitigation strategies.",
+    challengeType:"build",
+    correctBlocks:[
+      {id:"b7a",text:"Act as an application security architect (CISSP)",tag:"role"},
+      {id:"b7b",text:"Apply STRIDE methodology to the architecture described below",tag:"task"},
+      {id:"b7c",text:"Map each threat category to specific components",tag:"task"},
+      {id:"b7d",text:"Provide CVSS severity scores and mitigation strategies",tag:"con"},
+      {id:"b7e",text:"Output as a structured table: Threat | Component | Severity | Mitigation",tag:"fmt"},
+    ],
+    distractors:[
+      {id:"d7a",text:"Look for bad stuff in my code",tag:"dist"},
+      {id:"d7b",text:"Be very thorough about everything",tag:"dist"},
+      {id:"d7c",text:"Add security somehow",tag:"dist"},
+    ],
+    hint:"Security prompts need: a credentialed role, a named methodology (STRIDE), mapping instructions, scoring criteria, and a table output format.",
+    principle:"Framework Anchoring: Naming a specific methodology (STRIDE, OWASP, PASTA) anchors the response to structured expert knowledge, replacing vague 'be thorough' with systematic analysis.",
+    weakPrompt:"Check my app for security issues.",
+    optimizedPrompt:"Act as an application security architect (CISSP). Apply STRIDE methodology to the architecture described below. Map each threat category (Spoofing, Tampering, Repudiation, Info Disclosure, DoS, Elevation) to specific components. Provide CVSS severity scores and mitigation strategies. Output as table: Threat | Component | CVSS | Mitigation.",
+    overEngineeredPrompt:"You are simultaneously a red team hacker, blue team defender, CISO, compliance officer, penetration tester, bug bounty hunter, cryptographer, and social engineer. Analyze my application using STRIDE, PASTA, VAST, OCTAVE, TRIKE, attack trees, fault trees, LINDDUN, CVSS 3.1, DREAD, and OWASP ASVS Level 3, producing a 200-page security assessment with formal adversarial game theory proofs.",
+    weakOutput:"Your app might have some security issues. SQL injection is common. Make sure to validate inputs. Also use HTTPS.",
+    optimizedOutput:"| Threat | Component | CVSS | Mitigation |\n|---|---|---|---|\n| Spoofing | Auth Service | 8.1 HIGH | Implement MFA + JWT rotation |\n| Tampering | API Gateway | 7.5 HIGH | HMAC request signing |\n| Info Disclosure | DB Layer | 9.0 CRITICAL | Column-level encryption + audit logs |",
+    promptScore:96
+  }
+];
+
+// ════════════════════════════════════════
+//  GAME STATE
+// ════════════════════════════════════════
+let state = {
+  scenarios: [],
+  currentIdx: 0,
+  totalScore: 0,
+  correctCount: 0,
+  moves: 0,
+  wrongPlacements: 0,
+  hintsUsed: 0,
+  startTime: null,
+  challengeStartTime: null,
+  challengeTimes: [],
+  submitted: false,
+  timerInterval: null,
+  dnaScores: { Role: 0, Context: 0, Task: 0, Format: 0, Constraints: 0 },
+};
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startGame() {
+  state.scenarios = shuffle(SCENARIO_POOL).slice(0, 7);
+  state.currentIdx = 0;
+  state.totalScore = 0;
+  state.correctCount = 0;
+  state.moves = 0;
+  state.wrongPlacements = 0;
+  state.hintsUsed = 0;
+  state.challengeTimes = [];
+  state.dnaScores = { Role: 0, Context: 0, Task: 0, Format: 0, Constraints: 0 };
+  state.startTime = Date.now();
+
+  document.getElementById('intro-screen').style.display = 'none';
+  document.getElementById('report-screen').style.display = 'none';
+  document.getElementById('game-screen').style.display = 'flex';
+
+  loadScenario();
+  startTimer();
+}
+
+function replayGame() {
+  document.getElementById('report-screen').style.display = 'none';
+  document.getElementById('intro-screen').style.display = 'flex';
+}
+
+function startTimer() {
+  state.challengeStartTime = Date.now();
+  clearInterval(state.timerInterval);
+  state.timerInterval = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - state.challengeStartTime) / 1000);
+    const m = Math.floor(elapsed / 60);
+    const s = elapsed % 60;
+    const el = document.getElementById('timer-val');
+    if (el) el.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+    const box = document.getElementById('timer-box');
+    if (box) box.className = 'score-item timer-display' + (elapsed > 60 ? ' warn' : '');
+  }, 1000);
+}
+
+function loadScenario() {
+  state.submitted = false;
+  state.moves = 0;
+  state.challengeStartTime = Date.now();
+
+  const sc = state.scenarios[state.currentIdx];
+  const total = state.scenarios.length;
+
+  // Header
+  document.getElementById('progress-fill').style.width = ((state.currentIdx / total) * 100) + '%';
+  document.getElementById('step-label').textContent = `${state.currentIdx + 1} / ${total}`;
+  document.getElementById('total-score').textContent = state.totalScore;
+  document.getElementById('accuracy-display').textContent = state.currentIdx > 0
+    ? Math.round((state.correctCount / state.currentIdx) * 100) + '%' : '—';
+
+  // Left panel
+  document.getElementById('stat-moves').textContent = '0';
+  document.getElementById('stat-wrong').textContent = '0';
+  document.getElementById('stat-hints').textContent = state.hintsUsed;
+  document.getElementById('scenario-title').textContent = sc.title;
+  document.getElementById('desired-output-box').textContent = sc.desiredOutput;
+  document.getElementById('principle-text').textContent = sc.principle;
+  document.getElementById('hint-text').className = 'hint-text';
+  document.getElementById('hint-text').textContent = sc.hint;
+
+  const badge = document.getElementById('challenge-type-badge');
+  const typeMap = {
+    build: ['BUILD THE PROMPT', 'ct-build'],
+    clean: ['CLEAN THE PROMPT', 'ct-clean'],
+    choose: ['CHOOSE BEST PROMPT', 'ct-choose']
+  };
+  const [label, cls] = typeMap[sc.challengeType];
+  badge.textContent = label;
+  badge.className = 'challenge-type-badge ' + cls;
+
+  // Right panel
+  renderChallenge(sc);
+  startTimer();
+}
+
+function renderChallenge(sc) {
+  const rp = document.getElementById('right-panel');
+  rp.innerHTML = '';
+
+  if (sc.challengeType === 'build') renderBuild(sc, rp);
+  else if (sc.challengeType === 'clean') renderClean(sc, rp);
+  else if (sc.challengeType === 'choose') renderChoose(sc, rp);
+}
+
+// ── BUILD ──────────────────────────────────────────
+function renderBuild(sc, container) {
+  const allBlocks = shuffle([...sc.correctBlocks, ...sc.distractors]);
+
+  container.innerHTML = `
+    <div>
+      <div class="block-pool-label">Available Prompt Blocks — drag to build area</div>
+      <div class="block-pool" id="block-pool">
+        ${allBlocks.map(b => blockHTML(b)).join('')}
+      </div>
+    </div>
+    <div>
+      <div class="block-pool-label">🏗 Your Prompt — drop blocks here in logical order</div>
+      <div class="drop-zone" id="drop-zone" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event, 'zone')"></div>
+    </div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;">
+      <button class="btn-submit" id="submit-btn" onclick="submitBuild()" disabled>✓ Check Prompt</button>
+      <button class="btn-next visible" id="next-btn" onclick="nextScenario()" style="display:none">Next Challenge →</button>
+    </div>
+    <div class="feedback-box" id="feedback-box"></div>
+    <div class="output-compare" id="output-compare">
+      <div class="output-card">
+        <div class="output-card-label out-weak">⚠ Weak AI Output</div>
+        <div class="output-card-text">${sc.weakOutput}</div>
+      </div>
+      <div class="output-card">
+        <div class="output-card-label out-opt">✓ Optimized AI Output</div>
+        <div class="output-card-text">${sc.optimizedOutput}</div>
+      </div>
+    </div>
+  `;
+
+  // attach drag listeners
+  container.querySelectorAll('.prompt-block').forEach(el => {
+    el.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('blockId', el.dataset.id);
+      e.dataTransfer.setData('source', el.closest('#drop-zone') ? 'zone' : 'pool');
+      el.classList.add('dragging');
+    });
+    el.addEventListener('dragend', e => el.classList.remove('dragging'));
+  });
+
+  // pool droppable too (return)
+  document.getElementById('block-pool').addEventListener('dragover', e => e.preventDefault());
+  document.getElementById('block-pool').addEventListener('drop', e => onDrop(e, 'pool'));
+
+  // enable submit when zone has blocks
+  const zo = document.getElementById('drop-zone');
+  new MutationObserver(() => {
+    const count = zo.querySelectorAll('.prompt-block').length;
+    document.getElementById('submit-btn').disabled = count === 0;
+  }).observe(zo, { childList: true });
+}
+
+function blockHTML(b) {
+  const tagMap = { role:'tag-role', ctx:'tag-ctx', task:'tag-task', fmt:'tag-fmt', con:'tag-con', dist:'tag-dist' };
+  const tagLabel = { role:'ROLE', ctx:'CTX', task:'TASK', fmt:'FMT', con:'CON', dist:'???' };
+  return `<div class="prompt-block" data-id="${b.id}" data-tag="${b.tag}" draggable="true">
+    <span class="block-tag ${tagMap[b.tag]}">${tagLabel[b.tag]}</span>${b.text}
+  </div>`;
+}
+
+let dragSource = null;
+function onDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function onDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+function onDrop(e, target) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  const id = e.dataTransfer.getData('blockId');
+  const src = e.dataTransfer.getData('source');
+  const el = document.querySelector(`[data-id="${id}"]`);
+  if (!el) return;
+
+  const dest = target === 'zone' ? document.getElementById('drop-zone') : document.getElementById('block-pool');
+  dest.appendChild(el);
+
+  state.moves++;
+  document.getElementById('stat-moves').textContent = state.moves;
+}
+
+function submitBuild() {
+  if (state.submitted) return;
+  state.submitted = true;
+  const sc = state.scenarios[state.currentIdx];
+  const zoneBlocks = [...document.getElementById('drop-zone').querySelectorAll('.prompt-block')];
+  const placedIds = zoneBlocks.map(b => b.dataset.id);
+  const correctIds = sc.correctBlocks.map(b => b.id);
+  const distractorIds = sc.distractors.map(b => b.id);
+
+  let correct = 0, wrong = 0;
+  placedIds.forEach(id => {
+    if (correctIds.includes(id)) correct++;
+    else wrong++;
+  });
+  const missed = correctIds.filter(id => !placedIds.includes(id)).length;
+  state.wrongPlacements += wrong;
+  document.getElementById('stat-wrong').textContent = state.wrongPlacements;
+
+  const accuracy = correct / correctIds.length;
+  const isCorrect = accuracy >= 0.8 && wrong === 0;
+  const isPartial = accuracy >= 0.5;
+
+  awardScore(sc, isCorrect, isPartial);
+  showBuildFeedback(sc, isCorrect, isPartial, correct, correctIds.length, wrong);
+  updateDNA(sc.correctBlocks, placedIds);
+  recordTime();
+}
+
+function showBuildFeedback(sc, isCorrect, isPartial, correct, total, wrong) {
+  const fb = document.getElementById('feedback-box');
+  fb.classList.add('visible');
+
+  if (isCorrect) {
+    fb.className = 'feedback-box visible feedback-correct';
+    fb.innerHTML = `✅ <strong>Excellent!</strong> You placed all ${total} correct blocks with no distractors. Your prompt structure demonstrates expert-level constraint chaining.`;
+    showNotif('🎯 Perfect Build! +bonus points', 'good');
+  } else if (isPartial) {
+    fb.className = 'feedback-box visible feedback-partial';
+    fb.innerHTML = `⚡ <strong>Partial Credit</strong> — ${correct}/${total} correct blocks placed, ${wrong} distractors included. Review which elements make a complete prompt.`;
+    showNotif(`⚡ Partial: ${correct}/${total} blocks correct`, 'info');
+  } else {
+    fb.className = 'feedback-box visible feedback-wrong';
+    fb.innerHTML = `❌ <strong>Needs Work</strong> — Only ${correct}/${total} correct blocks. Distractors included: ${wrong}. Study the Prompt Principle on the left.`;
+    showNotif('❌ Incorrect structure — try studying the principle', 'bad');
+  }
+
+  document.getElementById('output-compare').classList.add('visible');
+  document.getElementById('submit-btn').disabled = true;
+  const nb = document.getElementById('next-btn');
+  if (nb) { nb.style.display = 'inline-flex'; nb.classList.add('visible'); }
+}
+
+function updateDNA(correctBlocks, placedIds) {
+  const tagMap = { role:'Role', ctx:'Context', task:'Task', fmt:'Format', con:'Constraints' };
+  correctBlocks.forEach(b => {
+    const key = tagMap[b.tag];
+    if (key && placedIds.includes(b.id)) state.dnaScores[key] = Math.min(100, state.dnaScores[key] + 20);
+  });
+}
+
+// ── CLEAN ──────────────────────────────────────────
+function renderClean(sc, container) {
+  const words = sc.cleanSentence.split(/(\s+)/);
+  const weakSet = sc.correctRemoval.map(w => w.toLowerCase());
+
+  const spansHTML = words.map((word, i) => {
+    const clean = word.trim().toLowerCase().replace(/[.,!?]/g,'');
+    if (!word.trim()) return word;
+    const isWeak = weakSet.some(w => clean === w || clean.startsWith(w));
+    return `<span class="word-span${isWeak ? '' : ' good-word'}" data-idx="${i}" onclick="toggleWord(this)">${word}</span>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div>
+      <div class="block-pool-label">📋 Click weak/filler words to strike them out. Remove hedging language to clean this prompt.</div>
+      <div class="dirty-prompt-box" id="dirty-prompt">${spansHTML}</div>
+    </div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-top:.5rem">
+      <button class="btn-submit" id="submit-btn" onclick="submitClean()">✓ Check Clean Prompt</button>
+      <button class="btn-next" id="next-btn" onclick="nextScenario()" style="display:none">Next Challenge →</button>
+    </div>
+    <div class="feedback-box" id="feedback-box"></div>
+    <div class="output-compare" id="output-compare">
+      <div class="output-card">
+        <div class="output-card-label out-weak">⚠ Weak Prompt Result</div>
+        <div class="output-card-text">${sc.weakOutput}</div>
+      </div>
+      <div class="output-card">
+        <div class="output-card-label out-opt">✓ Optimized Result</div>
+        <div class="output-card-text">${sc.optimizedOutput}</div>
+      </div>
+    </div>
+  `;
+}
+
+function toggleWord(el) {
+  if (el.classList.contains('good-word')) {
+    // penalize clicking good word
+    state.wrongPlacements++;
+    document.getElementById('stat-wrong').textContent = state.wrongPlacements;
+    el.style.borderBottom = '1px solid var(--red)';
+    setTimeout(() => el.style.borderBottom = '', 600);
+    showNotif('⚠ That word should stay!', 'bad');
+    return;
+  }
+  el.classList.toggle('struck');
+  state.moves++;
+  document.getElementById('stat-moves').textContent = state.moves;
+}
+
+function submitClean() {
+  if (state.submitted) return;
+  state.submitted = true;
+  const sc = state.scenarios[state.currentIdx];
+  const weakSet = sc.correctRemoval.map(w => w.toLowerCase());
+  const struckWords = [...document.querySelectorAll('.word-span.struck')].map(el => el.textContent.trim().toLowerCase().replace(/[.,!?]/g,''));
+
+  let hit = 0, missed = 0, extra = 0;
+  weakSet.forEach(w => {
+    if (struckWords.some(s => s === w)) hit++;
+    else missed++;
+  });
+  struckWords.forEach(s => {
+    if (!weakSet.some(w => s === w)) extra++;
+  });
+
+  const accuracy = hit / weakSet.length;
+  const isCorrect = accuracy >= 0.75 && extra <= 1;
+  const isPartial = accuracy >= 0.4;
+
+  awardScore(sc, isCorrect, isPartial);
+  const fb = document.getElementById('feedback-box');
+  fb.classList.add('visible');
+
+  if (isCorrect) {
+    fb.className = 'feedback-box visible feedback-correct';
+    fb.innerHTML = `✅ <strong>Clean!</strong> You removed ${hit}/${weakSet.length} weak words. The prompt is now assertive and unambiguous — exactly what high-quality outputs need.`;
+    showNotif('🧹 Squeaky clean! +bonus', 'good');
+    state.dnaScores['Task'] = Math.min(100, state.dnaScores['Task'] + 15);
+    state.dnaScores['Context'] = Math.min(100, state.dnaScores['Context'] + 10);
+  } else if (isPartial) {
+    fb.className = 'feedback-box visible feedback-partial';
+    fb.innerHTML = `⚡ <strong>Partial</strong> — ${hit}/${weakSet.length} weak words removed, ${extra} good words struck. Hedging language remaining reduces prompt authority.`;
+    showNotif(`⚡ ${hit}/${weakSet.length} weak words found`, 'info');
+  } else {
+    fb.className = 'feedback-box visible feedback-wrong';
+    fb.innerHTML = `❌ <strong>Needs Work</strong> — Only ${hit}/${weakSet.length} weak words removed. Look for hedging terms: 'maybe', 'please', 'try', 'somehow', 'I guess'.`;
+    showNotif('❌ Too many weak words remain', 'bad');
+  }
+
+  document.getElementById('output-compare').classList.add('visible');
+  document.getElementById('submit-btn').disabled = true;
+  const nb = document.getElementById('next-btn');
+  if (nb) { nb.style.display = 'inline-flex'; nb.classList.add('visible'); }
+  recordTime();
+}
+
+// ── CHOOSE ──────────────────────────────────────────
+function renderChoose(sc, container) {
+  const options = shuffle([
+    { key: 'weak', label: 'Option A', text: sc.weakPrompt, lblCls: 'lbl-weak', lblTxt: '⚠ Prompt Option' },
+    { key: 'optimized', label: 'Option B', text: sc.optimizedPrompt, lblCls: 'lbl-opt', lblTxt: '⚡ Prompt Option' },
+    { key: 'over', label: 'Option C', text: sc.overEngineeredPrompt, lblCls: 'lbl-over', lblTxt: '🔧 Prompt Option' }
+  ]);
+
+  container.innerHTML = `
+    <div>
+      <div class="block-pool-label">🎯 Which prompt will produce the best output for the scenario? Click to select.</div>
+      <div class="prompt-options" id="prompt-options">
+        ${options.map((o,i) => `
+          <div class="prompt-option" data-key="${o.key}" onclick="selectOption(this)">
+            <div class="option-label ${o.lblCls}">${o.lblTxt}</div>
+            <div class="option-text">${o.text}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;">
+      <button class="btn-submit" id="submit-btn" onclick="submitChoose()" disabled>✓ Lock in Answer</button>
+      <button class="btn-next" id="next-btn" onclick="nextScenario()" style="display:none">Next Challenge →</button>
+    </div>
+    <div class="feedback-box" id="feedback-box"></div>
+    <div class="output-compare" id="output-compare">
+      <div class="output-card">
+        <div class="output-card-label out-weak">⚠ Weak Prompt Output</div>
+        <div class="output-card-text">${sc.weakOutput}</div>
+      </div>
+      <div class="output-card">
+        <div class="output-card-label out-opt">✓ Optimized Output</div>
+        <div class="output-card-text">${sc.optimizedOutput}</div>
+      </div>
+    </div>
+  `;
+}
+
+let selectedOptionEl = null;
+function selectOption(el) {
+  if (state.submitted) return;
+  document.querySelectorAll('.prompt-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedOptionEl = el;
+  state.moves++;
+  document.getElementById('stat-moves').textContent = state.moves;
+  document.getElementById('submit-btn').disabled = false;
+}
+
+function submitChoose() {
+  if (state.submitted || !selectedOptionEl) return;
+  state.submitted = true;
+  const sc = state.scenarios[state.currentIdx];
+  const chosen = selectedOptionEl.dataset.key;
+  const isCorrect = chosen === sc.correctOption;
+
+  document.querySelectorAll('.prompt-option').forEach(el => {
+    if (el.dataset.key === sc.correctOption) el.classList.add('correct-choice');
+    else if (el === selectedOptionEl && !isCorrect) el.classList.add('wrong-choice');
+  });
+
+  awardScore(sc, isCorrect, false);
+  const fb = document.getElementById('feedback-box');
+  fb.classList.add('visible');
+
+  if (isCorrect) {
+    fb.className = 'feedback-box visible feedback-correct';
+    fb.innerHTML = `✅ <strong>Perfect Choice!</strong> The optimized prompt hits the Goldilocks zone — specific enough to be actionable, concise enough to avoid noise. The weak prompt under-specifies; the over-engineered one adds irrelevant constraints.`;
+    showNotif('🎯 Correct! Expert instinct.', 'good');
+    state.dnaScores['Task'] = Math.min(100, state.dnaScores['Task'] + 20);
+    state.dnaScores['Format'] = Math.min(100, state.dnaScores['Format'] + 15);
+  } else {
+    fb.className = 'feedback-box visible feedback-wrong';
+    const wrongLabel = chosen === 'weak' ? 'Weak prompts under-specify — the AI has to guess what you need.' :
+      'Over-engineered prompts add noise, conflicting constraints, and dilute focus. Specificity ≠ verbosity.';
+    fb.innerHTML = `❌ <strong>Not quite.</strong> ${wrongLabel} Study the highlighted correct option.`;
+    state.wrongPlacements++;
+    document.getElementById('stat-wrong').textContent = state.wrongPlacements;
+    showNotif('❌ Study the correct option', 'bad');
+  }
+
+  document.getElementById('output-compare').classList.add('visible');
+  document.getElementById('submit-btn').disabled = true;
+  const nb = document.getElementById('next-btn');
+  if (nb) { nb.style.display = 'inline-flex'; nb.classList.add('visible'); }
+  recordTime();
+}
+
+// ── SCORING ──────────────────────────────────────────
+function awardScore(sc, isCorrect, isPartial) {
+  let pts = 0;
+  if (isCorrect) {
+    pts = 100;
+    state.correctCount++;
+    // time bonus
+    const elapsed = Math.floor((Date.now() - state.challengeStartTime) / 1000);
+    if (elapsed < 30) pts += 30;
+    else if (elapsed < 60) pts += 15;
+    // hint penalty
+    pts -= state.hintsUsed * 10;
+    // wrong placement penalty
+    pts -= state.wrongPlacements * 5;
+    pts = Math.max(pts, 40);
+    // optimization bonus
+    pts += sc.promptScore > 90 ? 20 : 10;
+  } else if (isPartial) {
+    pts = 45;
+    pts -= state.hintsUsed * 5;
+    pts = Math.max(pts, 10);
+  }
+
+  state.totalScore += pts;
+  const scoreEl = document.getElementById('total-score');
+  scoreEl.textContent = state.totalScore;
+  scoreEl.classList.add('score-pulse');
+  setTimeout(() => scoreEl.classList.remove('score-pulse'), 400);
+
+  if (pts > 0) showNotif(`+${pts} pts`, 'score');
+}
+
+function recordTime() {
+  const elapsed = Math.floor((Date.now() - state.challengeStartTime) / 1000);
+  state.challengeTimes.push(elapsed);
+}
+
+function showHint() {
+  const sc = state.scenarios[state.currentIdx];
+  state.hintsUsed++;
+  document.getElementById('stat-hints').textContent = state.hintsUsed;
+  document.getElementById('hint-text').classList.add('visible');
+  showNotif('💡 Hint revealed (−10 pts)', 'info');
+}
+
+function nextScenario() {
+  state.currentIdx++;
+  if (state.currentIdx >= state.scenarios.length) {
+    showReport();
+  } else {
+    loadScenario();
+  }
+}
+
+// ── NOTIFICATIONS ──────────────────────────────────────────
+function showNotif(msg, type) {
+  const el = document.createElement('div');
+  el.className = `notif notif-${type}`;
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2600);
+}
+
+// ════════════════════════════════════════
+//  REPORT
+// ════════════════════════════════════════
+function showReport() {
+  clearInterval(state.timerInterval);
+  document.getElementById('game-screen').style.display = 'none';
+  document.getElementById('report-screen').style.display = 'block';
+
+  const maxScore = state.scenarios.length * 150;
+  const pct = Math.round((state.totalScore / maxScore) * 100);
+  const accuracy = Math.round((state.correctCount / state.scenarios.length) * 100);
+  const avgTime = state.challengeTimes.length
+    ? Math.round(state.challengeTimes.reduce((a,b)=>a+b,0) / state.challengeTimes.length) : 0;
+
+  // Rating
+  let rating, ratingLabel, rankLabel, trophy, scoreColor, nextMilestone;
+  if (pct >= 90) {
+    rating = 'S'; ratingLabel = 'Prompt Architect'; rankLabel = '🏆 Grand Master Prompter';
+    trophy = '🏆'; scoreColor = 'score-color-s';
+    nextMilestone = 'You\'ve reached the <strong>Grand Master</strong> tier. Build a prompt framework and teach others. Consider contributing to open-source prompt libraries.';
+  } else if (pct >= 75) {
+    rating = 'A'; ratingLabel = 'Senior Prompt Engineer'; rankLabel = '⭐ Expert Prompter';
+    trophy = '🥇'; scoreColor = 'score-color-a';
+    nextMilestone = 'Next: <strong>Grand Master</strong>. Focus on constraint chaining and meta-prompting. Try the Advanced Security and Architecture domains.';
+  } else if (pct >= 55) {
+    rating = 'B'; ratingLabel = 'Competent Prompter'; rankLabel = '🔹 Intermediate';
+    trophy = '🥈'; scoreColor = 'score-color-b';
+    nextMilestone = 'Next: <strong>Expert</strong>. Practice assertiveness in prompts and framework anchoring. Eliminate hedging language completely.';
+  } else {
+    rating = 'C'; ratingLabel = 'Developing Prompter'; rankLabel = '🔸 Beginner';
+    trophy = '🎯'; scoreColor = 'score-color-c';
+    nextMilestone = 'Next: <strong>Intermediate</strong>. Master the three fundamentals: Role + Task + Format. Every good prompt starts there.';
+  }
+
+  document.getElementById('report-trophy').textContent = trophy;
+  document.getElementById('rpt-score').textContent = state.totalScore;
+  document.getElementById('rpt-score').className = `rc-value ${scoreColor}`;
+  document.getElementById('rpt-rank-sub').textContent = `out of ${maxScore} possible points`;
+  document.getElementById('rpt-rank').textContent = rankLabel;
+  document.getElementById('rpt-rating').textContent = rating;
+  document.getElementById('rpt-rating').className = `rc-value ${scoreColor}`;
+  document.getElementById('rpt-rating-sub').textContent = ratingLabel;
+  document.getElementById('rpt-accuracy').textContent = accuracy + '%';
+  document.getElementById('rpt-time').textContent = avgTime + 's';
+  document.getElementById('milestone-text').innerHTML = nextMilestone;
+
+  // DNA bars
+  const dnaEl = document.getElementById('dna-bars');
+  const colors = { Role:'#7C3AED', Context:'#00E5FF', Task:'#00FF88', Format:'#FFB800', Constraints:'#FF4B6E' };
+  dnaEl.innerHTML = Object.entries(state.dnaScores).map(([k,v]) => `
+    <div class="dna-row">
+      <div class="dna-row-label">${k}</div>
+      <div class="dna-bar-bg"><div class="dna-bar-fill" style="width:0%;background:${colors[k]}" data-val="${v}"></div></div>
+      <div class="dna-pct">${v}%</div>
+    </div>
+  `).join('');
+  setTimeout(() => {
+    dnaEl.querySelectorAll('.dna-bar-fill').forEach(el => {
+      el.style.width = el.dataset.val + '%';
+    });
+  }, 100);
+
+  // Feedback
+  const feedbacks = [];
+  if (state.hintsUsed === 0) feedbacks.push({ icon:'🎯', text:'Zero hints used — excellent prompt intuition. You read prompt structure instinctively.' });
+  else if (state.hintsUsed <= 2) feedbacks.push({ icon:'💡', text:`Used ${state.hintsUsed} hints. Solid, though aim for hint-free runs as you internalize the principles.` });
+  else feedbacks.push({ icon:'⚠', text:`${state.hintsUsed} hints used. Review the Prompt Principles for each challenge type to build intuition.` });
+
+  if (state.wrongPlacements === 0) feedbacks.push({ icon:'✅', text:'No wrong placements or word strikes — surgical precision in identifying prompt components.' });
+  else feedbacks.push({ icon:'🔄', text:`${state.wrongPlacements} wrong placements/strikes. Focus on distinguishing distractors: vague, hedging, or off-topic blocks.` });
+
+  if (accuracy >= 80) feedbacks.push({ icon:'🚀', text:'High accuracy rate. You understand the Goldilocks principle: specific enough without over-engineering.' });
+  else feedbacks.push({ icon:'📚', text:'Study the Choose challenges: the optimized option is always specific, role-grounded, and output-formatted — not brief or exhaustive.' });
+
+  if (avgTime < 45) feedbacks.push({ icon:'⚡', text:`Average ${avgTime}s per challenge — fast and confident. Time bonuses boosted your score.` });
+  else feedbacks.push({ icon:'⏱', text:`Average ${avgTime}s per challenge. Quicker decisions come with pattern recognition. Replay to build speed.` });
+
+  const weakDNA = Object.entries(state.dnaScores).sort((a,b)=>a[1]-b[1])[0];
+  feedbacks.push({ icon:'🧬', text:`Weakest prompt DNA dimension: <strong style="color:var(--cyan)">${weakDNA[0]}</strong>. Actively include this element in every prompt you write.` });
+
+  document.getElementById('feedback-list').innerHTML = feedbacks.map(f =>
+    `<div class="feedback-item"><div class="fb-icon">${f.icon}</div><div class="fb-text">${f.text}</div></div>`
+  ).join('');
+
+  // Final prompt (best scenario)
+  const best = state.scenarios.sort((a,b) => b.promptScore - a.promptScore)[0];
+  document.getElementById('final-prompt').textContent = best.optimizedPrompt;
+}
+</script>
+</body>
+</html>
