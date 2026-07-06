@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cognitive Pattern Explorer</title>
+<style>
+  :root{
+    --void:#0e1120;
+    --panel:#171c33;
+    --panel-2:#1f2547;
+    --panel-border:rgba(238,241,251,0.09);
+    --ink:#eef1fb;
+    --ink-dim:#aab0d6;
+    --teal:#6fe7dd;
+    --violet:#a78bfa;
+    --rose:#f6a6b2;
+    --amber:#f5c26b;
+    --paper:#f6f2e9;
+    --paper-ink:#2b2a26;
+    --radius:18px;
+    --radius-sm:10px;
+    --ease: cubic-bezier(.22,.9,.32,1);
+    --dur: 500ms;
+    --accent: var(--teal);
+    --accent-2: var(--violet);
+    --speed: 32s;
+    --font-display: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', serif;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  }
+  body[data-mode="stress"]{ --accent:var(--rose); --accent-2:var(--amber); --speed:13s; }
+  body[data-mode="calm"]{ --accent:var(--teal); --accent-2:var(--violet); --speed:32s; }
+
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    background:var(--void);
+    color:var(--ink);
+    font-family:var(--font-body);
+    min-height:100vh;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  .sr-only{
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+    overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+  a,button{ font-family:inherit; }
+  button{ cursor:pointer; }
+  :focus-visible{ outline:2px solid var(--accent); outline-offset:3px; border-radius:6px; }
+
+  /* ---------- Ambient background ---------- */
+  .ambient{ position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none; }
+  .blob{
+    position:absolute; border-radius:50%; filter:blur(60px); opacity:.35;
+    animation: drift var(--speed) ease-in-out infinite alternate;
+  }
+  .blob-1{ width:42vmax; height:42vmax; top:-15vmax; left:-10vmax; background:radial-gradient(circle,var(--accent),transparent 70%); }
+  .blob-2{ width:36vmax; height:36vmax; bottom:-14vmax; right:-8vmax; background:radial-gradient(circle,var(--accent-2),transparent 70%); animation-delay:-6s; }
+  .blob-3{ width:26vmax; height:26vmax; top:40%; left:60%; background:radial-gradient(circle,var(--violet),transparent 70%); opacity:.22; animation-delay:-12s; }
+  @keyframes drift{
+    0%{ transform:translate(0,0) scale(1); }
+    100%{ transform:translate(6%,8%) scale(1.12); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .blob{ animation:none !important; }
+  }
+  body.reduced-motion .blob{ animation:none !important; }
+
+  /* ---------- Layout shell ---------- */
+  #app{ position:relative; z-index:1; min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:32px 18px 60px; }
+
+  .progress{ width:100%; max-width:640px; margin:0 auto 28px; display:none; }
+  .progress.visible{ display:block; }
+  .steps{ list-style:none; display:flex; justify-content:space-between; padding:0; margin:0; position:relative; }
+  .steps::before{
+    content:""; position:absolute; top:9px; left:5%; right:5%; height:1px;
+    background:var(--panel-border); z-index:0;
+  }
+  .steps li{ position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; gap:8px; flex:1; }
+  .steps .dot{
+    width:19px; height:19px; border-radius:50%; background:var(--panel);
+    border:1px solid var(--panel-border); transition: all var(--dur) var(--ease);
+  }
+  .steps li.done .dot{ background:var(--accent); box-shadow:0 0 12px var(--accent); border-color:transparent; }
+  .steps li.current .dot{ background:var(--accent-2); box-shadow:0 0 0 4px rgba(167,139,250,.18); border-color:transparent; }
+  .steps .label{ font-size:.7rem; letter-spacing:.03em; color:var(--ink-dim); text-align:center; }
+  .steps li.current .label{ color:var(--ink); }
+
+  main{ width:100%; max-width:640px; }
+
+  .screen{
+    display:none;
+    opacity:0; transform:translateY(14px);
+  }
+  .screen.active{
+    display:block;
+    animation: fadeUp var(--dur) var(--ease) forwards;
+  }
+  @keyframes fadeUp{ to{ opacity:1; transform:translateY(0); } }
+  @media (prefers-reduced-motion: reduce){
+    .screen.active{ animation:none; opacity:1; transform:none; }
+  }
+  body.reduced-motion .screen.active{ animation:none; opacity:1; transform:none; }
+
+  .eyebrow{
+    display:inline-block; font-family:var(--font-mono); font-size:.72rem;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--accent);
+    margin-bottom:8px;
+  }
+  h1,h2,h3{ font-family:var(--font-display); font-weight:400; line-height:1.15; margin:0 0 10px; }
+  h1{ font-size:clamp(2rem,6vw,2.7rem); }
+  h2{ font-size:clamp(1.4rem,4.5vw,1.9rem); }
+  p{ line-height:1.6; color:var(--ink-dim); margin:0 0 16px; }
+  .card, .panel{
+    background:linear-gradient(160deg,var(--panel),var(--panel-2));
+    border:1px solid var(--panel-border);
+    border-radius:var(--radius);
+    padding:28px;
+  }
+
+  /* ---------- Start screen ---------- */
+  #screen-start{ text-align:center; padding-top:6vh; }
+  #screen-start .tagline{ max-width:46ch; margin-left:auto; margin-right:auto; }
+  .mode-select{ display:flex; gap:12px; justify-content:center; margin:28px 0; }
+  .mode-btn{
+    background:var(--panel); border:1px solid var(--panel-border); color:var(--ink);
+    padding:12px 22px; border-radius:999px; font-size:.95rem; transition:all var(--dur) var(--ease);
+  }
+  .mode-btn[aria-pressed="true"]{
+    background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:#111428; border-color:transparent; font-weight:600;
+  }
+  .primary-btn{
+    background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:#111428; border:none;
+    padding:15px 34px; border-radius:999px; font-size:1rem; font-weight:600;
+    box-shadow:0 8px 26px -8px var(--accent); transition:transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  }
+  .primary-btn:hover, .primary-btn:focus-visible{ transform:translateY(-2px); box-shadow:0 12px 30px -6px var(--accent); }
+  .primary-btn:disabled{ opacity:.4; cursor:not-allowed; transform:none; box-shadow:none; }
+  .ghost-btn{
+    background:transparent; border:1px solid var(--panel-border); color:var(--ink-dim);
+    padding:11px 22px; border-radius:999px; font-size:.9rem; margin-top:10px;
+    transition:all var(--dur) var(--ease);
+  }
+  .ghost-btn:hover, .ghost-btn:focus-visible{ color:var(--ink); border-color:var(--accent); }
+  .disclaimer{ font-size:.78rem; opacity:.65; max-width:44ch; margin:26px auto 0; }
+
+  /* ---------- Chapter head ---------- */
+  .chapter-head{ margin-bottom:20px; }
+  .q-counter{ font-family:var(--font-mono); font-size:.78rem; color:var(--ink-dim); margin:0; }
+
+  /* ---------- Chapter 1 : scenarios ---------- */
+  .scenario-text{ font-size:1.12rem; color:var(--ink); margin-bottom:22px; }
+  .options{ display:flex; flex-direction:column; gap:10px; }
+  .option-btn{
+    text-align:left; background:rgba(255,255,255,.03); border:1px solid var(--panel-border);
+    color:var(--ink); padding:15px 18px; border-radius:var(--radius-sm); font-size:.96rem;
+    transition:all var(--dur) var(--ease);
+  }
+  .option-btn:hover, .option-btn:focus-visible{ border-color:var(--accent); background:rgba(255,255,255,.06); transform:translateX(4px); }
+  .option-btn.chosen{ border-color:var(--accent); background:rgba(111,231,221,.12); }
+
+  /* ---------- Chapter 2 : rank list ---------- */
+  .rank-list{ list-style:none; margin:0 0 22px; padding:0; display:flex; flex-direction:column; gap:10px; }
+  .rank-item{
+    display:flex; align-items:center; gap:14px; background:rgba(255,255,255,.03);
+    border:1px solid var(--panel-border); border-radius:var(--radius-sm); padding:14px 16px;
+    cursor:grab; transition:border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+  }
+  .rank-item:active{ cursor:grabbing; }
+  .rank-item.dragging{ opacity:.4; }
+  .rank-item:focus-visible{ border-color:var(--accent); }
+  .rank-badge{
+    font-family:var(--font-mono); width:26px; height:26px; border-radius:50%;
+    background:var(--accent); color:#111428; display:flex; align-items:center; justify-content:center;
+    font-size:.8rem; flex-shrink:0;
+  }
+  .drag-handle{ margin-left:auto; opacity:.4; font-size:1.1rem; }
+
+  /* ---------- Chapter 3 : timeline ---------- */
+  .pool{
+    display:flex; flex-wrap:wrap; gap:10px; min-height:56px; padding:14px;
+    border:1px dashed var(--panel-border); border-radius:var(--radius-sm); margin-bottom:22px;
+    transition:border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+  }
+  .pool.drag-over{ border-color:var(--accent); background:rgba(111,231,221,.06); }
+  .timeline-card{
+    background:rgba(255,255,255,.05); border:1px solid var(--panel-border); border-radius:var(--radius-sm);
+    padding:10px 14px; font-size:.88rem; cursor:grab; transition:all var(--dur) var(--ease);
+  }
+  .timeline-card:active{ cursor:grabbing; }
+  .timeline-card.dragging{ opacity:.35; }
+  .timeline-card:focus-visible{ border-color:var(--accent); }
+  .slots{ display:flex; gap:10px; flex-wrap:wrap; }
+  .slot{
+    flex:1 1 0; min-width:110px; min-height:96px; border:1px dashed var(--panel-border);
+    border-radius:var(--radius-sm); padding:10px; display:flex; flex-direction:column; gap:8px;
+    transition:border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+  }
+  .slot.drag-over{ border-color:var(--accent); background:rgba(111,231,221,.06); }
+  .slot-label{ font-family:var(--font-mono); font-size:.68rem; color:var(--ink-dim); letter-spacing:.06em; text-transform:uppercase; }
+  .slot .timeline-card{ width:100%; }
+  .drag-clone{ z-index:999; opacity:.9; box-shadow:0 10px 30px rgba(0,0,0,.4); pointer-events:none; }
+
+  .instructions{ font-size:.82rem; opacity:.7; margin-bottom:18px; }
+
+  .nav-row{ display:flex; justify-content:flex-end; margin-top:8px; }
+  .hint{ font-size:.78rem; color:var(--ink-dim); margin-top:-8px; margin-bottom:16px; min-height:1em; }
+
+  /* ---------- Final screen ---------- */
+  #screen-final .card{ background:linear-gradient(160deg,var(--paper),#efe9db); color:var(--paper-ink); }
+  #screen-final .card p, #screen-final .card .breakdown-pct{ color:var(--paper-ink); }
+  .constellation-wrap{ display:flex; justify-content:center; margin:8px 0 18px; }
+  .breakdown{ list-style:none; padding:0; margin:0 0 20px; display:flex; flex-direction:column; gap:10px; }
+  .breakdown li{ display:flex; align-items:center; gap:12px; font-size:.88rem; }
+  .breakdown .swatch{ width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+  .breakdown .name{ flex:1; }
+  .breakdown-pct{ font-family:var(--font-mono); font-weight:600; }
+  .journal-text p{ color:var(--paper-ink); opacity:.85; }
+  .journal-textarea{
+    width:100%; min-height:100px; margin-top:8px; padding:12px; border-radius:var(--radius-sm);
+    border:1px solid rgba(43,42,38,.2); background:rgba(255,255,255,.5); font-family:var(--font-body);
+    font-size:.92rem; color:var(--paper-ink); resize:vertical;
+  }
+  .final-actions{ display:flex; gap:12px; justify-content:center; margin-top:24px; flex-wrap:wrap; }
+
+  @media (max-width:520px){
+    .card, .panel{ padding:20px; }
+    .slots{ flex-direction:column; }
+    .slot{ min-width:0; }
+  }
+</style>
+</head>
+<body data-mode="calm">
+
+<div class="ambient" aria-hidden="true">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+</div>
+
+<div id="liveRegion" class="sr-only" aria-live="polite"></div>
+
+<div id="app">
+  <nav class="progress" id="progressBar" aria-label="Journey progress">
+    <ol class="steps">
+      <li data-step="1"><span class="dot"></span><span class="label">Thinking Style</span></li>
+      <li data-step="2"><span class="dot"></span><span class="label">Priorities</span></li>
+      <li data-step="3"><span class="dot"></span><span class="label">Timeline</span></li>
+      <li data-step="4"><span class="dot"></span><span class="label">Reflection</span></li>
+    </ol>
+  </nav>
+
+  <main id="screens">
+
+    <!-- START -->
+    <section class="screen active" id="screen-start" aria-labelledby="startHeading">
+      <span class="eyebrow">A quiet self-reflection journey</span>
+      <h1 id="startHeading" tabindex="-1">Cognitive Pattern Explorer</h1>
+      <p class="tagline">Wander through a few small scenarios and discover the shape of how you tend to think, feel, and decide. There are no right answers here — only patterns worth noticing.</p>
+
+      <div class="mode-select" role="group" aria-label="Choose your pace">
+        <button type="button" class="mode-btn" data-set-mode="calm" aria-pressed="true">🌙 Calm</button>
+        <button type="button" class="mode-btn" data-set-mode="stress" aria-pressed="false">⚡ Stress</button>
+      </div>
+
+      <div>
+        <button type="button" class="primary-btn" id="beginBtn">Begin the Exploration</button>
+      </div>
+      <p class="disclaimer">This experience is educational and reflective only. It does not diagnose, assess, or replace guidance from a mental health professional.</p>
+    </section>
+
+    <!-- CHAPTER 1 -->
+    <section class="screen" id="screen-ch1" aria-labelledby="ch1Heading">
+      <div class="chapter-head">
+        <span class="eyebrow">Chapter One</span>
+        <h2 id="ch1Heading" tabindex="-1">Discover Your Thinking Style</h2>
+        <p class="q-counter" id="q1Counter">Scenario 1 of 5</p>
+      </div>
+      <div class="card">
+        <p class="scenario-text" id="q1Text"></p>
+        <div class="options" id="q1Options" role="list" aria-label="Choose the response closest to you"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 2 -->
+    <section class="screen" id="screen-ch2" aria-labelledby="ch2Heading">
+      <div class="chapter-head">
+        <span class="eyebrow">Chapter Two</span>
+        <h2 id="ch2Heading" tabindex="-1">Choose Your Priorities</h2>
+      </div>
+      <div class="card">
+        <p class="instructions">Drag to reorder — or focus a card and use the arrow keys. Put what matters <em>most</em> to you when deciding, at the top.</p>
+        <ul class="rank-list" id="rankList" aria-label="Drag to rank, arrow keys also work"></ul>
+        <div class="nav-row">
+          <button type="button" class="primary-btn" id="ch2Continue">Continue</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 3 -->
+    <section class="screen" id="screen-ch3" aria-labelledby="ch3Heading">
+      <div class="chapter-head">
+        <span class="eyebrow">Chapter Three</span>
+        <h2 id="ch3Heading" tabindex="-1">Map Your Thinking</h2>
+      </div>
+      <div class="card">
+        <p class="instructions">Drag each card onto the timeline in the order you'd naturally reach for it — first instinct to last resort. On a keyboard: focus a card and press 1–5 to place it, or Backspace to return it to the pool.</p>
+        <div class="pool" id="timelinePool" aria-label="Unplaced thoughts"></div>
+        <div class="slots" id="timelineSlots" aria-label="Your timeline, first instinct to last resort"></div>
+        <p class="hint" id="ch3Hint"></p>
+        <div class="nav-row">
+          <button type="button" class="primary-btn" id="ch3Continue">See My Reflection</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- FINAL -->
+    <section class="screen" id="screen-final" aria-labelledby="finalHeading">
+      <div class="chapter-head">
+        <span class="eyebrow">Final Reflection</span>
+        <h2 id="finalHeading" tabindex="-1">Your Reflection Journal</h2>
+      </div>
+      <div class="card">
+        <div class="constellation-wrap" id="constellationWrap"></div>
+        <ul class="breakdown" id="breakdownList" aria-label="Percentage breakdown of your tendencies"></ul>
+        <div class="journal-text" id="journalText"></div>
+        <label for="journalInput" style="font-size:.82rem; opacity:.75; display:block; margin-top:10px;">Add your own note to this journal entry (just for this session):</label>
+        <textarea class="journal-textarea" id="journalInput" placeholder="What surprised you about this pattern?"></textarea>
+        <div class="final-actions">
+          <button type="button" class="ghost-btn" id="restartBtn">Start Over</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============================================================
+     DATA
+  ============================================================ */
+  var TENDENCIES = {
+    analytical:   { name:"Analytical Thinker", color:"#6fe7dd",
+      blurb:"You tend to lean on evidence, structure, and logic before settling on a direction.",
+      journal:"You often reach for the facts first — this suggests a mind that finds steadiness in clarity and evidence." },
+    emotional:    { name:"Emotional Intuitive", color:"#a78bfa",
+      blurb:"You often sense the right path through feeling and instinct before you can fully explain why.",
+      journal:"You often trust a quiet feeling before a loud argument — this suggests an intuitive, people-attuned way of moving through decisions." },
+    overthinking: { name:"Overthinking Loop Style", color:"#f6a6b2",
+      blurb:"You tend to revisit decisions from multiple angles, sometimes circling the same thought more than once.",
+      journal:"You often return to a decision again and again, turning it over — this suggests a mind that cares deeply about getting things right, even when that care becomes a loop." },
+    action:       { name:"Action-First Decision Maker", color:"#f5c26b",
+      blurb:"You tend to move quickly, preferring to learn by doing rather than by deliberating for long.",
+      journal:"You often start moving before every detail is settled — this suggests comfort with momentum and trust in adjusting course along the way." },
+    balanced:     { name:"Balanced Reflective Thinker", color:"#8fd694",
+      blurb:"You tend to hold logic and emotion together, weighing both before choosing.",
+      journal:"You often let thought and feeling inform each other rather than compete — this suggests a steady, integrative way of approaching decisions." }
+  };
+  var T_ORDER = ["analytical","emotional","overthinking","action","balanced"];
+
+  var CH1_QUESTIONS = [
+    { text:"It's the night before a big decision and you don't have all the information you'd like. What do you find yourself doing?",
+      options:[
+        {text:"Searching for one more data point before I settle", t:"analytical"},
+        {text:"Sitting with it and noticing what feels right", t:"emotional"},
+        {text:"Running through every version of tomorrow in my head", t:"overthinking"},
+        {text:"Making a call and figuring out the rest as I go", t:"action"},
+        {text:"Weighing what I know against what I feel", t:"balanced"}
+      ]},
+    { text:"Someone disagrees with an idea you just shared in a meeting. What's your first instinct?",
+      options:[
+        {text:"Respond right away and keep the conversation moving", t:"action"},
+        {text:"Ask them to walk me through their reasoning", t:"analytical"},
+        {text:"Notice the tension in the room before the words", t:"emotional"},
+        {text:"Replay the exchange for the rest of the day", t:"overthinking"},
+        {text:"Consider their point while holding onto mine", t:"balanced"}
+      ]},
+    { text:"You have three days to plan a trip you've never taken before.",
+      options:[
+        {text:"Build a spreadsheet of options and compare them", t:"analytical"},
+        {text:"Keep changing my mind about the itinerary", t:"overthinking"},
+        {text:"Picture how each place would feel to be in", t:"emotional"},
+        {text:"Sketch a rough plan, then leave room to feel it out", t:"balanced"},
+        {text:"Book something and adjust the details later", t:"action"}
+      ]},
+    { text:"A close friend calls you, upset about a problem they can't solve.",
+      options:[
+        {text:"Focus on how they're feeling before anything else", t:"emotional"},
+        {text:"Help them break the problem into pieces", t:"analytical"},
+        {text:"Suggest a first step they could take tonight", t:"action"},
+        {text:"Turn their problem over in my mind long after we hang up", t:"overthinking"},
+        {text:"Listen fully, then help them think it through", t:"balanced"}
+      ]},
+    { text:"You've just finished a big project. What happens next, in your head?",
+      options:[
+        {text:"I'm already thinking about the next thing", t:"action"},
+        {text:"I review what worked and what didn't, objectively", t:"analytical"},
+        {text:"I keep wondering if I could have done it better", t:"overthinking"},
+        {text:"I notice how proud or relieved I feel", t:"emotional"},
+        {text:"I reflect on both the outcome and how it felt", t:"balanced"}
+      ]}
+  ];
+
+  var CH2_CARDS = [
+    { id:"c2-analytical",   text:"Logic and evidence", t:"analytical" },
+    { id:"c2-emotional",    text:"Emotional connection", t:"emotional" },
+    { id:"c2-overthinking", text:"Getting every detail exactly right", t:"overthinking" },
+    { id:"c2-action",       text:"Speed and momentum", t:"action" },
+    { id:"c2-balanced",     text:"Balance between head and heart", t:"balanced" }
+  ];
+
+  var CH3_CARDS = [
+    { id:"c3-analytical",   text:"Gather every fact I can find", t:"analytical" },
+    { id:"c3-emotional",    text:"Notice how it feels in my body", t:"emotional" },
+    { id:"c3-overthinking", text:"Replay the scenario again and again", t:"overthinking" },
+    { id:"c3-action",       text:"Jump in and start doing", t:"action" },
+    { id:"c3-balanced",     text:"Step back and weigh it all calmly", t:"balanced" }
+  ];
+  var SLOT_LABELS = ["1st \u2014 first instinct","2nd","3rd","4th","5th \u2014 last resort"];
+
+  /* ============================================================
+     STATE
+  ============================================================ */
+  var scores = {};
+  var ch1Index = 0;
+
+  function resetScores(){
+    scores = { analytical:0, emotional:0, overthinking:0, action:0, balanced:0 };
+  }
+  resetScores();
+
+  function addScore(t, pts){ if(scores.hasOwnProperty(t)) scores[t]+=pts; }
+
+  /* ============================================================
+     UTIL
+  ============================================================ */
+  function announce(msg){
+    var el = document.getElementById("liveRegion");
+    el.textContent = "";
+    window.setTimeout(function(){ el.textContent = msg; }, 30);
+  }
+  function qs(sel, ctx){ return (ctx||document).querySelector(sel); }
+  function qsa(sel, ctx){ return Array.prototype.slice.call((ctx||document).querySelectorAll(sel)); }
+
+  var prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(prefersReducedMotion){ document.body.classList.add("reduced-motion"); }
+
+  /* ============================================================
+     NAVIGATION
+  ============================================================ */
+  var SCREEN_STEP = { "screen-ch1":1, "screen-ch2":2, "screen-ch3":3, "screen-final":4 };
+
+  function goTo(id){
+    qsa(".screen").forEach(function(s){ s.classList.remove("active"); });
+    var target = document.getElementById(id);
+    target.classList.add("active");
+
+    var pb = document.getElementById("progressBar");
+    if(id === "screen-start"){
+      pb.classList.remove("visible");
+    } else {
+      pb.classList.add("visible");
+      var step = SCREEN_STEP[id];
+      qsa(".steps li").forEach(function(li){
+        var n = parseInt(li.getAttribute("data-step"), 10);
+        li.classList.toggle("done", n < step);
+        li.classList.toggle("current", n === step);
+      });
+    }
+    var heading = qs("h1[tabindex], h2[tabindex]", target);
+    if(heading){ window.setTimeout(function(){ heading.focus(); }, 60); }
+  }
+
+  /* ============================================================
+     GENERIC DRAG COMPONENT
+     Reused by the rank list (chapter 2) and the timeline (chapter 3).
+     Attaches native HTML5 drag events + a touch fallback that
+     follows the finger with a floating clone.
+  ============================================================ */
+  function enableDrag(el, handlers){
+    handlers = handlers || {};
+    el.setAttribute("draggable", "true");
+
+    el.addEventListener("dragstart", function(e){
+      e.dataTransfer.effectAllowed = "move";
+      try{ e.dataTransfer.setData("text/plain", el.dataset.id || ""); }catch(err){}
+      el.classList.add("dragging");
+      if(handlers.onStart) handlers.onStart(el);
+    });
+    el.addEventListener("dragend", function(){
+      el.classList.remove("dragging");
+      if(handlers.onDragEnd) handlers.onDragEnd(el);
+    });
+
+    el.addEventListener("touchstart", function(e){
+      if(e.touches.length !== 1) return;
+      var touch = e.touches[0];
+      var rect = el.getBoundingClientRect();
+      var offsetX = touch.clientX - rect.left;
+      var offsetY = touch.clientY - rect.top;
+
+      var clone = el.cloneNode(true);
+      clone.classList.add("drag-clone");
+      clone.style.position = "fixed";
+      clone.style.width = rect.width + "px";
+      clone.style.left = rect.left + "px";
+      clone.style.top = rect.top + "px";
+      document.body.appendChild(clone);
+      el.classList.add("dragging");
+      if(handlers.onStart) handlers.onStart(el);
+
+      function move(ev){
+        ev.preventDefault();
+        var t = ev.touches[0];
+        clone.style.left = (t.clientX - offsetX) + "px";
+        clone.style.top = (t.clientY - offsetY) + "px";
+        if(handlers.onMove) handlers.onMove(t.clientX, t.clientY, el);
+      }
+      function end(ev){
+        document.removeEventListener("touchmove", move);
+        document.removeEventListener("touchend", end);
+        document.removeEventListener("touchcancel", end);
+        var t = (ev.changedTouches && ev.changedTouches[0]) || null;
+        clone.remove();
+        el.classList.remove("dragging");
+        if(handlers.onEnd) handlers.onEnd(el, t);
+      }
+      document.addEventListener("touchmove", move, {passive:false});
+      document.addEventListener("touchend", end);
+      document.addEventListener("touchcancel", end);
+    }, {passive:false});
+  }
+
+  /* ============================================================
+     CHAPTER 1 — multiple choice scenarios
+  ============================================================ */
+  function renderCh1(){
+    ch1Index = 0;
+    showCh1Question();
+  }
+
+  function showCh1Question(){
+    var q = CH1_QUESTIONS[ch1Index];
+    document.getElementById("q1Counter").textContent = "Scenario " + (ch1Index+1) + " of " + CH1_QUESTIONS.length;
+    document.getElementById("q1Text").textContent = q.text;
+    var wrap = document.getElementById("q1Options");
+    wrap.innerHTML = "";
+    q.options.forEach(function(opt){
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "option-btn";
+      btn.setAttribute("role","listitem");
+      btn.textContent = opt.text;
+      btn.addEventListener("click", function(){
+        if(btn.disabled) return;
+        qsa(".option-btn", wrap).forEach(function(b){ b.disabled = true; });
+        btn.classList.add("chosen");
+        addScore(opt.t, 2);
+        announce("Choice recorded.");
+        window.setTimeout(function(){
+          ch1Index++;
+          if(ch1Index < CH1_QUESTIONS.length){
+            showCh1Question();
+          } else {
+            renderCh2();
+            goTo("screen-ch2");
+          }
+        }, 420);
+      });
+      wrap.appendChild(btn);
+    });
+  }
+
+  /* ============================================================
+     CHAPTER 2 — draggable priority ranking
+  ============================================================ */
+  function renderCh2(){
+    var list = document.getElementById("rankList");
+    list.innerHTML = "";
+    // shuffle a copy so the initial order isn't the scoring order
+    var cards = CH2_CARDS.slice().sort(function(){ return Math.random()-0.5; });
+    cards.forEach(function(card){
+      var li = document.createElement("li");
+      li.className = "rank-item";
+      li.dataset.id = card.id;
+      li.dataset.t = card.t;
+      li.tabIndex = 0;
+      li.setAttribute("role","listitem");
+      li.setAttribute("aria-label", card.text + ", use arrow keys to reorder");
+
+      var badge = document.createElement("span");
+      badge.className = "rank-badge";
+      var span = document.createElement("span");
+      span.textContent = card.text;
+      var handle = document.createElement("span");
+      handle.className = "drag-handle";
+      handle.setAttribute("aria-hidden","true");
+      handle.textContent = "\u2630";
+
+      li.appendChild(badge);
+      li.appendChild(span);
+      li.appendChild(handle);
+      list.appendChild(li);
+
+      li.addEventListener("keydown", function(e){
+        if(e.key === "ArrowUp"){ e.preventDefault(); moveRankItem(li, -1); }
+        else if(e.key === "ArrowDown"){ e.preventDefault(); moveRankItem(li, 1); }
+      });
+
+      enableDrag(li, {
+        onMove: function(x, y){
+          var after = getDragAfterElement(list, y);
+          if(after == null) list.appendChild(li); else list.insertBefore(li, after);
+        },
+        onEnd: function(){ updateRankBadges(); }
+      });
+    });
+
+    // native dragover on the container keeps the reorder smooth for mouse users
+    list.addEventListener("dragover", function(e){
+      e.preventDefault();
+      var dragging = qs(".rank-item.dragging", list);
+      if(!dragging) return;
+      var after = getDragAfterElement(list, e.clientY);
+      if(after == null) list.appendChild(dragging); else list.insertBefore(dragging, after);
+    });
+    list.addEventListener("drop", function(e){ e.preventDefault(); updateRankBadges(); });
+
+    updateRankBadges();
+  }
+
+  function getDragAfterElement(container, y){
+    var els = qsa(".rank-item:not(.dragging)", container);
+    var closest = { offset: -Infinity, element: null };
+    els.forEach(function(child){
+      var box = child.getBoundingClientRect();
+      var offset = y - box.top - box.height/2;
+      if(offset < 0 && offset > closest.offset){ closest = { offset: offset, element: child }; }
+    });
+    return closest.element;
+  }
+
+  function moveRankItem(item, dir){
+    var list = item.parentElement;
+    var items = qsa(".rank-item", list);
+    var idx = items.indexOf(item);
+    var newIdx = idx + dir;
+    if(newIdx < 0 || newIdx >= items.length) return;
+    if(dir < 0) list.insertBefore(item, items[newIdx]);
+    else list.insertBefore(item, items[newIdx].nextSibling);
+    updateRankBadges();
+    item.focus();
+    announce(item.textContent.trim() + " moved to position " + (qsa(".rank-item", list).indexOf(item)+1));
+  }
+
+  function updateRankBadges(){
+    qsa("#rankList .rank-item").forEach(function(li, i){
+      li.querySelector(".rank-badge").textContent = i+1;
+    });
+  }
+
+  document.getElementById("ch2Continue").addEventListener("click", function(){
+    var items = qsa("#rankList .rank-item");
+    items.forEach(function(li, i){
+      addScore(li.dataset.t, items.length - i);
+    });
+    renderCh3();
+    goTo("screen-ch3");
+  });
+
+  /* ============================================================
+     CHAPTER 3 — draggable timeline
+  ============================================================ */
+  function renderCh3(){
+    var pool = document.getElementById("timelinePool");
+    var slotsWrap = document.getElementById("timelineSlots");
+    pool.innerHTML = "";
+    slotsWrap.innerHTML = "";
+    document.getElementById("ch3Hint").textContent = "";
+
+    for(var i=0;i<5;i++){
+      var slot = document.createElement("div");
+      slot.className = "slot dropzone";
+      slot.dataset.slotIndex = String(i);
+      slot.setAttribute("role","group");
+      slot.setAttribute("aria-label", "Timeline position " + (i+1));
+      var label = document.createElement("div");
+      label.className = "slot-label";
+      label.textContent = SLOT_LABELS[i];
+      slot.appendChild(label);
+      slotsWrap.appendChild(slot);
+      attachZoneDropHandlers(slot);
+    }
+    pool.classList.add("dropzone");
+    attachZoneDropHandlers(pool);
+
+    var cards = CH3_CARDS.slice().sort(function(){ return Math.random()-0.5; });
+    cards.forEach(function(card){
+      pool.appendChild(makeTimelineCard(card));
+    });
+  }
+
+  function makeTimelineCard(card){
+    var el = document.createElement("div");
+    el.className = "timeline-card";
+    el.dataset.id = card.id;
+    el.dataset.t = card.t;
+    el.tabIndex = 0;
+    el.textContent = card.text;
+    el.setAttribute("aria-label", card.text + ". Press 1 through 5 to place on the timeline, or Backspace to return it to the pool.");
+
+    el.addEventListener("keydown", function(e){
+      if(e.key >= "1" && e.key <= "5"){
+        var idx = parseInt(e.key,10)-1;
+        var slot = qs('.slot[data-slot-index="'+idx+'"]');
+        if(slot) placeCard(el, slot);
+      } else if(e.key === "Backspace" || e.key === "Delete"){
+        placeCard(el, document.getElementById("timelinePool"));
+      }
+    });
+
+    enableDrag(el, {
+      onMove: function(x, y){
+        qsa(".dropzone").forEach(function(z){ z.classList.remove("drag-over"); });
+        var under = document.elementFromPoint(x, y);
+        var zone = under && under.closest(".dropzone");
+        if(zone) zone.classList.add("drag-over");
+      },
+      onEnd: function(dragEl, touch){
+        qsa(".dropzone").forEach(function(z){ z.classList.remove("drag-over"); });
+        if(!touch) return;
+        var under = document.elementFromPoint(touch.clientX, touch.clientY);
+        var zone = under && under.closest(".dropzone");
+        if(zone) placeCard(dragEl, zone);
+      }
+    });
+    return el;
+  }
+
+  function attachZoneDropHandlers(zone){
+    zone.addEventListener("dragover", function(e){ e.preventDefault(); zone.classList.add("drag-over"); });
+    zone.addEventListener("dragleave", function(){ zone.classList.remove("drag-over"); });
+    zone.addEventListener("drop", function(e){
+      e.preventDefault();
+      zone.classList.remove("drag-over");
+      var id = e.dataTransfer.getData("text/plain");
+      var card = document.querySelector('.timeline-card[data-id="'+id+'"]');
+      if(card) placeCard(card, zone);
+    });
+  }
+
+  function placeCard(card, zone){
+    if(zone.classList.contains("slot")){
+      var existing = qs(".timeline-card", zone);
+      if(existing && existing !== card){
+        document.getElementById("timelinePool").appendChild(existing);
+      }
+    }
+    zone.appendChild(card);
+    updateCh3Hint();
+    var label = zone.classList.contains("slot")
+      ? "position " + (parseInt(zone.dataset.slotIndex,10)+1)
+      : "the pool";
+    announce(card.textContent.trim() + " moved to " + label + ".");
+  }
+
+  function updateCh3Hint(){
+    var filled = qsa(".slot .timeline-card").length;
+    var hint = document.getElementById("ch3Hint");
+    hint.textContent = filled < 5
+      ? (5 - filled) + " card" + (5-filled===1?"":"s") + " left to place on the timeline."
+      : "All set — every step of your timeline is placed.";
+  }
+
+  document.getElementById("ch3Continue").addEventListener("click", function(){
+    var slots = qsa(".slot");
+    var filledCount = qsa(".slot .timeline-card").length;
+    if(filledCount === 0){
+      announce("Place at least one card on the timeline before continuing.");
+      document.getElementById("ch3Hint").textContent = "Place at least one card on the timeline to continue.";
+      return;
+    }
+    slots.forEach(function(slot, i){
+      var card = qs(".timeline-card", slot);
+      if(card) addScore(card.dataset.t, 5 - i);
+    });
+    renderFinal();
+    goTo("screen-final");
+  });
+
+  /* ============================================================
+     FINAL — journal + constellation + percentage breakdown
+  ============================================================ */
+  function computePercentages(){
+    var total = 0;
+    T_ORDER.forEach(function(k){ total += scores[k]; });
+    if(total <= 0) total = 1;
+    var pct = {};
+    T_ORDER.forEach(function(k){ pct[k] = Math.round((scores[k]/total)*100); });
+    // reconcile rounding so it sums to 100
+    var sum = 0; T_ORDER.forEach(function(k){ sum += pct[k]; });
+    var sorted = T_ORDER.slice().sort(function(a,b){ return scores[b]-scores[a]; });
+    pct[sorted[0]] += (100 - sum);
+    return pct;
+  }
+
+  function renderFinal(){
+    var pct = computePercentages();
+    var ranked = T_ORDER.slice().sort(function(a,b){ return pct[b]-pct[a]; });
+    var top = ranked[0], second = ranked[1];
+
+    renderConstellation(pct);
+
+    var list = document.getElementById("breakdownList");
+    list.innerHTML = "";
+    ranked.forEach(function(key){
+      var li = document.createElement("li");
+      var sw = document.createElement("span");
+      sw.className = "swatch";
+      sw.style.background = TENDENCIES[key].color;
+      var name = document.createElement("span");
+      name.className = "name";
+      name.textContent = TENDENCIES[key].name;
+      var val = document.createElement("span");
+      val.className = "breakdown-pct";
+      val.textContent = pct[key] + "%";
+      li.appendChild(sw); li.appendChild(name); li.appendChild(val);
+      list.appendChild(li);
+    });
+
+    var journal = document.getElementById("journalText");
+    journal.innerHTML = "";
+    var p1 = document.createElement("p");
+    p1.innerHTML = "<strong>" + TENDENCIES[top].name + "</strong> shows up most strongly for you today. " + TENDENCIES[top].journal;
+    var p2 = document.createElement("p");
+    p2.textContent = "You also carry traces of " + TENDENCIES[second].name + ": " + TENDENCIES[second].blurb;
+    var p3 = document.createElement("p");
+    p3.textContent = "Remember — this reflects tendencies, not fixed traits. They shift with mood, context, and practice, and this page is a mirror for reflection, not a diagnosis.";
+    journal.appendChild(p1); journal.appendChild(p2); journal.appendChild(p3);
+
+    document.getElementById("journalInput").value = "";
+  }
+
+  function renderConstellation(pct){
+    var wrap = document.getElementById("constellationWrap");
+    wrap.innerHTML = "";
+    var size = 300, cx = size/2, cy = size/2, radius = 100;
+    var svgNS = "http://www.w3.org/2000/svg";
+    var svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("viewBox", "0 0 " + size + " " + size);
+    svg.setAttribute("width", "280");
+    svg.setAttribute("height", "280");
+    svg.setAttribute("role", "img");
+    var summary = T_ORDER.map(function(k){ return TENDENCIES[k].name + " " + pct[k] + "%"; }).join(", ");
+    svg.setAttribute("aria-label", "Constellation of your thinking pattern: " + summary);
+
+    var defs = document.createElementNS(svgNS, "defs");
+    var filter = document.createElementNS(svgNS, "filter");
+    filter.setAttribute("id", "glow");
+    var blur = document.createElementNS(svgNS, "feGaussianBlur");
+    blur.setAttribute("stdDeviation", "4");
+    blur.setAttribute("result", "blur");
+    var merge = document.createElementNS(svgNS, "feMerge");
+    var m1 = document.createElementNS(svgNS, "feMergeNode"); m1.setAttribute("in","blur");
+    var m2 = document.createElementNS(svgNS, "feMergeNode"); m2.setAttribute("in","SourceGraphic");
+    merge.appendChild(m1); merge.appendChild(m2);
+    filter.appendChild(blur); filter.appendChild(merge);
+    defs.appendChild(filter);
+    svg.appendChild(defs);
+
+    var points = T_ORDER.map(function(k, i){
+      var angle = (-90 + i * (360/T_ORDER.length)) * Math.PI/180;
+      return { key:k, x: cx + radius*Math.cos(angle), y: cy + radius*Math.sin(angle) };
+    });
+
+    points.forEach(function(pt){
+      var line = document.createElementNS(svgNS, "line");
+      line.setAttribute("x1", cx); line.setAttribute("y1", cy);
+      line.setAttribute("x2", pt.x); line.setAttribute("y2", pt.y);
+      line.setAttribute("stroke", TENDENCIES[pt.key].color);
+      line.setAttribute("stroke-width", Math.max(1, pct[pt.key]/18));
+      line.setAttribute("stroke-opacity", 0.35 + (pct[pt.key]/100)*0.5);
+      svg.appendChild(line);
+    });
+
+    var centerDot = document.createElementNS(svgNS, "circle");
+    centerDot.setAttribute("cx", cx); centerDot.setAttribute("cy", cy); centerDot.setAttribute("r", 5);
+    centerDot.setAttribute("fill", "#8a8368");
+    svg.appendChild(centerDot);
+
+    points.forEach(function(pt){
+      var r = 6 + pct[pt.key]*0.32;
+      var circle = document.createElementNS(svgNS, "circle");
+      circle.setAttribute("cx", pt.x); circle.setAttribute("cy", pt.y); circle.setAttribute("r", r);
+      circle.setAttribute("fill", TENDENCIES[pt.key].color);
+      circle.setAttribute("filter", "url(#glow)");
+      svg.appendChild(circle);
+
+      var text = document.createElementNS(svgNS, "text");
+      var lx = cx + (pt.x-cx)*1.28, ly = cy + (pt.y-cy)*1.28;
+      text.setAttribute("x", lx); text.setAttribute("y", ly);
+      text.setAttribute("text-anchor", "middle");
+      text.setAttribute("font-size", "10");
+      text.setAttribute("font-family", "SFMono-Regular, Consolas, monospace");
+      text.setAttribute("fill", "#5a5648");
+      text.textContent = pct[pt.key] + "%";
+      svg.appendChild(text);
+    });
+
+    wrap.appendChild(svg);
+  }
+
+  /* ============================================================
+     START SCREEN / MODE / RESTART
+  ============================================================ */
+  qsa(".mode-btn").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var mode = btn.getAttribute("data-set-mode");
+      document.body.setAttribute("data-mode", mode);
+      qsa(".mode-btn").forEach(function(b){ b.setAttribute("aria-pressed", b===btn ? "true":"false"); });
+    });
+  });
+
+  document.getElementById("beginBtn").addEventListener("click", function(){
+    resetScores();
+    renderCh1();
+    goTo("screen-ch1");
+  });
+
+  document.getElementById("restartBtn").addEventListener("click", function(){
+    resetScores();
+    goTo("screen-start");
+  });
+
+})();
+</script>
+</body>
+</html>
