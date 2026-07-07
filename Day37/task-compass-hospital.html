@@ -1,0 +1,2077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Task Compass – Hospital / Healthcare</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+  :root {
+    --bg: #070d1a;
+    --bg2: #0c1526;
+    --bg3: #111e33;
+    --glass: rgba(255,255,255,0.04);
+    --glass-border: rgba(255,255,255,0.09);
+    --text: #e8edf5;
+    --muted: #7a8fa8;
+    --accent: #00c9a7;
+    --accent2: #4f8ef7;
+    --accent3: #f77c4f;
+    --red: #f7504f;
+    --purple: #9d6ef7;
+    --gold: #f7c74f;
+
+    /* Role colors */
+    --c-doctor: #4f8ef7;
+    --c-nurse: #00c9a7;
+    --c-admin: #9d6ef7;
+    --c-pharmacist: #f77c4f;
+    --c-radiology: #f7c74f;
+    --c-lab: #f7504f;
+    --c-it: #60d6ff;
+    --c-hr: #c97fe8;
+    --c-quality: #7df76e;
+    --c-social: #ff9f7a;
+    --c-billing: #ffd166;
+    --c-security: #aab4c4;
+
+    --radius: 14px;
+    --radius-sm: 8px;
+    --shadow: 0 8px 32px rgba(0,0,0,0.45);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 20% 20%, rgba(0,201,167,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 50% at 80% 80%, rgba(79,142,247,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 50% 50%, rgba(157,110,247,0.04) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  #app { position: relative; z-index: 1; }
+
+  /* ── HEADER ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 32px;
+    border-bottom: 1px solid var(--glass-border);
+    backdrop-filter: blur(12px);
+    background: rgba(7,13,26,0.7);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-icon {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 0 18px rgba(0,201,167,0.3);
+  }
+
+  .logo-text h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    background: linear-gradient(90deg, #e8edf5, #a0b4cc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .logo-text p {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.3px;
+  }
+
+  .progress-bar-outer {
+    flex: 1;
+    max-width: 280px;
+    margin: 0 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .progress-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .progress-track {
+    height: 5px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 99px;
+    transition: width 0.6s cubic-bezier(.4,0,.2,1);
+    box-shadow: 0 0 8px rgba(0,201,167,0.5);
+  }
+
+  .stage-badge {
+    font-size: 12px;
+    color: var(--muted);
+    padding: 6px 14px;
+    border: 1px solid var(--glass-border);
+    border-radius: 99px;
+    background: var(--glass);
+  }
+
+  /* ── SCREEN WRAPPER ── */
+  .screen {
+    display: none;
+    min-height: calc(100vh - 72px);
+    padding: 40px 24px;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  .screen.active { display: block; }
+
+  /* ── WELCOME ── */
+  #welcome {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 80px 24px;
+    min-height: calc(100vh - 72px);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  #welcome.active { display: flex; }
+
+  .welcome-pulse {
+    width: 90px;
+    height: 90px;
+    background: linear-gradient(135deg, rgba(0,201,167,0.2), rgba(79,142,247,0.2));
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 42px;
+    margin-bottom: 28px;
+    animation: pulse 2.5s ease-in-out infinite;
+    box-shadow: 0 0 30px rgba(0,201,167,0.2);
+  }
+
+  @keyframes pulse {
+    0%,100% { box-shadow: 0 0 20px rgba(0,201,167,0.2); transform: scale(1); }
+    50% { box-shadow: 0 0 45px rgba(0,201,167,0.4); transform: scale(1.04); }
+  }
+
+  #welcome h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 14px;
+    line-height: 1.2;
+  }
+
+  #welcome p {
+    color: var(--muted);
+    line-height: 1.7;
+    font-size: 15px;
+    margin-bottom: 10px;
+  }
+
+  .stage-overview {
+    display: flex;
+    gap: 12px;
+    margin: 28px 0;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .stage-pill {
+    padding: 8px 18px;
+    border: 1px solid var(--glass-border);
+    border-radius: 99px;
+    background: var(--glass);
+    font-size: 13px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .stage-pill .pill-num {
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 700;
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── BUTTONS ── */
+  .btn {
+    padding: 13px 32px;
+    border-radius: 12px;
+    border: none;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.2px;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #00a78a);
+    color: #000;
+    box-shadow: 0 4px 20px rgba(0,201,167,0.3);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(0,201,167,0.45);
+  }
+
+  .btn-secondary {
+    background: var(--glass);
+    color: var(--text);
+    border: 1px solid var(--glass-border);
+  }
+  .btn-secondary:hover {
+    background: rgba(255,255,255,0.08);
+    transform: translateY(-1px);
+  }
+
+  /* ── GAME STAGE ── */
+  .stage-header {
+    margin-bottom: 28px;
+  }
+
+  .stage-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--accent);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .stage-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    margin-bottom: 6px;
+  }
+
+  .stage-desc {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .question-counter {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  .q-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    transition: background 0.3s;
+  }
+  .q-dot.done { background: var(--accent); }
+  .q-dot.active { background: var(--accent2); box-shadow: 0 0 6px var(--accent2); }
+
+  /* ── TASK CARD ── */
+  .task-card {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(8px);
+    box-shadow: var(--shadow);
+  }
+
+  .task-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+
+  .task-ticket-id {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ticket-tag {
+    padding: 2px 8px;
+    background: rgba(0,201,167,0.1);
+    border: 1px solid rgba(0,201,167,0.2);
+    border-radius: 4px;
+    font-size: 10px;
+    color: var(--accent);
+  }
+
+  .task-text {
+    font-size: 16px;
+    line-height: 1.6;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  /* ── ROLE CARDS ── */
+  .roles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .role-card {
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--glass-border);
+    background: var(--glass);
+    cursor: grab;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+    user-select: none;
+    backdrop-filter: blur(6px);
+  }
+
+  .role-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255,255,255,0.2);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  }
+
+  .role-card.dragging {
+    opacity: 0.5;
+    transform: scale(0.95);
+    cursor: grabbing;
+  }
+
+  .role-card.selected {
+    border-color: var(--accent);
+    background: rgba(0,201,167,0.1);
+    box-shadow: 0 0 15px rgba(0,201,167,0.2);
+  }
+
+  .role-emoji {
+    font-size: 24px;
+    line-height: 1;
+  }
+
+  .role-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  .role-dept {
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  /* ── DROP ZONE ── */
+  .drop-zone {
+    min-height: 80px;
+    border: 2px dashed rgba(79,142,247,0.3);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    transition: all 0.2s;
+    position: relative;
+    background: rgba(79,142,247,0.03);
+  }
+
+  .drop-zone.drag-over {
+    border-color: var(--accent);
+    background: rgba(0,201,167,0.07);
+    box-shadow: 0 0 20px rgba(0,201,167,0.15);
+  }
+
+  .drop-zone-label {
+    color: var(--muted);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .dropped-role {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: rgba(0,201,167,0.1);
+    border: 1px solid rgba(0,201,167,0.3);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    animation: snapIn 0.3s cubic-bezier(.34,1.56,.64,1);
+  }
+
+  @keyframes snapIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .remove-drop { cursor: pointer; color: var(--muted); font-size: 16px; margin-left: auto; }
+  .remove-drop:hover { color: var(--red); }
+
+  /* ── STAGE 2: WORKFLOW BUILDER ── */
+  .workflow-builder {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+    min-height: 60px;
+  }
+
+  .workflow-slot {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    border: 2px dashed rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.02);
+    transition: all 0.2s;
+    min-height: 52px;
+  }
+
+  .workflow-slot.filled {
+    border-color: rgba(79,142,247,0.4);
+    background: rgba(79,142,247,0.07);
+  }
+
+  .workflow-slot.drag-over {
+    border-color: var(--accent);
+    background: rgba(0,201,167,0.07);
+  }
+
+  .slot-num {
+    width: 24px;
+    height: 24px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+
+  .slot-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    font-size: 13px;
+  }
+
+  .slot-placeholder {
+    color: var(--muted);
+    font-size: 13px;
+    font-style: italic;
+  }
+
+  .workflow-arrow {
+    text-align: center;
+    color: var(--muted);
+    font-size: 18px;
+    line-height: 1;
+    margin: -2px 0;
+  }
+
+  /* Stage 2 animated flow */
+  .flow-animation {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 16px;
+    background: rgba(255,255,255,0.02);
+    border-radius: var(--radius);
+    border: 1px solid var(--glass-border);
+    margin-bottom: 16px;
+  }
+
+  .flow-node {
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.4s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .flow-node.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .flow-arrow-anim {
+    color: var(--accent);
+    font-size: 16px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .flow-arrow-anim.visible { opacity: 1; }
+
+  /* ── STAGE 3: MULTI-SELECT ── */
+  .assign-area {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .assign-slot {
+    min-height: 72px;
+    border: 2px dashed rgba(255,255,255,0.12);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: all 0.2s;
+    background: rgba(255,255,255,0.02);
+  }
+
+  .assign-slot.drag-over {
+    border-color: var(--accent);
+    background: rgba(0,201,167,0.07);
+  }
+
+  .assign-slot-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .assign-slot:nth-child(1) .assign-slot-label { color: var(--accent2); }
+  .assign-slot:nth-child(2) .assign-slot-label { color: var(--accent); }
+  .assign-slot:nth-child(3) .assign-slot-label { color: var(--gold); }
+  .assign-slot:nth-child(4) .assign-slot-label { color: var(--purple); }
+
+  .assign-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    animation: snapIn 0.25s ease;
+  }
+
+  .assign-chip .chip-remove {
+    cursor: pointer;
+    opacity: 0.5;
+    font-size: 13px;
+  }
+  .assign-chip .chip-remove:hover { opacity: 1; color: var(--red); }
+
+  /* ── FEEDBACK PANEL ── */
+  .feedback-panel {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    margin-top: 16px;
+    display: none;
+    animation: slideUp 0.4s ease;
+    backdrop-filter: blur(8px);
+  }
+
+  .feedback-panel.show { display: block; }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .feedback-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .feedback-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .feedback-icon.good { background: rgba(0,201,167,0.15); }
+  .feedback-icon.partial { background: rgba(247,199,79,0.15); }
+
+  .feedback-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  .feedback-body {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.7;
+    margin-bottom: 14px;
+  }
+
+  .feedback-section {
+    margin-bottom: 10px;
+  }
+
+  .feedback-section-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  .insight-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .insight-chip {
+    padding: 4px 12px;
+    border-radius: 99px;
+    font-size: 12px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text);
+  }
+
+  .insight-chip.primary {
+    background: rgba(0,201,167,0.12);
+    border-color: rgba(0,201,167,0.3);
+    color: var(--accent);
+  }
+
+  /* ── RESULTS ── */
+  #results { text-align: center; }
+  #results.active { display: block; }
+
+  .results-header {
+    margin-bottom: 40px;
+  }
+
+  .results-header h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.3px;
+  }
+
+  .results-header p {
+    color: var(--muted);
+    font-size: 15px;
+  }
+
+  /* Radar chart */
+  .radar-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 32px 0;
+  }
+
+  .radar-container {
+    position: relative;
+    width: 280px;
+    height: 280px;
+  }
+
+  .radar-svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Skill bars */
+  .skill-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-width: 500px;
+    margin: 0 auto 32px;
+    text-align: left;
+  }
+
+  .skill-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .skill-row-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .skill-val { color: var(--muted); }
+
+  .skill-bar-track {
+    height: 8px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .skill-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    width: 0%;
+    transition: width 1s cubic-bezier(.4,0,.2,1);
+  }
+
+  .reflection-card {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    padding: 28px;
+    max-width: 600px;
+    margin: 0 auto 24px;
+    text-align: left;
+    backdrop-filter: blur(8px);
+  }
+
+  .reflection-card h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .reflection-item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 14px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+
+  .reflection-icon { flex-shrink: 0; font-size: 16px; margin-top: 1px; }
+
+  .insight-callout {
+    background: linear-gradient(135deg, rgba(0,201,167,0.08), rgba(79,142,247,0.08));
+    border: 1px solid rgba(0,201,167,0.2);
+    border-radius: var(--radius-sm);
+    padding: 16px 18px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+    margin-top: 14px;
+    font-style: italic;
+  }
+
+  /* Celebration */
+  .celebration {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+  }
+
+  .confetti-piece {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    top: -20px;
+    animation: confettiFall linear forwards;
+  }
+
+  @keyframes confettiFall {
+    to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* Utility */
+  .spacer { height: 20px; }
+  .text-center { text-align: center; }
+  .flex-center { display: flex; justify-content: center; }
+  .flex-gap { display: flex; gap: 12px; flex-wrap: wrap; }
+  .mt-16 { margin-top: 16px; }
+  .mt-24 { margin-top: 24px; }
+
+  .separator {
+    height: 1px;
+    background: var(--glass-border);
+    margin: 20px 0;
+  }
+
+  /* Transition between questions */
+  .fade-out { animation: fadeOut 0.3s ease forwards; }
+  .fade-in { animation: fadeIn 0.3s ease forwards; }
+  @keyframes fadeOut { to { opacity: 0; transform: translateY(-8px); } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 600px) {
+    header { padding: 14px 16px; }
+    .progress-bar-outer { max-width: 160px; margin: 0 12px; }
+    .screen { padding: 24px 14px; }
+    .roles-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+    .assign-area { grid-template-columns: 1fr; }
+    #welcome h2 { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🏥</div>
+      <div class="logo-text">
+        <h1>Task Compass</h1>
+        <p>Hospital / Healthcare</p>
+      </div>
+    </div>
+    <div class="progress-bar-outer" id="headerProgress" style="display:none">
+      <div class="progress-labels">
+        <span id="progressLabel">Stage 1</span>
+        <span id="progressPct">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="stage-badge" id="stageBadge">Welcome</div>
+  </header>
+
+  <!-- WELCOME SCREEN -->
+  <div id="welcome" class="active">
+    <div class="welcome-pulse">🏥</div>
+    <h2>How Work Moves Through a Hospital</h2>
+    <p>Step inside a busy healthcare organization. You'll learn how tasks are owned, routed, and solved — not through a quiz, but through the lens of a management simulation.</p>
+    <p style="color:var(--accent); font-size:13px;">9 scenarios across 3 stages · Drag-and-drop · Real reasoning</p>
+    <div class="stage-overview">
+      <div class="stage-pill"><span class="pill-num">1</span> Who Owns This?</div>
+      <div class="stage-pill"><span class="pill-num">2</span> Task Routing</div>
+      <div class="stage-pill"><span class="pill-num">3</span> Collaboration Challenge</div>
+    </div>
+    <button class="btn btn-primary" onclick="startGame()">Begin Simulation →</button>
+  </div>
+
+  <!-- STAGE 1 -->
+  <div class="screen" id="stage1Screen">
+    <div class="stage-header">
+      <div class="stage-label">Stage 1 · Ownership</div>
+      <div class="stage-title">Who Owns This?</div>
+      <div class="stage-desc">Drag the role most responsible for this task into the ownership slot. Consider who would be accountable if it went wrong.</div>
+    </div>
+
+    <div id="s1Counter" class="question-counter"></div>
+
+    <div id="s1TaskCard" class="task-card">
+      <div class="task-ticket-id">
+        <span id="s1TicketId">HOSP-001</span>
+        <span class="ticket-tag" id="s1TicketTag">Incoming Task</span>
+      </div>
+      <div class="task-text" id="s1TaskText"></div>
+    </div>
+
+    <div id="s1DropZone" class="drop-zone" 
+         ondragover="event.preventDefault(); this.classList.add('drag-over')"
+         ondragleave="this.classList.remove('drag-over')"
+         ondrop="handleS1Drop(event)">
+      <div class="drop-zone-label" id="s1DropLabel">
+        <span>🎯</span><span>Drop the primary owner here</span>
+      </div>
+    </div>
+
+    <div class="roles-grid" id="s1Roles"></div>
+
+    <div class="flex-gap">
+      <button class="btn btn-primary" id="s1SubmitBtn" onclick="submitS1()" disabled style="opacity:0.4">Submit Answer</button>
+    </div>
+
+    <div class="feedback-panel" id="s1Feedback">
+      <div class="feedback-header">
+        <div class="feedback-icon" id="s1FbIcon">✓</div>
+        <div>
+          <div class="feedback-title" id="s1FbTitle"></div>
+        </div>
+      </div>
+      <div class="feedback-body" id="s1FbBody"></div>
+      <div class="feedback-section">
+        <div class="feedback-section-title">Also involved</div>
+        <div class="insight-chips" id="s1FbAssist"></div>
+      </div>
+      <div class="spacer"></div>
+      <button class="btn btn-primary" onclick="nextS1()">Continue →</button>
+    </div>
+  </div>
+
+  <!-- STAGE 2 -->
+  <div class="screen" id="stage2Screen">
+    <div class="stage-header">
+      <div class="stage-label">Stage 2 · Routing</div>
+      <div class="stage-title">Task Routing</div>
+      <div class="stage-desc">Build the workflow by dragging roles into the correct order. Think about who initiates, who acts, and who closes the loop.</div>
+    </div>
+
+    <div id="s2Counter" class="question-counter"></div>
+
+    <div id="s2TaskCard" class="task-card">
+      <div class="task-ticket-id">
+        <span id="s2TicketId">HOSP-004</span>
+        <span class="ticket-tag" id="s2TicketTag">Routing Task</span>
+      </div>
+      <div class="task-text" id="s2TaskText"></div>
+    </div>
+
+    <div class="workflow-builder" id="s2Slots"></div>
+
+    <div class="roles-grid" id="s2Roles"></div>
+
+    <div class="flex-gap">
+      <button class="btn btn-primary" id="s2SubmitBtn" onclick="submitS2()">Submit Workflow</button>
+    </div>
+
+    <div class="feedback-panel" id="s2Feedback">
+      <div class="feedback-header">
+        <div class="feedback-icon" id="s2FbIcon">🔄</div>
+        <div>
+          <div class="feedback-title" id="s2FbTitle"></div>
+        </div>
+      </div>
+      <div class="feedback-body" id="s2FbBody"></div>
+      <div class="feedback-section">
+        <div class="feedback-section-title">Typical Flow</div>
+        <div id="s2FlowAnim" class="flow-animation"></div>
+      </div>
+      <div class="spacer"></div>
+      <button class="btn btn-primary" onclick="nextS2()">Continue →</button>
+    </div>
+  </div>
+
+  <!-- STAGE 3 -->
+  <div class="screen" id="stage3Screen">
+    <div class="stage-header">
+      <div class="stage-label">Stage 3 · Collaboration</div>
+      <div class="stage-title">Collaboration Challenge</div>
+      <div class="stage-desc">Complex hospital situations rarely have a single owner. Assign up to four roles across the slots — think about who leads, who supports, who communicates, and who closes.</div>
+    </div>
+
+    <div id="s3Counter" class="question-counter"></div>
+
+    <div id="s3TaskCard" class="task-card">
+      <div class="task-ticket-id">
+        <span id="s3TicketId">HOSP-007</span>
+        <span class="ticket-tag" id="s3TicketTag" style="background:rgba(157,110,247,0.1);border-color:rgba(157,110,247,0.3);color:var(--purple)">Complex Situation</span>
+      </div>
+      <div class="task-text" id="s3TaskText"></div>
+    </div>
+
+    <div class="assign-area" id="s3Slots"></div>
+
+    <div class="roles-grid" id="s3Roles"></div>
+
+    <div class="flex-gap">
+      <button class="btn btn-primary" id="s3SubmitBtn" onclick="submitS3()">Submit Collaboration Plan</button>
+    </div>
+
+    <div class="feedback-panel" id="s3Feedback">
+      <div class="feedback-header">
+        <div class="feedback-icon" id="s3FbIcon">🤝</div>
+        <div>
+          <div class="feedback-title" id="s3FbTitle"></div>
+        </div>
+      </div>
+      <div class="feedback-body" id="s3FbBody"></div>
+      <div class="feedback-section">
+        <div class="feedback-section-title">Ideal Collaboration Map</div>
+        <div class="insight-chips" id="s3FbMap"></div>
+      </div>
+      <div class="feedback-section mt-16">
+        <div class="feedback-section-title">Communication Flow</div>
+        <div class="feedback-body" id="s3CommFlow" style="margin:0"></div>
+      </div>
+      <div class="spacer"></div>
+      <button class="btn btn-primary" id="s3NextBtn" onclick="nextS3()">Continue →</button>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="screen" id="results">
+    <div class="results-header">
+      <h2>🎓 Simulation Complete</h2>
+      <p>Here's what your decisions reveal about how you understand healthcare organizations.</p>
+    </div>
+
+    <div class="skill-bars" id="skillBars"></div>
+
+    <div class="radar-wrap">
+      <div class="radar-container">
+        <canvas id="radarCanvas" width="280" height="280"></canvas>
+      </div>
+    </div>
+
+    <div class="reflection-card" id="reflectionCard"></div>
+
+    <div class="flex-center mt-24">
+      <button class="btn btn-primary" onclick="restartGame()">Play Again →</button>
+    </div>
+  </div>
+
+</div><!-- #app -->
+
+<div id="celebration" class="celebration"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════
+
+const ROLES = [
+  { id: 'doctor',     name: 'Attending Physician', dept: 'Clinical',      emoji: '👨‍⚕️', color: '#4f8ef7' },
+  { id: 'nurse',      name: 'Charge Nurse',         dept: 'Nursing',       emoji: '👩‍⚕️', color: '#00c9a7' },
+  { id: 'admin',      name: 'Hospital Admin',        dept: 'Administration',emoji: '🏛️',  color: '#9d6ef7' },
+  { id: 'pharmacist', name: 'Pharmacist',            dept: 'Pharmacy',      emoji: '💊',  color: '#f77c4f' },
+  { id: 'radiology',  name: 'Radiologist',           dept: 'Radiology',     emoji: '🔬',  color: '#f7c74f' },
+  { id: 'lab',        name: 'Lab Technician',        dept: 'Lab',           emoji: '🧪',  color: '#f7504f' },
+  { id: 'it',         name: 'IT/Systems',            dept: 'IT',            emoji: '💻',  color: '#60d6ff' },
+  { id: 'hr',         name: 'HR Manager',            dept: 'HR',            emoji: '🤝',  color: '#c97fe8' },
+  { id: 'quality',    name: 'Quality & Safety',      dept: 'Quality',       emoji: '🛡️',  color: '#7df76e' },
+  { id: 'social',     name: 'Social Worker',         dept: 'Patient Svcs',  emoji: '💙',  color: '#ff9f7a' },
+  { id: 'billing',    name: 'Billing Specialist',    dept: 'Finance',       emoji: '💳',  color: '#ffd166' },
+  { id: 'security',   name: 'Security Officer',      dept: 'Security',      emoji: '🔒',  color: '#aab4c4' },
+];
+
+const roleById = {};
+ROLES.forEach(r => roleById[r.id] = r);
+
+// Stage 1: Ownership questions
+const S1_QUESTIONS = [
+  {
+    id: 'HOSP-001',
+    tag: 'Patient Care',
+    text: 'A patient in Room 14B is showing early signs of sepsis — rising fever, low blood pressure, and altered mental status.',
+    owner: 'doctor',
+    ownerReason: 'The attending physician holds clinical decision-making authority. Sepsis is a time-critical medical emergency requiring immediate diagnosis, ordering of blood cultures, antibiotics, and escalation protocols.',
+    assistants: ['nurse', 'lab', 'pharmacist'],
+    assistReason: ['Monitors vitals and executes orders', 'Draws blood cultures stat', 'Dispenses IV antibiotics immediately'],
+  },
+  {
+    id: 'HOSP-002',
+    tag: 'Medication Safety',
+    text: 'A nurse discovers that a patient received the wrong dosage of a blood thinner. The patient appears stable.',
+    owner: 'quality',
+    ownerReason: 'Quality & Safety owns the incident response process. They coordinate the formal root-cause analysis, ensure the error is documented, protect the patient, and prevent recurrence.',
+    assistants: ['doctor', 'nurse', 'pharmacist'],
+    assistReason: ['Assesses patient and may order reversal agents', 'Provides first-hand account and ongoing monitoring', 'Reviews medication dispensing records'],
+  },
+  {
+    id: 'HOSP-003',
+    tag: 'Records & Systems',
+    text: "The hospital's Electronic Health Record (EHR) system goes down mid-shift and staff can't access patient records.",
+    owner: 'it',
+    ownerReason: 'IT/Systems is the primary owner of system availability and disaster recovery. Restoring the EHR is their core responsibility — they hold the vendor contracts, admin credentials, and recovery procedures.',
+    assistants: ['admin', 'nurse', 'quality'],
+    assistReason: ['Activates downtime protocols and communicates to all floors', 'Switches to paper-based downtime documentation', 'Tracks impact for incident report and reviews procedures'],
+  },
+];
+
+// Stage 2: Routing questions
+const S2_QUESTIONS = [
+  {
+    id: 'HOSP-004',
+    tag: 'Diagnostic Flow',
+    text: "A patient presents to the ED with chest pain. They need a rapid ECG, blood work, and chest X-ray before the cardiologist can make a diagnosis.",
+    steps: [
+      { roleId: 'nurse', label: 'Triage & vitals', note: 'Nurse triages urgency, takes vitals, and starts monitoring' },
+      { roleId: 'doctor', label: 'Orders diagnostics', note: 'Attending orders ECG, troponin panel, and chest X-ray' },
+      { roleId: 'lab', label: 'Blood work', note: 'Lab draws and processes cardiac enzyme levels' },
+      { roleId: 'radiology', label: 'Chest X-ray', note: 'Radiology images the chest and uploads to PACS' },
+      { roleId: 'doctor', label: 'Review & diagnose', note: 'Physician reviews all results and determines care pathway' },
+    ],
+    explanation: 'In emergency care, nursing triage sets urgency. The physician then batches diagnostic orders so lab and radiology can work in parallel, reducing time-to-decision. Results flow back to the physician who closes the loop.',
+  },
+  {
+    id: 'HOSP-005',
+    tag: 'Medication Dispensing',
+    text: "A post-surgical patient needs a newly prescribed pain management regimen, including a controlled substance.",
+    steps: [
+      { roleId: 'doctor', label: 'Writes prescription', note: 'Physician enters the order into the EHR with dosage and schedule' },
+      { roleId: 'pharmacist', label: 'Verifies & prepares', note: 'Pharmacist checks for drug interactions and prepares the medication' },
+      { roleId: 'nurse', label: 'Administers medication', note: 'Nurse confirms patient ID, documents, and administers the dose' },
+      { roleId: 'nurse', label: 'Monitors response', note: 'Nurse assesses pain level and side effects post-administration' },
+    ],
+    explanation: 'Prescribing, dispensing, and administration are intentionally separated to create safety checkpoints. The pharmacist acts as the last safety gate before medication reaches the patient.',
+  },
+  {
+    id: 'HOSP-006',
+    tag: 'Discharge Planning',
+    text: "An elderly patient recovering from a hip fracture is medically stable and ready for discharge, but lives alone and may need home support.",
+    steps: [
+      { roleId: 'doctor', label: 'Clears medically', note: 'Physician confirms the patient meets discharge criteria' },
+      { roleId: 'social', label: 'Assesses home needs', note: 'Social worker evaluates support system, living conditions, and safety risk' },
+      { roleId: 'nurse', label: 'Patient education', note: 'Nurse explains wound care, medications, and follow-up appointments' },
+      { roleId: 'billing', label: 'Processes insurance', note: 'Billing coordinates coverage for post-acute care or home health' },
+    ],
+    explanation: 'Safe discharge is a multidisciplinary handoff. Medical clearance alone is insufficient — social, educational, and financial barriers must all be resolved or the patient risks readmission.',
+  },
+];
+
+// Stage 3: Collaboration challenges
+const S3_QUESTIONS = [
+  {
+    id: 'HOSP-007',
+    tag: 'Patient Safety Crisis',
+    text: "Three patients on the same ward develop hospital-acquired infections within 48 hours. An outbreak is suspected. The ward must remain operational while the source is identified and contained.",
+    slots: ['Lead Investigator', 'Clinical Response', 'Communication', 'Operational Control'],
+    idealMap: {
+      'Lead Investigator': ['quality'],
+      'Clinical Response': ['doctor', 'nurse'],
+      'Communication': ['admin'],
+      'Operational Control': ['hr', 'it'],
+    },
+    reasoning: 'A healthcare outbreak requires a structured command structure. Quality & Safety leads the investigation, clinical teams manage patient care, administration communicates to staff and regulators, and operations ensure staffing and systems continue.',
+    commFlow: 'Quality reports findings → Physician adjusts patient isolation → Admin notifies infection control authority → HR manages staff reassignments → IT generates exposure reports from EHR data.',
+  },
+  {
+    id: 'HOSP-008',
+    tag: 'Major System Delay',
+    text: "The planned rollout of a new electronic prescribing system has been delayed two weeks before go-live. 300 staff have already been trained. The old system contract expires in 10 days.",
+    slots: ['Decision Maker', 'Technical Lead', 'Staff Communication', 'Risk Management'],
+    idealMap: {
+      'Decision Maker': ['admin'],
+      'Technical Lead': ['it'],
+      'Staff Communication': ['hr'],
+      'Risk Management': ['quality'],
+    },
+    reasoning: 'System rollout delays in healthcare are high-stakes because patient safety depends on functional records. Each role manages a distinct risk: admin decides whether to extend or force rollout, IT owns the technical fix, HR manages the human impact, and Quality tracks patient safety risk during the gap.',
+    commFlow: 'Admin assesses options → IT provides revised timeline → HR sends updated comms to staff → Quality creates downtime protocol → All teams meet daily until resolved.',
+  },
+  {
+    id: 'HOSP-009',
+    tag: 'Workforce & Culture',
+    text: "Anonymous staff surveys reveal that 40% of nurses on a specific unit feel burned out and unsafe, and several have mentioned seeking employment elsewhere. Turnover risk is high.",
+    slots: ['Owns the Response', 'Clinical Operations', 'Support Services', 'Systemic Fix'],
+    idealMap: {
+      'Owns the Response': ['hr', 'admin'],
+      'Clinical Operations': ['nurse'],
+      'Support Services': ['social'],
+      'Systemic Fix': ['quality'],
+    },
+    reasoning: 'Nurse burnout is both a human and a safety issue. HR and Admin own the formal response and resource decisions. The charge nurse speaks for the unit and knows the workload reality. Social workers can provide confidential staff support. Quality connects burnout data to patient safety outcomes.',
+    commFlow: 'HR gathers data and proposes interventions → Charge Nurse validates root causes → Admin approves additional staffing or schedule changes → Social Worker offers confidential staff support → Quality tracks metrics over 90 days.',
+  },
+];
+
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+
+let state = {
+  stage: 0,
+  s1Index: 0,
+  s2Index: 0,
+  s3Index: 0,
+  s1Drop: null,         // roleId dropped
+  s2Slots: [],          // array of roleIds
+  s3Slots: {},          // slotLabel -> [roleId]
+  scores: { ownership: 0, delegation: 0, collaboration: 0, workflow: 0 },
+  totalQ: 0,
+};
+
+// ═══════════════════════════════════════════════
+//  DRAG STATE
+// ═══════════════════════════════════════════════
+
+let dragRole = null;
+let dragSource = null; // 'grid' | 's2slot_N' | 's3slot_LABEL'
+
+// ═══════════════════════════════════════════════
+//  PROGRESS
+// ═══════════════════════════════════════════════
+
+function updateProgress() {
+  const total = 9;
+  const done = state.s1Index + state.s2Index + state.s3Index;
+  const pct = Math.round((done / total) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent = pct + '%';
+  const stageNames = ['','Stage 1','Stage 2','Stage 3'];
+  document.getElementById('progressLabel').textContent = stageNames[state.stage] || 'Complete';
+  document.getElementById('stageBadge').textContent = stageNames[state.stage] || 'Results';
+  document.getElementById('headerProgress').style.display = 'flex';
+}
+
+function makeQCounter(containerId, total, current) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('span');
+    d.className = 'q-dot' + (i < current ? ' done' : i === current ? ' active' : '');
+    el.appendChild(d);
+  }
+  const label = document.createTextNode(` Question ${current + 1} of ${total}`);
+  el.appendChild(label);
+}
+
+// ═══════════════════════════════════════════════
+//  ROLE CARD BUILDER
+// ═══════════════════════════════════════════════
+
+function buildRoleCard(role, container, isDraggable = true) {
+  const el = document.createElement('div');
+  el.className = 'role-card';
+  el.dataset.roleId = role.id;
+  el.style.borderColor = role.color + '44';
+  el.innerHTML = `
+    <span class="role-emoji">${role.emoji}</span>
+    <span class="role-name">${role.name}</span>
+    <span class="role-dept">${role.dept}</span>
+  `;
+  if (isDraggable) {
+    el.draggable = true;
+    el.addEventListener('dragstart', (e) => {
+      dragRole = role.id;
+      dragSource = 'grid';
+      el.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    el.addEventListener('dragend', () => el.classList.remove('dragging'));
+
+    // Touch support
+    el.addEventListener('touchstart', (e) => {
+      dragRole = role.id;
+      dragSource = 'grid';
+      el.classList.add('selected');
+    }, { passive: true });
+    el.addEventListener('touchend', () => el.classList.remove('selected'));
+  }
+  container.appendChild(el);
+  return el;
+}
+
+function getRoleSubset(ids) {
+  return ids.map(id => roleById[id]).filter(Boolean);
+}
+
+// ═══════════════════════════════════════════════
+//  GAME START
+// ═══════════════════════════════════════════════
+
+function startGame() {
+  document.getElementById('welcome').classList.remove('active');
+  state.stage = 1;
+  loadS1(0);
+  updateProgress();
+}
+
+// ═══════════════════════════════════════════════
+//  STAGE 1
+// ═══════════════════════════════════════════════
+
+function loadS1(idx) {
+  state.s1Index = idx;
+  state.s1Drop = null;
+  const q = S1_QUESTIONS[idx];
+
+  // Show screen
+  document.getElementById('stage1Screen').classList.add('active');
+  document.getElementById('stage2Screen').classList.remove('active');
+
+  // Update content
+  document.getElementById('s1TicketId').textContent = q.id;
+  document.getElementById('s1TicketTag').textContent = q.tag;
+  document.getElementById('s1TaskText').textContent = q.text;
+
+  // Counter
+  makeQCounter('s1Counter', 3, idx);
+
+  // Drop zone
+  const dz = document.getElementById('s1DropZone');
+  dz.innerHTML = '<div class="drop-zone-label" id="s1DropLabel"><span>🎯</span><span>Drop the primary owner here</span></div>';
+  dz.classList.remove('drag-over');
+
+  // Role cards — use subset relevant to question
+  const relevant = [q.owner, ...q.assistants, 'billing', 'security', 'it', 'hr'].slice(0, 8);
+  const seen = new Set();
+  const ids = relevant.filter(id => { if (seen.has(id)) return false; seen.add(id); return true; });
+  // Shuffle
+  for (let i = ids.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [ids[i], ids[j]] = [ids[j], ids[i]];
+  }
+
+  const rolesEl = document.getElementById('s1Roles');
+  rolesEl.innerHTML = '';
+  getRoleSubset(ids).forEach(r => buildRoleCard(r, rolesEl));
+
+  // Submit btn
+  const btn = document.getElementById('s1SubmitBtn');
+  btn.disabled = true;
+  btn.style.opacity = '0.4';
+
+  // Hide feedback
+  document.getElementById('s1Feedback').classList.remove('show');
+
+  updateProgress();
+}
+
+function handleS1Drop(event) {
+  event.preventDefault();
+  const dz = document.getElementById('s1DropZone');
+  dz.classList.remove('drag-over');
+  if (!dragRole) return;
+
+  const role = roleById[dragRole];
+  if (!role) return;
+
+  state.s1Drop = dragRole;
+  dz.innerHTML = `
+    <div class="dropped-role" style="border-color:${role.color}55; background:${role.color}15">
+      <span style="font-size:20px">${role.emoji}</span>
+      <span>${role.name}</span>
+      <span class="remove-drop" onclick="clearS1Drop()">✕</span>
+    </div>
+  `;
+
+  const btn = document.getElementById('s1SubmitBtn');
+  btn.disabled = false;
+  btn.style.opacity = '1';
+
+  // Touch: also wire click on role cards
+  dragRole = null;
+}
+
+// Touch: click role to assign
+document.addEventListener('touchend', () => {
+  // handled per stage
+}, true);
+
+function clearS1Drop() {
+  state.s1Drop = null;
+  const dz = document.getElementById('s1DropZone');
+  dz.innerHTML = '<div class="drop-zone-label" id="s1DropLabel"><span>🎯</span><span>Drop the primary owner here</span></div>';
+  const btn = document.getElementById('s1SubmitBtn');
+  btn.disabled = true;
+  btn.style.opacity = '0.4';
+}
+
+function submitS1() {
+  const q = S1_QUESTIONS[state.s1Index];
+  const chosen = state.s1Drop;
+  const isCorrect = chosen === q.owner;
+  const role = roleById[chosen];
+  const ownerRole = roleById[q.owner];
+
+  // Score
+  if (isCorrect) {
+    state.scores.ownership += 25;
+    state.scores.delegation += 10;
+  } else {
+    state.scores.delegation += 15; // they thought about it
+  }
+
+  // Feedback
+  const fb = document.getElementById('s1Feedback');
+  const icon = document.getElementById('s1FbIcon');
+  const title = document.getElementById('s1FbTitle');
+  const body = document.getElementById('s1FbBody');
+  const assist = document.getElementById('s1FbAssist');
+
+  if (isCorrect) {
+    icon.className = 'feedback-icon good';
+    icon.textContent = '✓';
+    title.textContent = `${ownerRole.name} is the right primary owner`;
+  } else {
+    icon.className = 'feedback-icon partial';
+    icon.textContent = '↻';
+    title.textContent = `${ownerRole.name} is the primary owner`;
+    body.innerHTML = `You chose <strong>${role ? role.name : 'Unknown'}</strong> — ${role ? role.dept + ' does play a role here, but' : ''} ownership of this task ultimately falls to the ${ownerRole.name} because they hold the primary accountability and authority to act.`;
+  }
+
+  body.textContent = q.ownerReason;
+
+  assist.innerHTML = '';
+  q.assistants.forEach((id, i) => {
+    const r = roleById[id];
+    const chip = document.createElement('div');
+    chip.className = 'insight-chip';
+    chip.innerHTML = `${r.emoji} ${r.name} — ${q.assistReason[i]}`;
+    assist.appendChild(chip);
+  });
+
+  fb.classList.add('show');
+  fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function nextS1() {
+  if (state.s1Index < S1_QUESTIONS.length - 1) {
+    loadS1(state.s1Index + 1);
+  } else {
+    state.stage = 2;
+    loadS2(0);
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  STAGE 2
+// ═══════════════════════════════════════════════
+
+function loadS2(idx) {
+  state.s2Index = idx;
+  state.s2Slots = [];
+
+  document.getElementById('stage1Screen').classList.remove('active');
+  document.getElementById('stage2Screen').classList.add('active');
+  document.getElementById('stage3Screen').classList.remove('active');
+
+  const q = S2_QUESTIONS[idx];
+  document.getElementById('s2TicketId').textContent = q.id;
+  document.getElementById('s2TicketTag').textContent = q.tag;
+  document.getElementById('s2TaskText').textContent = q.text;
+
+  makeQCounter('s2Counter', 3, idx);
+
+  // Initialize empty slots
+  const numSlots = q.steps.length;
+  state.s2Slots = new Array(numSlots).fill(null);
+
+  renderS2Slots(q);
+
+  // Role grid
+  const allIds = [...new Set(q.steps.map(s => s.roleId))];
+  // Add distractors
+  const extras = ROLES.map(r => r.id).filter(id => !allIds.includes(id)).slice(0, 3);
+  const pool = [...allIds, ...extras.slice(0, 2)];
+  shuffle(pool);
+
+  const rolesEl = document.getElementById('s2Roles');
+  rolesEl.innerHTML = '';
+  getRoleSubset(pool).forEach(r => buildRoleCard(r, rolesEl));
+
+  document.getElementById('s2Feedback').classList.remove('show');
+
+  updateProgress();
+}
+
+function renderS2Slots(q) {
+  const container = document.getElementById('s2Slots');
+  container.innerHTML = '';
+  const n = q.steps.length;
+
+  for (let i = 0; i < n; i++) {
+    if (i > 0) {
+      const arrow = document.createElement('div');
+      arrow.className = 'workflow-arrow';
+      arrow.textContent = '↓';
+      container.appendChild(arrow);
+    }
+    const slot = document.createElement('div');
+    slot.className = 'workflow-slot' + (state.s2Slots[i] ? ' filled' : '');
+    slot.dataset.slotIdx = i;
+
+    slot.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      slot.classList.add('drag-over');
+    });
+    slot.addEventListener('dragleave', () => slot.classList.remove('drag-over'));
+    slot.addEventListener('drop', (e) => {
+      e.preventDefault();
+      slot.classList.remove('drag-over');
+      handleS2SlotDrop(i);
+    });
+
+    const numEl = document.createElement('div');
+    numEl.className = 'slot-num';
+    numEl.textContent = i + 1;
+    slot.appendChild(numEl);
+
+    const content = document.createElement('div');
+    content.className = 'slot-content';
+
+    if (state.s2Slots[i]) {
+      const r = roleById[state.s2Slots[i]];
+      content.innerHTML = `<span style="font-size:18px">${r.emoji}</span><span style="font-weight:500">${r.name}</span>
+        <span class="remove-drop" onclick="clearS2Slot(${i})" style="margin-left:auto">✕</span>`;
+    } else {
+      content.innerHTML = `<span class="slot-placeholder">Drop a role here...</span>`;
+    }
+    slot.appendChild(content);
+    container.appendChild(slot);
+  }
+}
+
+function handleS2SlotDrop(slotIdx) {
+  if (!dragRole) return;
+  state.s2Slots[slotIdx] = dragRole;
+  dragRole = null;
+  renderS2Slots(S2_QUESTIONS[state.s2Index]);
+}
+
+function clearS2Slot(idx) {
+  state.s2Slots[idx] = null;
+  renderS2Slots(S2_QUESTIONS[state.s2Index]);
+}
+
+function submitS2() {
+  const q = S2_QUESTIONS[state.s2Index];
+  const filled = state.s2Slots.filter(Boolean);
+  if (filled.length < 2) { return; }
+
+  // Score: compare sequence
+  const correct = q.steps.map(s => s.roleId);
+  let matches = 0;
+  for (let i = 0; i < Math.min(state.s2Slots.length, correct.length); i++) {
+    if (state.s2Slots[i] === correct[i]) matches++;
+  }
+  const ratio = matches / correct.length;
+  state.scores.workflow += Math.round(ratio * 30);
+  state.scores.delegation += 15;
+
+  // Feedback
+  const fb = document.getElementById('s2Feedback');
+  document.getElementById('s2FbIcon').textContent = '🔄';
+  document.getElementById('s2FbTitle').textContent = ratio > 0.6 ? 'Good instinct on this workflow' : "Here's how this typically flows";
+  document.getElementById('s2FbBody').textContent = q.explanation;
+
+  // Animate flow
+  const flowEl = document.getElementById('s2FlowAnim');
+  flowEl.innerHTML = '';
+  q.steps.forEach((step, i) => {
+    const r = roleById[step.roleId];
+    const node = document.createElement('div');
+    node.className = 'flow-node';
+    node.style.background = r.color + '22';
+    node.style.border = '1px solid ' + r.color + '55';
+    node.style.color = r.color;
+    node.innerHTML = `${r.emoji} ${r.name}`;
+    flowEl.appendChild(node);
+
+    if (i < q.steps.length - 1) {
+      const arr = document.createElement('div');
+      arr.className = 'flow-arrow-anim';
+      arr.textContent = '→';
+      flowEl.appendChild(arr);
+    }
+
+    setTimeout(() => {
+      node.classList.add('visible');
+    }, i * 300);
+    if (i < q.steps.length - 1) {
+      setTimeout(() => {
+        flowEl.children[i * 2 + 1]?.classList.add('visible');
+      }, i * 300 + 200);
+    }
+  });
+
+  fb.classList.add('show');
+  fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function nextS2() {
+  if (state.s2Index < S2_QUESTIONS.length - 1) {
+    loadS2(state.s2Index + 1);
+  } else {
+    state.stage = 3;
+    loadS3(0);
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  STAGE 3
+// ═══════════════════════════════════════════════
+
+function loadS3(idx) {
+  state.s3Index = idx;
+  state.s3Slots = {};
+
+  document.getElementById('stage2Screen').classList.remove('active');
+  document.getElementById('stage3Screen').classList.add('active');
+
+  const q = S3_QUESTIONS[idx];
+  document.getElementById('s3TicketId').textContent = q.id;
+  document.getElementById('s3TaskText').textContent = q.text;
+  makeQCounter('s3Counter', 3, idx);
+
+  // Build slot area
+  const slotsEl = document.getElementById('s3Slots');
+  slotsEl.innerHTML = '';
+
+  q.slots.forEach((slotLabel) => {
+    state.s3Slots[slotLabel] = [];
+
+    const slotDiv = document.createElement('div');
+    slotDiv.className = 'assign-slot';
+    slotDiv.dataset.slotLabel = slotLabel;
+
+    slotDiv.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      slotDiv.classList.add('drag-over');
+    });
+    slotDiv.addEventListener('dragleave', () => slotDiv.classList.remove('drag-over'));
+    slotDiv.addEventListener('drop', (e) => {
+      e.preventDefault();
+      slotDiv.classList.remove('drag-over');
+      handleS3Drop(slotLabel);
+    });
+
+    const labelEl = document.createElement('div');
+    labelEl.className = 'assign-slot-label';
+    labelEl.textContent = slotLabel;
+    slotDiv.appendChild(labelEl);
+
+    const chips = document.createElement('div');
+    chips.id = 's3chips_' + slotLabel.replace(/\s+/g, '_');
+    chips.style.display = 'flex';
+    chips.style.flexWrap = 'wrap';
+    chips.style.gap = '5px';
+    slotDiv.appendChild(chips);
+
+    slotsEl.appendChild(slotDiv);
+  });
+
+  // Role grid
+  const rolesEl = document.getElementById('s3Roles');
+  rolesEl.innerHTML = '';
+  const allIds = Object.values(q.idealMap).flat();
+  const extras = ROLES.map(r => r.id).filter(id => !allIds.includes(id)).slice(0, 2);
+  const pool = [...new Set([...allIds, ...extras])];
+  shuffle(pool);
+  getRoleSubset(pool).forEach(r => buildRoleCard(r, rolesEl));
+
+  document.getElementById('s3Feedback').classList.remove('show');
+  document.getElementById('s3NextBtn').textContent = idx < S3_QUESTIONS.length - 1 ? 'Continue →' : 'View Results →';
+
+  updateProgress();
+}
+
+function handleS3Drop(slotLabel) {
+  if (!dragRole) return;
+  const arr = state.s3Slots[slotLabel];
+  if (arr.length >= 2) return; // max 2 per slot
+  if (arr.includes(dragRole)) { dragRole = null; return; }
+
+  arr.push(dragRole);
+  const key = dragRole;
+  dragRole = null;
+
+  const chipsEl = document.getElementById('s3chips_' + slotLabel.replace(/\s+/g, '_'));
+  const r = roleById[key];
+  const chip = document.createElement('div');
+  chip.className = 'assign-chip';
+  chip.style.borderColor = r.color + '55';
+  chip.style.background = r.color + '18';
+  chip.innerHTML = `${r.emoji} ${r.name} <span class="chip-remove" onclick="removeS3Chip('${slotLabel}','${key}',this.parentElement)">✕</span>`;
+  chipsEl.appendChild(chip);
+}
+
+function removeS3Chip(slotLabel, roleId, el) {
+  state.s3Slots[slotLabel] = state.s3Slots[slotLabel].filter(id => id !== roleId);
+  el.remove();
+}
+
+function submitS3() {
+  const q = S3_QUESTIONS[state.s3Index];
+
+  // Score: check coverage of ideal roles
+  const idealAll = Object.values(q.idealMap).flat();
+  const chosenAll = Object.values(state.s3Slots).flat();
+  const overlap = chosenAll.filter(id => idealAll.includes(id)).length;
+  const coverage = overlap / idealAll.length;
+  state.scores.collaboration += Math.round(coverage * 35);
+  state.scores.ownership += 10;
+
+  // Feedback
+  const fb = document.getElementById('s3Feedback');
+  document.getElementById('s3FbIcon').textContent = '🤝';
+  document.getElementById('s3FbTitle').textContent = coverage > 0.6
+    ? 'Strong collaborative thinking'
+    : 'Complex problems need broader teams';
+  document.getElementById('s3FbBody').textContent = q.reasoning;
+  document.getElementById('s3CommFlow').textContent = q.commFlow;
+
+  // Map chips
+  const mapEl = document.getElementById('s3FbMap');
+  mapEl.innerHTML = '';
+  q.slots.forEach(slotLabel => {
+    const roleIds = q.idealMap[slotLabel] || [];
+    const slotChip = document.createElement('div');
+    slotChip.className = 'insight-chip primary';
+    slotChip.style.margin = '3px';
+    const roles = roleIds.map(id => roleById[id] ? `${roleById[id].emoji} ${roleById[id].name}` : id).join(' + ');
+    slotChip.textContent = `${slotLabel}: ${roles}`;
+    mapEl.appendChild(slotChip);
+  });
+
+  fb.classList.add('show');
+  fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function nextS3() {
+  if (state.s3Index < S3_QUESTIONS.length - 1) {
+    loadS3(state.s3Index + 1);
+  } else {
+    showResults();
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  RESULTS
+// ═══════════════════════════════════════════════
+
+function showResults() {
+  document.getElementById('stage3Screen').classList.remove('active');
+  const resultsEl = document.getElementById('results');
+  resultsEl.classList.add('active');
+  state.stage = 4;
+  document.getElementById('stageBadge').textContent = 'Complete';
+  document.getElementById('progressFill').style.width = '100%';
+  document.getElementById('progressPct').textContent = '100%';
+
+  celebrate();
+
+  const s = state.scores;
+  // Normalize 0-100
+  const maxO = 75 + 30; // 3 * 25 + 3 * 10
+  const maxD = 30 + 45; // stage 1 + stage 2
+  const maxC = 35 * 3 + 30; // stage 3 * 3 + ownership
+  const maxW = 30 * 3;
+
+  const norm = (v, m) => Math.min(100, Math.round((v / m) * 100));
+  const scores = {
+    Ownership:      norm(s.ownership, 105),
+    Delegation:     norm(s.delegation, 75),
+    Collaboration:  norm(s.collaboration, 105),
+    'Workflow':     norm(s.workflow, 90),
+  };
+
+  // Skill bars
+  const barsEl = document.getElementById('skillBars');
+  barsEl.innerHTML = '';
+  const barColors = ['#4f8ef7', '#00c9a7', '#9d6ef7', '#f7c74f'];
+  Object.entries(scores).forEach(([label, val], i) => {
+    const row = document.createElement('div');
+    row.className = 'skill-row';
+    row.innerHTML = `
+      <div class="skill-row-header">
+        <span>${label}</span>
+        <span class="skill-val">${val}%</span>
+      </div>
+      <div class="skill-bar-track">
+        <div class="skill-bar-fill" id="bar_${i}" style="background:${barColors[i]}"></div>
+      </div>
+    `;
+    barsEl.appendChild(row);
+    setTimeout(() => {
+      document.getElementById('bar_' + i).style.width = val + '%';
+    }, 200 + i * 150);
+  });
+
+  // Radar
+  drawRadar(Object.values(scores));
+
+  // Reflection
+  const avgScore = Object.values(scores).reduce((a, b) => a + b, 0) / 4;
+  const weak = Object.entries(scores).sort((a,b) => a[1]-b[1])[0][0];
+  const strong = Object.entries(scores).sort((a,b) => b[1]-a[1])[0][0];
+
+  const reflMap = {
+    'Ownership': 'identifying who holds accountability for specific tasks',
+    'Delegation': 'recognizing when to involve other roles without over-centralizing',
+    'Collaboration': 'spreading responsibility across multiple teams for complex problems',
+    'Workflow': 'sequencing task handoffs efficiently through an organization',
+  };
+
+  const insight = avgScore > 65
+    ? 'In hospitals, ambiguous ownership causes delays and safety gaps. The best organizations make ownership explicit — even when the work is collaborative.'
+    : 'Healthcare organizations work because roles trust each other. Clear ownership doesn\'t mean isolation — it means knowing who calls the play while others support.';
+
+  const refEl = document.getElementById('reflectionCard');
+  refEl.innerHTML = `
+    <h3>📋 Your Reflection</h3>
+    <div class="reflection-item"><span class="reflection-icon">✅</span><div><strong>Understood well:</strong> ${reflMap[strong]}. Your instincts here were solid.</div></div>
+    <div class="reflection-item"><span class="reflection-icon">🔎</span><div><strong>Tended to over-assign:</strong> You may have spread responsibility broadly in scenarios requiring a single clear owner. In hospitals, unclear ownership can delay critical decisions.</div></div>
+    <div class="reflection-item"><span class="reflection-icon">🤝</span><div><strong>Underestimated collaboration in:</strong> ${reflMap[weak]}. Many healthcare challenges require coordinated teams, not solo actors.</div></div>
+    <div class="insight-callout">"${insight}"</div>
+  `;
+
+  resultsEl.scrollIntoView({ behavior: 'smooth' });
+}
+
+function drawRadar(values) {
+  const canvas = document.getElementById('radarCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = 280, H = 280, cx = 140, cy = 140, r = 90;
+  const labels = ['Ownership', 'Delegation', 'Collaboration', 'Workflow'];
+  const n = labels.length;
+
+  ctx.clearRect(0, 0, W, H);
+
+  const pts = (val) => labels.map((_, i) => {
+    const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+    return {
+      x: cx + Math.cos(angle) * r * (val / 100),
+      y: cy + Math.sin(angle) * r * (val / 100),
+    };
+  });
+
+  // Grid
+  for (let ring = 1; ring <= 4; ring++) {
+    const rr = r * ring / 4;
+    ctx.beginPath();
+    for (let i = 0; i < n; i++) {
+      const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+      const x = cx + Math.cos(angle) * rr;
+      const y = cy + Math.sin(angle) * rr;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // Axes
+  labels.forEach((_, i) => {
+    const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + Math.cos(angle) * r, cy + Math.sin(angle) * r);
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+    ctx.stroke();
+  });
+
+  // Data fill
+  const dataPoints = pts(100).map((_, i) => {
+    const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+    return {
+      x: cx + Math.cos(angle) * r * (values[i] / 100),
+      y: cy + Math.sin(angle) * r * (values[i] / 100),
+    };
+  });
+
+  ctx.beginPath();
+  dataPoints.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(0,201,167,0.15)';
+  ctx.fill();
+  ctx.strokeStyle = '#00c9a7';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Dots
+  dataPoints.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+    ctx.fillStyle = '#00c9a7';
+    ctx.fill();
+  });
+
+  // Labels
+  ctx.font = '600 11px Inter, sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.textAlign = 'center';
+  labels.forEach((label, i) => {
+    const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+    const lx = cx + Math.cos(angle) * (r + 22);
+    const ly = cy + Math.sin(angle) * (r + 22);
+    ctx.fillText(label, lx, ly + 4);
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  CELEBRATION
+// ═══════════════════════════════════════════════
+
+function celebrate() {
+  const container = document.getElementById('celebration');
+  container.innerHTML = '';
+  const colors = ['#00c9a7', '#4f8ef7', '#9d6ef7', '#f7c74f', '#f77c4f'];
+  for (let i = 0; i < 50; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random() * 100 + 'vw';
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+    piece.style.animationDelay = (Math.random() * 1.2) + 's';
+    container.appendChild(piece);
+  }
+  setTimeout(() => container.innerHTML = '', 4000);
+}
+
+// ═══════════════════════════════════════════════
+//  RESTART
+// ═══════════════════════════════════════════════
+
+function restartGame() {
+  state = {
+    stage: 0,
+    s1Index: 0,
+    s2Index: 0,
+    s3Index: 0,
+    s1Drop: null,
+    s2Slots: [],
+    s3Slots: {},
+    scores: { ownership: 0, delegation: 0, collaboration: 0, workflow: 0 },
+    totalQ: 0,
+  };
+  document.getElementById('results').classList.remove('active');
+  document.getElementById('stage3Screen').classList.remove('active');
+  document.getElementById('headerProgress').style.display = 'none';
+  document.getElementById('stageBadge').textContent = 'Welcome';
+  document.getElementById('welcome').classList.add('active');
+}
+
+// ═══════════════════════════════════════════════
+//  UTILITY
+// ═══════════════════════════════════════════════
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// Global dragend cleanup
+document.addEventListener('dragend', () => { dragRole = null; });
+
+// Touch: tap role card then tap slot (simple mobile support)
+let touchSelectedRole = null;
+document.addEventListener('click', (e) => {
+  const rc = e.target.closest('.role-card');
+  if (rc) {
+    if (touchSelectedRole === rc.dataset.roleId) {
+      touchSelectedRole = null;
+      document.querySelectorAll('.role-card.selected').forEach(el => el.classList.remove('selected'));
+    } else {
+      document.querySelectorAll('.role-card.selected').forEach(el => el.classList.remove('selected'));
+      touchSelectedRole = rc.dataset.roleId;
+      rc.classList.add('selected');
+      dragRole = rc.dataset.roleId;
+    }
+    return;
+  }
+
+  // Stage 1 drop zone click
+  const dz = e.target.closest('#s1DropZone');
+  if (dz && touchSelectedRole) {
+    handleS1Drop({ preventDefault: () => {} });
+    touchSelectedRole = null;
+    return;
+  }
+
+  // Stage 2 slot click
+  const ws = e.target.closest('.workflow-slot');
+  if (ws && touchSelectedRole) {
+    handleS2SlotDrop(parseInt(ws.dataset.slotIdx));
+    touchSelectedRole = null;
+    document.querySelectorAll('.role-card.selected').forEach(el => el.classList.remove('selected'));
+    return;
+  }
+
+  // Stage 3 slot click
+  const as = e.target.closest('.assign-slot');
+  if (as && touchSelectedRole) {
+    handleS3Drop(as.dataset.slotLabel);
+    touchSelectedRole = null;
+    document.querySelectorAll('.role-card.selected').forEach(el => el.classList.remove('selected'));
+    return;
+  }
+});
+</script>
+</body>
+</html>
