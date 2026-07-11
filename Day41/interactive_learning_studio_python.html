@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NumPy Fundamentals for AI — Interactive Learning Studio</title>
+<style>
+  :root{
+    --bg: #0a0f1c;
+    --bg-panel: #111a2e;
+    --bg-panel-2: #16213a;
+    --bg-elevated: #1b2743;
+    --border: #263455;
+    --border-soft: #1d2a48;
+    --text: #eaf0fa;
+    --text-muted: #93a2c2;
+    --text-faint: #5f6d8c;
+    --accent: #5eead4;
+    --accent-dim: #2f6f68;
+    --accent-2: #fbbf24;
+    --accent-2-dim: #7a5c1a;
+    --danger: #fb7185;
+    --danger-dim: #6b2f3a;
+    --code-bg: #0c1424;
+    --code-border: #1f2d4d;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --font-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'JetBrains Mono', Consolas, 'Courier New', monospace;
+    --shadow-lg: 0 20px 60px -20px rgba(0,0,0,0.6);
+    --shadow-sm: 0 4px 16px -4px rgba(0,0,0,0.4);
+    color-scheme: dark;
+  }
+  html.light{
+    --bg: #f5f7fb;
+    --bg-panel: #ffffff;
+    --bg-panel-2: #eef1f8;
+    --bg-elevated: #ffffff;
+    --border: #dde3f0;
+    --border-soft: #e6eaf4;
+    --text: #121a2e;
+    --text-muted: #4c5875;
+    --text-faint: #8a93ab;
+    --accent: #0f9c8c;
+    --accent-dim: #d3f3ee;
+    --accent-2: #b9790a;
+    --accent-2-dim: #fbe8c2;
+    --danger: #d1425a;
+    --danger-dim: #fbdde2;
+    --code-bg: #101a30;
+    --code-border: #22314f;
+    --shadow-lg: 0 20px 60px -20px rgba(30,40,70,0.25);
+    --shadow-sm: 0 4px 16px -4px rgba(30,40,70,0.15);
+    color-scheme: light;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-body);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    transition:background .35s ease, color .35s ease;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; scroll-behavior:auto !important;}
+  }
+  ::selection{background:var(--accent); color:#062824;}
+  a{color:var(--accent);}
+  h1,h2,h3,h4{font-family:var(--font-display); font-weight:600; margin:0 0 .5em 0; letter-spacing:.2px;}
+  p{margin:0 0 1em 0;}
+  code, .mono{font-family:var(--font-mono);}
+  :focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:4px;}
+
+  /* ---------- Layout shell ---------- */
+  .app-shell{display:flex; min-height:100vh;}
+  .topbar{
+    position:fixed; top:0; left:0; right:0; height:60px; z-index:200;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 18px; background:color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter:blur(10px); border-bottom:1px solid var(--border-soft);
+  }
+  .brand{display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-size:1.05rem; font-weight:700;}
+  .brand-mark{width:28px;height:28px; border-radius:7px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-weight:700; color:#04201c; font-size:.85rem;}
+  .topbar-right{display:flex; align-items:center; gap:14px;}
+  .xp-pill{
+    display:flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:.78rem;
+    padding:6px 12px; border-radius:99px; background:var(--bg-panel-2); border:1px solid var(--border);
+    color:var(--accent-2);
+  }
+  .theme-toggle{
+    width:38px;height:38px; border-radius:10px; border:1px solid var(--border); background:var(--bg-panel-2);
+    color:var(--text); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1rem;
+    transition:transform .15s ease, background .2s ease;
+  }
+  .theme-toggle:hover{transform:translateY(-1px); background:var(--bg-elevated);}
+  .menu-toggle{display:none; width:38px;height:38px; border-radius:10px; border:1px solid var(--border); background:var(--bg-panel-2); color:var(--text); cursor:pointer; font-size:1.1rem;}
+
+  .progress-strip{position:fixed; top:60px; left:0; right:0; height:3px; background:var(--border-soft); z-index:199;}
+  .progress-strip-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--accent-2)); transition:width .5s ease;}
+
+  .sidebar{
+    position:fixed; top:63px; bottom:0; left:0; width:272px; overflow-y:auto;
+    border-right:1px solid var(--border-soft); background:var(--bg-panel); padding:22px 14px 40px;
+    z-index:150;
+  }
+  .sidebar h4{font-family:var(--font-mono); text-transform:uppercase; font-size:.68rem; letter-spacing:1.5px; color:var(--text-faint); margin:18px 8px 8px;}
+  .nav-item{
+    display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; margin-bottom:4px;
+    color:var(--text-muted); text-decoration:none; font-size:.88rem; cursor:pointer; border:1px solid transparent;
+    transition:background .15s ease, color .15s ease;
+  }
+  .nav-item:hover{background:var(--bg-panel-2); color:var(--text);}
+  .nav-item.active{background:var(--accent-dim); color:var(--accent); border-color:var(--accent-dim);}
+  html.light .nav-item.active{color:#065f52;}
+  .nav-item.locked{opacity:.45; cursor:not-allowed;}
+  .nav-badge{margin-left:auto; font-family:var(--font-mono); font-size:.68rem; padding:2px 7px; border-radius:99px; background:var(--bg-elevated); border:1px solid var(--border);}
+  .nav-badge.done{background:var(--accent-dim); color:var(--accent); border-color:transparent;}
+
+  .main{margin-left:272px; padding:84px 0 0; width:calc(100% - 272px);}
+  .content-wrap{max-width:880px; margin:0 auto; padding:0 32px 100px;}
+
+  @media (max-width: 980px){
+    .sidebar{transform:translateX(-100%); transition:transform .25s ease; box-shadow:var(--shadow-lg);}
+    .sidebar.open{transform:translateX(0);}
+    .main{margin-left:0; width:100%;}
+    .menu-toggle{display:flex; align-items:center; justify-content:center;}
+    .content-wrap{padding:0 18px 80px;}
+  }
+
+  /* ---------- Generic components ---------- */
+  .eyebrow{font-family:var(--font-mono); font-size:.72rem; letter-spacing:2px; text-transform:uppercase; color:var(--accent); margin-bottom:10px; display:block;}
+  .card{background:var(--bg-panel); border:1px solid var(--border-soft); border-radius:var(--radius); padding:24px; margin:18px 0; box-shadow:var(--shadow-sm);}
+  .card-tight{padding:18px 22px;}
+  .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  @media (max-width:700px){.grid-2{grid-template-columns:1fr;}}
+  .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:14px;}
+  @media (max-width:700px){.grid-3{grid-template-columns:1fr;}}
+
+  .btn{
+    font-family:var(--font-body); font-weight:600; font-size:.88rem; padding:11px 20px; border-radius:10px;
+    border:1px solid var(--border); background:var(--bg-panel-2); color:var(--text); cursor:pointer;
+    transition:transform .12s ease, background .15s ease, box-shadow .15s ease; display:inline-flex; align-items:center; gap:8px;
+  }
+  .btn:hover{transform:translateY(-1px); box-shadow:var(--shadow-sm);}
+  .btn:active{transform:translateY(0);}
+  .btn-primary{background:linear-gradient(135deg,var(--accent),#3fb8a8); color:#04241f; border:none;}
+  html.light .btn-primary{color:#03332c;}
+  .btn-primary:hover{box-shadow:0 8px 24px -6px color-mix(in srgb, var(--accent) 60%, transparent);}
+  .btn:disabled{opacity:.4; cursor:not-allowed; transform:none;}
+  .btn-ghost{background:transparent;}
+
+  code.inline{background:var(--code-bg); border:1px solid var(--code-border); padding:2px 6px; border-radius:5px; font-size:.86em; color:var(--accent-2);}
+  pre.code-block{
+    background:var(--code-bg); border:1px solid var(--code-border); border-radius:var(--radius-sm);
+    padding:16px 18px; overflow-x:auto; font-family:var(--font-mono); font-size:.84rem; line-height:1.65; margin:14px 0;
+    position:relative;
+  }
+  pre.code-block .c-cmt{color:var(--text-faint);}
+  pre.code-block .c-kw{color:#c792ea;}
+  pre.code-block .c-fn{color:#82aaff;}
+  pre.code-block .c-str{color:var(--accent-2);}
+  pre.code-block .c-num{color:var(--accent);}
+  .code-out{
+    background:var(--bg-panel-2); border:1px dashed var(--border); border-radius:var(--radius-sm);
+    padding:12px 16px; font-family:var(--font-mono); font-size:.82rem; color:var(--text-muted); margin-top:-8px; margin-bottom:14px;
+  }
+  .code-out b{color:var(--accent);}
+
+  .callout{border-left:3px solid var(--accent); background:var(--accent-dim); border-radius:0 10px 10px 0; padding:14px 18px; margin:16px 0; font-size:.92rem;}
+  .callout.warn{border-color:var(--accent-2); background:var(--accent-2-dim);}
+  .callout.danger{border-color:var(--danger); background:var(--danger-dim);}
+  .callout-title{font-weight:700; font-family:var(--font-mono); font-size:.78rem; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; display:block;}
+
+  .tag{display:inline-block; font-family:var(--font-mono); font-size:.72rem; padding:3px 10px; border-radius:99px; background:var(--bg-panel-2); border:1px solid var(--border); color:var(--text-muted); margin:2px 4px 2px 0;}
+
+  table.cmp{width:100%; border-collapse:collapse; margin:14px 0; font-size:.88rem;}
+  table.cmp th, table.cmp td{border:1px solid var(--border-soft); padding:10px 12px; text-align:left;}
+  table.cmp th{background:var(--bg-panel-2); font-family:var(--font-mono); font-size:.75rem; text-transform:uppercase; letter-spacing:.5px; color:var(--text-muted);}
+  table.cmp td code{font-size:.82rem;}
+
+  details.exercise{border:1px solid var(--border-soft); border-radius:var(--radius-sm); margin:14px 0; background:var(--bg-panel-2); overflow:hidden;}
+  details.exercise summary{cursor:pointer; padding:12px 16px; font-weight:600; font-size:.88rem; list-style:none; display:flex; align-items:center; gap:8px;}
+  details.exercise summary::-webkit-details-marker{display:none;}
+  details.exercise summary:before{content:"▸"; color:var(--accent); transition:transform .2s ease;}
+  details.exercise[open] summary:before{transform:rotate(90deg);}
+  details.exercise .exercise-body{padding:0 16px 16px;}
+
+  /* ---------- Hero ---------- */
+  .hero{padding:52px 0 20px;}
+  .hero h1{font-size:clamp(2rem, 4vw, 2.7rem); line-height:1.12;}
+  .hero .lede{font-size:1.08rem; color:var(--text-muted); max-width:640px;}
+  .meta-row{display:flex; flex-wrap:wrap; gap:10px; margin:20px 0;}
+  .meta-chip{display:flex; align-items:center; gap:8px; padding:9px 14px; border-radius:10px; background:var(--bg-panel); border:1px solid var(--border-soft); font-size:.82rem; color:var(--text-muted);}
+  .meta-chip b{color:var(--text); font-weight:600;}
+
+  /* ---------- Array visualizer (signature element) ---------- */
+  .array-viz{display:flex; align-items:flex-end; gap:0; margin:24px 0; overflow-x:auto; padding:20px 4px 8px;}
+  .cell-stack{display:flex; flex-direction:column; align-items:center; margin-right:4px;}
+  .idx-label{font-family:var(--font-mono); font-size:.68rem; color:var(--text-faint); margin-bottom:6px;}
+  .arr-cell{
+    width:52px; height:52px; display:flex; align-items:center; justify-content:center;
+    border:1.5px solid var(--border); background:var(--bg-panel-2); border-radius:8px;
+    font-family:var(--font-mono); font-weight:600; font-size:.95rem; color:var(--text);
+    transition:all .3s ease;
+  }
+  .arr-cell.hl{border-color:var(--accent); background:var(--accent-dim); color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);}
+  .arr-cell.hl2{border-color:var(--accent-2); background:var(--accent-2-dim); color:var(--accent-2);}
+  .arr-meta{font-family:var(--font-mono); font-size:.72rem; color:var(--text-faint); margin-top:6px;}
+  .viz-caption{font-size:.82rem; color:var(--text-muted); margin-top:6px;}
+
+  /* ---------- Quiz ---------- */
+  .quiz-wrap{margin-top:34px;}
+  .quiz-header{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;}
+  .quiz-progress{font-family:var(--font-mono); font-size:.78rem; color:var(--text-muted);}
+  .q-block{margin-bottom:22px; padding-bottom:20px; border-bottom:1px solid var(--border-soft);}
+  .q-block:last-child{border-bottom:none;}
+  .q-title{font-weight:600; margin-bottom:12px; font-size:.96rem;}
+  .q-options{display:flex; flex-direction:column; gap:8px;}
+  .q-option{
+    display:flex; align-items:center; gap:10px; padding:11px 14px; border:1px solid var(--border); border-radius:10px;
+    background:var(--bg-panel-2); cursor:pointer; font-size:.88rem; transition:border-color .15s ease, background .15s ease;
+  }
+  .q-option:hover{border-color:var(--accent);}
+  .q-option input{accent-color:var(--accent);}
+  .q-option.correct{border-color:var(--accent); background:var(--accent-dim);}
+  .q-option.incorrect{border-color:var(--danger); background:var(--danger-dim);}
+  .q-feedback{display:none; margin-top:10px; padding:11px 14px; border-radius:10px; font-size:.85rem; background:var(--bg-elevated); border:1px solid var(--border-soft);}
+  .q-feedback.show{display:block;}
+  .q-feedback .verdict{font-weight:700; font-family:var(--font-mono); font-size:.75rem; text-transform:uppercase; letter-spacing:1px;}
+  .q-feedback.correct .verdict{color:var(--accent);}
+  .q-feedback.incorrect .verdict{color:var(--danger);}
+  .quiz-summary{display:none; text-align:center; padding:26px; border-radius:var(--radius); background:var(--bg-panel-2); border:1px solid var(--border-soft); margin-top:12px;}
+  .quiz-summary.show{display:block;}
+  .score-ring{width:96px; height:96px; margin:0 auto 14px;}
+  .quiz-actions{display:flex; gap:10px; justify-content:center; margin-top:16px; flex-wrap:wrap;}
+
+  /* ---------- Module gating ---------- */
+  .module-section{padding-top:36px; scroll-margin-top:80px;}
+  .locked-panel{text-align:center; padding:60px 24px; border:1px dashed var(--border); border-radius:var(--radius); color:var(--text-muted);}
+  .locked-panel .lock-icon{font-size:2rem; margin-bottom:10px;}
+
+  .module-head{display:flex; align-items:center; gap:14px; margin-bottom:6px;}
+  .module-num{font-family:var(--font-mono); font-size:1.6rem; color:var(--accent); font-weight:700; opacity:.5;}
+  .module-tags{margin-bottom:18px;}
+
+  .key-takeaways{list-style:none; padding:0; margin:0;}
+  .key-takeaways li{position:relative; padding-left:26px; margin-bottom:10px; font-size:.92rem;}
+  .key-takeaways li:before{content:"✓"; position:absolute; left:0; color:var(--accent); font-weight:700;}
+
+  .toast{
+    position:fixed; bottom:24px; right:24px; z-index:400; background:var(--bg-elevated); border:1px solid var(--accent);
+    color:var(--text); padding:14px 20px; border-radius:12px; box-shadow:var(--shadow-lg); font-size:.88rem;
+    display:flex; align-items:center; gap:10px; transform:translateY(20px); opacity:0; transition:all .35s ease; pointer-events:none;
+  }
+  .toast.show{transform:translateY(0); opacity:1;}
+  .toast .badge-icon{width:30px;height:30px; border-radius:8px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); display:flex; align-items:center; justify-content:center; font-size:.9rem;}
+
+  footer.site-footer{border-top:1px solid var(--border-soft); padding:40px 32px; text-align:center; color:var(--text-faint); font-size:.8rem;}
+
+  .resource-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:14px;}
+  @media (max-width:700px){.resource-grid{grid-template-columns:1fr;}}
+  .resource-card{border:1px solid var(--border-soft); border-radius:var(--radius-sm); padding:16px; background:var(--bg-panel);}
+  .resource-card h4{margin-bottom:8px; font-size:.95rem; display:flex; align-items:center; gap:8px;}
+  .resource-card ul{margin:0; padding-left:18px; font-size:.85rem; color:var(--text-muted);}
+  .resource-card li{margin-bottom:6px;}
+
+  .print-btn-wrap{display:flex; justify-content:flex-end; margin-bottom:6px;}
+  @media print{
+    .sidebar, .topbar, .progress-strip, .quiz-wrap, .print-btn-wrap, footer, .menu-toggle{display:none !important;}
+    .main{margin-left:0 !important; width:100% !important; padding-top:0 !important;}
+    body{background:#fff; color:#000;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <div class="brand"><div class="brand-mark">np</div> Interactive Learning Studio</div>
+  </div>
+  <div class="topbar-right">
+    <div class="xp-pill">★ <span id="xpCount">0</span> XP</div>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">◐</button>
+  </div>
+</div>
+<div class="progress-strip"><div class="progress-strip-fill" id="progressFill"></div></div>
+
+<div class="app-shell">
+  <nav class="sidebar" id="sidebar">
+    <h4>Start Here</h4>
+    <a class="nav-item active" data-target="#intro">🏠 Introduction</a>
+    <h4>Modules</h4>
+    <a class="nav-item" data-target="#module-1" data-module="1">🧩 1. NumPy Basics <span class="nav-badge" id="badge-1">0%</span></a>
+    <a class="nav-item locked" data-target="#module-2" data-module="2">⚡ 2. Ops &amp; Broadcasting <span class="nav-badge" id="badge-2">🔒</span></a>
+    <a class="nav-item locked" data-target="#module-3" data-module="3">🧱 3. Reshape &amp; Aggregate <span class="nav-badge" id="badge-3">🔒</span></a>
+    <a class="nav-item locked" data-target="#module-4" data-module="4">🧠 4. AI/ML Applications <span class="nav-badge" id="badge-4">🔒</span></a>
+    <h4>Wrap-Up</h4>
+    <a class="nav-item locked" data-target="#challenge" data-module="5">🏆 Final Challenge</a>
+    <a class="nav-item" data-target="#cheatsheet">📋 Cheat Sheet</a>
+    <a class="nav-item" data-target="#continue">🚀 Continue Learning</a>
+    <h4 style="margin-top:26px;">Your Progress</h4>
+    <div style="padding:0 8px;">
+      <div style="height:8px;background:var(--border-soft);border-radius:99px;overflow:hidden;margin-bottom:8px;">
+        <div id="sidebarProgress" style="height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .5s ease;"></div>
+      </div>
+      <div style="font-family:var(--font-mono);font-size:.72rem;color:var(--text-faint);" id="sidebarProgressText">0 of 4 modules complete</div>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="content-wrap">
+
+      <!-- ============ INTRO ============ -->
+      <section id="intro" class="hero">
+        <span class="eyebrow">Python for AI · Interactive Tutorial</span>
+        <h1>NumPy Fundamentals for AI</h1>
+        <p class="lede">Every tensor in PyTorch, every DataFrame in Pandas, and every gradient update in a neural network rests on one idea: the N-dimensional array. Master how NumPy arrays are built, broadcast, reshaped, and multiplied, and you'll read AI code the way a mechanic reads an engine — down to the moving parts.</p>
+
+        <div id="heroViz"></div>
+
+        <div class="meta-row">
+          <div class="meta-chip">⏱ <b>90–110 min</b> total</div>
+          <div class="meta-chip">📶 Level: <b>Beginner → Practitioner</b></div>
+          <div class="meta-chip">🧰 Prereq: <b>Basic Python (variables, loops, lists)</b></div>
+          <div class="meta-chip">🎯 4 modules · 16 quiz questions · 1 capstone</div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card card-tight">
+            <h3 style="font-size:1rem;">Learning Objectives</h3>
+            <ul class="key-takeaways">
+              <li>Create, index, and slice NumPy arrays with full control over shape and dtype</li>
+              <li>Explain and apply vectorization and broadcasting instead of Python loops</li>
+              <li>Reshape, stack, and aggregate arrays along arbitrary axes</li>
+              <li>Use dot products and matrix multiplication to hand-roll a neural network layer</li>
+            </ul>
+          </div>
+          <div class="card card-tight">
+            <h3 style="font-size:1rem;">Reward System</h3>
+            <p style="font-size:.88rem; color:var(--text-muted); margin-bottom:10px;">Earn XP as you go. Each quiz question is worth <b style="color:var(--text)">10 XP</b>, each module clear gives a <b style="color:var(--text)">completion badge</b>, and the final challenge awards the <b style="color:var(--accent-2)">NumPy Practitioner</b> badge.</p>
+            <div class="tag">🥉 Array Novice</div>
+            <div class="tag">🥈 Broadcast Engineer</div>
+            <div class="tag">🥇 Tensor Wrangler</div>
+            <div class="tag">🏆 NumPy Practitioner</div>
+          </div>
+        </div>
+
+        <div class="card card-tight">
+          <h3 style="font-size:1rem;">Expected Outcomes</h3>
+          <p style="font-size:.9rem;">By the end, you'll be able to load raw numeric data into arrays, transform it into the exact shape a model expects, and implement the forward pass of a small neural network layer using nothing but NumPy — the same mental model used inside every major AI framework.</p>
+        </div>
+
+        <button class="btn btn-primary" onclick="scrollToId('module-1')">Begin Module 1 →</button>
+      </section>
+
+      <!-- ============ MODULE 1 ============ -->
+      <section id="module-1" class="module-section">
+        <div class="module-head"><span class="module-num">01</span><h2>NumPy Basics</h2></div>
+        <div class="module-tags"><span class="tag">arrays</span><span class="tag">ndarray</span><span class="tag">indexing</span><span class="tag">slicing</span><span class="tag">dtypes</span></div>
+
+        <p>A Python <code class="inline">list</code> can hold anything, in any mix, anywhere in memory. A NumPy <code class="inline">ndarray</code> gives up that flexibility on purpose: every element is the same fixed-size type, packed contiguously in memory. That trade is exactly what makes array math in AI fast.</p>
+
+        <div class="callout">
+          <span class="callout-title">Analogy</span>
+          A Python list is a row of labeled lockers, each one a different size, holding anything from a shoe to a sandwich, scattered across a building. A NumPy array is a train of identical train cars bolted together in a straight line — because every car is the same shape, the whole train can accelerate, brake, and turn as one unit. That uniformity is what "vectorized" math exploits later in this tutorial.
+        </div>
+
+        <h3>Creating arrays</h3>
+        <p>The most common entry point is <code class="inline">np.array()</code>, which converts a Python list (or list of lists) into an ndarray:</p>
+<pre class="code-block"><span class="c-kw">import</span> numpy <span class="c-kw">as</span> np
+
+a <span class="c-kw">=</span> np.array([<span class="c-num">1</span>, <span class="c-num">2</span>, <span class="c-num">3</span>, <span class="c-num">4</span>])
+<span class="c-fn">print</span>(a, a.shape, a.dtype)</pre>
+<div class="code-out">→ <b>[1 2 3 4] (4,) int64</b></div>
+
+        <div id="viz1"></div>
+
+        <p>For AI work you'll rarely type out arrays by hand — you'll generate them. These constructors show up constantly when initializing weights, masks, or placeholder tensors:</p>
+<pre class="code-block">np.zeros((<span class="c-num">3</span>, <span class="c-num">4</span>))       <span class="c-cmt"># 3x4 array of 0.0 — common for initializing bias terms</span>
+np.ones((<span class="c-num">2</span>, <span class="c-num">2</span>))        <span class="c-cmt"># 2x2 array of 1.0</span>
+np.arange(<span class="c-num">0</span>, <span class="c-num">10</span>, <span class="c-num">2</span>)   <span class="c-cmt"># [0 2 4 6 8] — like range(), but returns an array</span>
+np.linspace(<span class="c-num">0</span>, <span class="c-num">1</span>, <span class="c-num">5</span>)   <span class="c-cmt"># [0. 0.25 0.5 0.75 1.] — 5 evenly spaced points</span>
+np.random.randn(<span class="c-num">3</span>, <span class="c-num">3</span>) <span class="c-cmt"># random weight matrix, standard normal distribution</span></pre>
+
+        <h3>Shape, dtype, and why they matter</h3>
+        <p>Every array carries three things you should check by reflex: <code class="inline">.shape</code> (the dimensions), <code class="inline">.dtype</code> (the element type), and <code class="inline">.ndim</code> (how many axes). In AI code, a mismatched shape is the single most common bug — a model expecting <code class="inline">(batch, 784)</code> will fail silently or loudly on <code class="inline">(784, batch)</code>.</p>
+
+        <table class="cmp">
+          <tr><th>Property</th><th>Meaning</th><th>Example</th></tr>
+          <tr><td><code>.shape</code></td><td>Size along each axis</td><td><code>(3, 4)</code> = 3 rows, 4 columns</td></tr>
+          <tr><td><code>.dtype</code></td><td>Element data type</td><td><code>float32</code>, <code>int64</code>, <code>bool</code></td></tr>
+          <tr><td><code>.ndim</code></td><td>Number of axes</td><td>1 = vector, 2 = matrix, 3+ = tensor</td></tr>
+          <tr><td><code>.size</code></td><td>Total element count</td><td>3×4 array → <code>12</code></td></tr>
+        </table>
+
+        <div class="callout warn">
+          <span class="callout-title">Common Misconception</span>
+          "Shape <code class="inline">(3,)</code> and shape <code class="inline">(3,1)</code> are basically the same thing." They are not. <code class="inline">(3,)</code> is a flat 1-D vector; <code class="inline">(3,1)</code> is a 2-D column matrix. This exact confusion causes some of the most stubborn bugs when feeding data into ML models — always print <code class="inline">.shape</code> when something looks wrong.
+        </div>
+
+        <h3>Indexing and slicing</h3>
+        <p>Indexing pulls out single elements; slicing pulls out a view of a range. NumPy extends Python's <code class="inline">list[start:stop:step]</code> syntax across every axis at once, separated by commas.</p>
+<pre class="code-block">m <span class="c-kw">=</span> np.array([[<span class="c-num">10</span>,<span class="c-num">20</span>,<span class="c-num">30</span>], [<span class="c-num">40</span>,<span class="c-num">50</span>,<span class="c-num">60</span>], [<span class="c-num">70</span>,<span class="c-num">80</span>,<span class="c-num">90</span>]])
+
+m[<span class="c-num">1</span>, <span class="c-num">2</span>]      <span class="c-cmt"># 60 — row 1, column 2</span>
+m[<span class="c-num">0</span>]         <span class="c-cmt"># [10 20 30] — entire row 0</span>
+m[:, <span class="c-num">1</span>]      <span class="c-cmt"># [20 50 80] — entire column 1</span>
+m[<span class="c-num">0</span>:<span class="c-num">2</span>, <span class="c-num">1</span>:]    <span class="c-cmt"># [[20 30],[50 60]] — sub-matrix</span></pre>
+
+        <div id="viz1b"></div>
+
+        <div class="callout danger">
+          <span class="callout-title">Common Misconception</span>
+          "Slicing an array copies it, just like slicing a list." A NumPy slice is a <b>view</b>, not a copy — it shares memory with the original array. Modifying a slice modifies the source data. If you need an independent copy, call <code class="inline">.copy()</code> explicitly.
+        </div>
+
+        <h3>Key Takeaways</h3>
+        <ul class="key-takeaways">
+          <li>ndarrays store one fixed dtype in contiguous memory — that's the source of NumPy's speed</li>
+          <li><code class="inline">.shape</code>, <code class="inline">.dtype</code>, and <code class="inline">.ndim</code> should be checked whenever a bug appears</li>
+          <li>Comma-separated indices index across axes: <code class="inline">arr[row, col]</code></li>
+          <li>Slices are views into the original memory, not independent copies</li>
+        </ul>
+
+        <details class="exercise">
+          <summary>💻 Practical Exercise — Predict the output</summary>
+          <div class="exercise-body">
+            <p style="font-size:.88rem;">Given <code class="inline">g = np.arange(12).reshape(3,4)</code> (a 3×4 grid of 0–11), what does <code class="inline">g[1:, ::2]</code> return? Think about it, then reveal.</p>
+            <details style="margin-top:8px;"><summary style="font-size:.82rem; cursor:pointer; color:var(--accent);">Reveal answer</summary>
+              <div class="code-out" style="margin-top:8px;">Rows 1–2, columns 0 and 2 → <b>[[4, 6], [8, 10]]</b>. <code class="inline">1:</code> skips row 0; <code class="inline">::2</code> takes every other column starting at 0.</div>
+            </details>
+          </div>
+        </details>
+
+        <div id="quiz-1" class="quiz-wrap"></div>
+      </section>
+
+      <!-- ============ MODULE 2 ============ -->
+      <section id="module-2" class="module-section">
+        <div class="module-head"><span class="module-num">02</span><h2>Array Operations &amp; Broadcasting</h2></div>
+        <div id="lock-2" class="locked-panel"><div class="lock-icon">🔒</div>Complete Module 1's quiz to unlock this module.</div>
+        <div id="content-2" style="display:none;">
+        <div class="module-tags"><span class="tag">vectorization</span><span class="tag">broadcasting</span><span class="tag">element-wise ops</span></div>
+
+        <p>This module explains the single habit that separates fast AI code from slow AI code: replacing explicit <code class="inline">for</code> loops with vectorized array operations.</p>
+
+        <h3>Vectorization: the loop you don't write</h3>
+        <p>Compare two ways of doubling every value in a dataset of one million numbers:</p>
+<pre class="code-block"><span class="c-cmt"># Pure Python — interprets every element, one at a time</span>
+result <span class="c-kw">=</span> [x <span class="c-kw">*</span> <span class="c-num">2</span> <span class="c-kw">for</span> x <span class="c-kw">in</span> data]
+
+<span class="c-cmt"># NumPy — pushes the loop down into pre-compiled C code</span>
+result <span class="c-kw">=</span> data <span class="c-kw">*</span> <span class="c-num">2</span></pre>
+        <p>Both produce the same values. On a million-element array, the vectorized version is typically <b>10–50x faster</b>, because NumPy performs the loop in compiled C rather than the Python interpreter, and it can use CPU-level parallel instructions (SIMD) across contiguous memory.</p>
+
+        <div class="callout">
+          <span class="callout-title">Analogy</span>
+          A Python <code class="inline">for</code> loop is one clerk stamping a thousand documents by hand, one at a time. A vectorized NumPy operation is a printing press: load all thousand sheets at once, pull the lever once, and every sheet is stamped simultaneously. The press only works because all the sheets are the same size — which is exactly the uniform-array constraint from Module 1 paying off.
+        </div>
+
+        <h3>Broadcasting: math between different shapes</h3>
+        <p>Broadcasting lets NumPy apply an operation between arrays of different shapes by "stretching" the smaller one, without actually copying data. Two shapes are broadcast-compatible when, comparing dimensions from the right, each pair is either equal or one of them is 1.</p>
+
+        <div id="vizBroadcast"></div>
+
+<pre class="code-block">prices <span class="c-kw">=</span> np.array([<span class="c-num">100</span>, <span class="c-num">200</span>, <span class="c-num">300</span>])   <span class="c-cmt"># shape (3,)</span>
+tax_rate <span class="c-kw">=</span> <span class="c-num">1.08</span>                        <span class="c-cmt"># shape () — a scalar</span>
+prices <span class="c-kw">*</span> tax_rate  <span class="c-cmt"># [108. 216. 324.] — scalar "stretches" across all 3</span>
+
+batch <span class="c-kw">=</span> np.ones((<span class="c-num">4</span>, <span class="c-num">3</span>))              <span class="c-cmt"># shape (4, 3) — 4 samples, 3 features</span>
+mean  <span class="c-kw">=</span> np.array([<span class="c-num">10</span>, <span class="c-num">20</span>, <span class="c-num">30</span>])      <span class="c-cmt"># shape (3,)</span>
+batch <span class="c-kw">-</span> mean    <span class="c-cmt"># mean row is applied to all 4 rows — used constantly for normalization</span></pre>
+
+        <p>This exact pattern — subtracting a per-feature mean from a batch of samples — is how every neural network standardizes input data before training.</p>
+
+        <table class="cmp">
+          <tr><th>Shape A</th><th>Shape B</th><th>Compatible?</th><th>Result shape</th></tr>
+          <tr><td><code>(4, 3)</code></td><td><code>(3,)</code></td><td>✅ Yes</td><td><code>(4, 3)</code></td></tr>
+          <tr><td><code>(4, 3)</code></td><td><code>(4, 1)</code></td><td>✅ Yes</td><td><code>(4, 3)</code></td></tr>
+          <tr><td><code>(4, 3)</code></td><td><code>(4,)</code></td><td>❌ No</td><td>ValueError — 3 vs 4 mismatch</td></tr>
+        </table>
+
+        <div class="callout warn">
+          <span class="callout-title">Common Misconception</span>
+          "Broadcasting duplicates the smaller array in memory to match the bigger one." It doesn't — NumPy simulates the stretch mathematically without allocating the extra memory, which is part of why broadcasting is both fast and memory-efficient, not just a syntax shortcut.
+        </div>
+
+        <h3>Element-wise vs. matrix operations</h3>
+        <p><code class="inline">*</code> multiplies element-by-element. Matrix multiplication is a different operation entirely, done with <code class="inline">@</code> or <code class="inline">np.dot()</code> — this distinction becomes critical in Module 4.</p>
+
+        <h3>Key Takeaways</h3>
+        <ul class="key-takeaways">
+          <li>Vectorized operations replace Python loops with compiled, parallelized C code</li>
+          <li>Broadcasting compares shapes from the right; dimensions must match or be 1</li>
+          <li>No extra memory is allocated during broadcasting — it's a virtual stretch</li>
+          <li><code class="inline">*</code> is element-wise; matrix multiplication needs <code class="inline">@</code> or <code class="inline">np.dot()</code></li>
+        </ul>
+
+        <details class="exercise">
+          <summary>💻 Practical Exercise — Fix the shape error</summary>
+          <div class="exercise-body">
+            <p style="font-size:.88rem;"><code class="inline">batch</code> has shape <code class="inline">(5, 3)</code> (5 samples, 3 features) and you want to subtract a per-feature mean array of shape <code class="inline">(3,)</code>. Will <code class="inline">batch - mean</code> work, and why?</p>
+            <details style="margin-top:8px;"><summary style="font-size:.82rem; cursor:pointer; color:var(--accent);">Reveal answer</summary>
+              <div class="code-out" style="margin-top:8px;">Yes. Comparing from the right: <b>3 vs 3</b> → match, <b>5 vs (missing)</b> → treated as 1, so mean is broadcast across all 5 rows. Result shape: <b>(5, 3)</b>.</div>
+            </details>
+          </div>
+        </details>
+
+        <div id="quiz-2" class="quiz-wrap"></div>
+        </div>
+      </section>
+
+      <!-- ============ MODULE 3 ============ -->
+      <section id="module-3" class="module-section">
+        <div class="module-head"><span class="module-num">03</span><h2>Reshaping, Stacking &amp; Aggregation</h2></div>
+        <div id="lock-3" class="locked-panel"><div class="lock-icon">🔒</div>Complete Module 2's quiz to unlock this module.</div>
+        <div id="content-3" style="display:none;">
+        <div class="module-tags"><span class="tag">reshape</span><span class="tag">transpose</span><span class="tag">stack/concatenate</span><span class="tag">axis reductions</span></div>
+
+        <p>Raw data rarely arrives in the shape a model needs. This module covers reshaping arrays into new dimensions and collapsing them down with aggregations — the two operations that bridge "data you have" and "data your model accepts."</p>
+
+        <h3>Reshaping without copying data</h3>
+        <p><code class="inline">.reshape()</code> reorganizes the same underlying data into a new shape, as long as the total element count matches:</p>
+<pre class="code-block">flat <span class="c-kw">=</span> np.arange(<span class="c-num">12</span>)              <span class="c-cmt"># shape (12,)</span>
+grid <span class="c-kw">=</span> flat.reshape(<span class="c-num">3</span>, <span class="c-num">4</span>)         <span class="c-cmt"># shape (3, 4) — same 12 numbers, new layout</span>
+img  <span class="c-kw">=</span> flat.reshape(<span class="c-num">2</span>, <span class="c-num">2</span>, <span class="c-num">3</span>)      <span class="c-cmt"># shape (2, 2, 3) — e.g. a tiny 2x2 RGB image</span>
+auto <span class="c-kw">=</span> flat.reshape(<span class="c-num">4</span>, <span class="c-kw">-</span><span class="c-num">1</span>)       <span class="c-cmt"># -1 means "figure this dimension out" → (4, 3)</span></pre>
+
+        <div id="vizReshape"></div>
+
+        <div class="callout">
+          <span class="callout-title">Analogy</span>
+          Reshaping is like rearranging the same 12 dinner rolls from one long row into a 3×4 tray. You haven't baked new rolls or changed any of them — you've only changed how they're grouped for serving. The dough (memory) stays identical; only the tray (shape) changes.
+        </div>
+
+        <h3>Transpose and stacking</h3>
+        <p><code class="inline">.T</code> flips rows and columns — essential when a matrix is oriented backwards from what a formula expects. <code class="inline">np.stack</code>, <code class="inline">np.vstack</code>, and <code class="inline">np.hstack</code> combine multiple arrays into one, which is exactly how individual samples get assembled into a training batch.</p>
+<pre class="code-block">a <span class="c-kw">=</span> np.array([<span class="c-num">1</span>,<span class="c-num">2</span>,<span class="c-num">3</span>])
+b <span class="c-kw">=</span> np.array([<span class="c-num">4</span>,<span class="c-num">5</span>,<span class="c-num">6</span>])
+
+np.vstack([a, b])   <span class="c-cmt"># [[1 2 3],[4 5 6]] — stack as new rows</span>
+np.hstack([a, b])   <span class="c-cmt"># [1 2 3 4 5 6] — stack side by side</span>
+np.stack([a, b])    <span class="c-cmt"># same as vstack here — stacks along a new axis</span></pre>
+
+        <h3>Aggregations and the axis argument</h3>
+        <p>Functions like <code class="inline">.sum()</code>, <code class="inline">.mean()</code>, <code class="inline">.max()</code>, and <code class="inline">.argmax()</code> collapse an array down. The <code class="inline">axis</code> argument controls <i>which</i> dimension gets collapsed — this trips up almost everyone at first.</p>
+
+        <div id="vizAxis"></div>
+
+<pre class="code-block">m <span class="c-kw">=</span> np.array([[<span class="c-num">1</span>,<span class="c-num">2</span>,<span class="c-num">3</span>], [<span class="c-num">4</span>,<span class="c-num">5</span>,<span class="c-num">6</span>]])   <span class="c-cmt"># shape (2, 3)</span>
+
+m.sum()          <span class="c-cmt"># 21 — collapse everything to one number</span>
+m.sum(axis=<span class="c-num">0</span>)  <span class="c-cmt"># [5 7 9]  — collapse DOWN the rows → one value per column</span>
+m.sum(axis=<span class="c-num">1</span>)  <span class="c-cmt"># [6 15]   — collapse ACROSS the columns → one value per row</span></pre>
+
+        <div class="callout warn">
+          <span class="callout-title">Common Misconception</span>
+          "<code class="inline">axis=0</code> means 'operate on rows' and <code class="inline">axis=1</code> means 'operate on columns'." Backwards, intuitively. <code class="inline">axis=0</code> means "walk down that axis and collapse it" — which merges values <i>across rows</i>, producing one result per column. Reading it as "the axis that disappears" is more reliable than "the axis you operate on."
+        </div>
+
+        <table class="cmp">
+          <tr><th>Call</th><th>What collapses</th><th>Output shape from (2,3)</th></tr>
+          <tr><td><code>m.sum()</code></td><td>everything</td><td>scalar</td></tr>
+          <tr><td><code>m.sum(axis=0)</code></td><td>the row axis</td><td><code>(3,)</code> — per column</td></tr>
+          <tr><td><code>m.sum(axis=1)</code></td><td>the column axis</td><td><code>(2,)</code> — per row</td></tr>
+        </table>
+
+        <h3>Key Takeaways</h3>
+        <ul class="key-takeaways">
+          <li><code class="inline">.reshape()</code> reorganizes data without copying, as long as element counts match</li>
+          <li><code class="inline">.T</code> transposes; <code class="inline">vstack</code>/<code class="inline">hstack</code>/<code class="inline">stack</code> combine arrays into batches</li>
+          <li><code class="inline">axis</code> names the dimension that gets collapsed, not the dimension you "keep"</li>
+          <li>Always sanity-check aggregation results against the expected output shape</li>
+        </ul>
+
+        <details class="exercise">
+          <summary>💻 Practical Exercise — Batch mean</summary>
+          <div class="exercise-body">
+            <p style="font-size:.88rem;">You have <code class="inline">scores</code> with shape <code class="inline">(100, 5)</code> — 100 students, 5 test scores each. Which axis do you average over to get one overall average per student?</p>
+            <details style="margin-top:8px;"><summary style="font-size:.82rem; cursor:pointer; color:var(--accent);">Reveal answer</summary>
+              <div class="code-out" style="margin-top:8px;"><code class="inline">scores.mean(axis=1)</code> → shape <b>(100,)</b>. Collapsing axis 1 (the 5 test scores) leaves one average per student.</div>
+            </details>
+          </div>
+        </details>
+
+        <div id="quiz-3" class="quiz-wrap"></div>
+        </div>
+      </section>
+
+      <!-- ============ MODULE 4 ============ -->
+      <section id="module-4" class="module-section">
+        <div class="module-head"><span class="module-num">04</span><h2>AI/ML Applications</h2></div>
+        <div id="lock-4" class="locked-panel"><div class="lock-icon">🔒</div>Complete Module 3's quiz to unlock this module.</div>
+        <div id="content-4" style="display:none;">
+        <div class="module-tags"><span class="tag">dot product</span><span class="tag">matrix multiplication</span><span class="tag">normalization</span><span class="tag">neural net layer</span></div>
+
+        <p>Everything so far converges here: a single dense (fully-connected) neural network layer is nothing more than a matrix multiplication, a broadcasted addition, and an element-wise activation function — all NumPy operations you already know.</p>
+
+        <h3>Dot products: the atomic operation of AI</h3>
+        <p>The dot product multiplies two vectors element-wise and sums the result. It's how a neuron combines its inputs and weights into a single number:</p>
+<pre class="code-block">inputs  <span class="c-kw">=</span> np.array([<span class="c-num">1.0</span>, <span class="c-num">0.5</span>, <span class="c-num">2.0</span>])   <span class="c-cmt"># 3 input features</span>
+weights <span class="c-kw">=</span> np.array([<span class="c-num">0.2</span>, <span class="c-num">0.8</span>, <span class="c-kw">-</span><span class="c-num">0.1</span>])  <span class="c-cmt"># 3 learned weights</span>
+
+np.dot(inputs, weights)  <span class="c-cmt"># 1.0*0.2 + 0.5*0.8 + 2.0*-0.1 = 0.4</span></pre>
+
+        <div class="callout">
+          <span class="callout-title">Analogy</span>
+          A dot product is a grocery receipt: multiply each item's price by its quantity, then sum every line to get one total. A neuron does the same arithmetic — multiply each input by its weight (its "price"), then sum for one output value.
+        </div>
+
+        <h3>Matrix multiplication: dot products at scale</h3>
+        <p>A dense layer applies the same weighted-sum operation to an entire batch of samples and every output neuron at once, using <code class="inline">@</code> (matrix multiplication). For <code class="inline">A @ B</code> to work, A's number of columns must equal B's number of rows.</p>
+
+        <div id="vizMatmul"></div>
+
+<pre class="code-block">X <span class="c-kw">=</span> np.random.randn(<span class="c-num">32</span>, <span class="c-num">784</span>)   <span class="c-cmt"># batch of 32 images, each flattened to 784 pixels</span>
+W <span class="c-kw">=</span> np.random.randn(<span class="c-num">784</span>, <span class="c-num">128</span>)  <span class="c-cmt"># weights connecting 784 inputs to 128 neurons</span>
+b <span class="c-kw">=</span> np.zeros(<span class="c-num">128</span>)               <span class="c-cmt"># one bias per neuron</span>
+
+Z <span class="c-kw">=</span> X @ W <span class="c-kw">+</span> b   <span class="c-cmt"># shape (32, 128) — broadcasting adds b to every row</span></pre>
+
+        <p>That single line — <code class="inline">X @ W + b</code> — is the forward pass of a dense layer in every framework, whether it's raw NumPy, PyTorch, or TensorFlow underneath the abstractions.</p>
+
+        <h3>Activation functions: element-wise, not matrix ops</h3>
+        <p>After the matrix multiply, an activation function is applied element-wise — no shape change, just a per-element transformation:</p>
+<pre class="code-block"><span class="c-kw">def</span> <span class="c-fn">relu</span>(x):
+    <span class="c-kw">return</span> np.maximum(<span class="c-num">0</span>, x)   <span class="c-cmt"># element-wise: negative values become 0</span>
+
+A <span class="c-kw">=</span> relu(Z)   <span class="c-cmt"># shape stays (32, 128)</span></pre>
+
+        <h3>Normalization: broadcasting in practice</h3>
+        <p>Before training, features are typically standardized to mean 0, standard deviation 1 — directly reusing Module 2's broadcasting and Module 3's axis reductions:</p>
+<pre class="code-block">mean <span class="c-kw">=</span> X.mean(axis=<span class="c-num">0</span>)   <span class="c-cmt"># shape (784,) — per-feature mean across the batch</span>
+std  <span class="c-kw">=</span> X.std(axis=<span class="c-num">0</span>)    <span class="c-cmt"># shape (784,) — per-feature std across the batch</span>
+X_norm <span class="c-kw">=</span> (X <span class="c-kw">-</span> mean) <span class="c-kw">/</span> std  <span class="c-cmt"># broadcasting (32,784) against (784,)</span></pre>
+
+        <table class="cmp">
+          <tr><th>Operation</th><th>Operator</th><th>Shape rule</th></tr>
+          <tr><td>Element-wise multiply</td><td><code>*</code></td><td>Shapes must match or broadcast</td></tr>
+          <tr><td>Matrix multiply</td><td><code>@</code> / <code>np.dot</code></td><td>Inner dimensions must match: (n,k)@(k,m)→(n,m)</td></tr>
+          <tr><td>Activation (ReLU, sigmoid...)</td><td>function call</td><td>Shape unchanged</td></tr>
+        </table>
+
+        <div class="callout danger">
+          <span class="callout-title">Common Misconception</span>
+          "<code class="inline">*</code> and <code class="inline">@</code> are interchangeable for arrays that happen to be square." They compute entirely different things even when shapes allow both to run without error. <code class="inline">*</code> is element-wise; <code class="inline">@</code> sums products across a shared dimension. Silently using the wrong one is a classic, hard-to-spot AI bug because the code runs — it just learns nothing correctly.
+        </div>
+
+        <h3>Key Takeaways</h3>
+        <ul class="key-takeaways">
+          <li>A dot product is a weighted sum — the core computation of a single neuron</li>
+          <li><code class="inline">X @ W + b</code> is the forward pass of a dense layer, for a full batch at once</li>
+          <li>Activation functions apply element-wise and never change shape</li>
+          <li>Normalization combines axis-aware aggregation with broadcasting</li>
+        </ul>
+
+        <details class="exercise">
+          <summary>💻 Practical Exercise — Shape-check a layer</summary>
+          <div class="exercise-body">
+            <p style="font-size:.88rem;">Input batch <code class="inline">X</code> has shape <code class="inline">(16, 20)</code>. You want an output of shape <code class="inline">(16, 8)</code>. What shape must the weight matrix <code class="inline">W</code> be for <code class="inline">X @ W</code> to work?</p>
+            <details style="margin-top:8px;"><summary style="font-size:.82rem; cursor:pointer; color:var(--accent);">Reveal answer</summary>
+              <div class="code-out" style="margin-top:8px;"><code class="inline">W</code> must be shape <b>(20, 8)</b>. Inner dimensions 20 and 20 cancel, leaving outer dimensions (16, 8).</div>
+            </details>
+          </div>
+        </details>
+
+        <div id="quiz-4" class="quiz-wrap"></div>
+        </div>
+      </section>
+
+      <!-- ============ FINAL CHALLENGE ============ -->
+      <section id="challenge" class="module-section">
+        <div class="module-head"><span class="module-num">🏆</span><h2>Final Practical Challenge</h2></div>
+        <div id="lock-5" class="locked-panel"><div class="lock-icon">🔒</div>Complete all 4 modules to unlock the final challenge.</div>
+        <div id="content-5" style="display:none;">
+        <p>Using only what you've learned, implement the forward pass of a 2-layer neural network (a "multilayer perceptron") by hand with NumPy.</p>
+        <div class="card">
+          <h3 style="font-size:1rem;">The brief</h3>
+          <p style="font-size:.9rem;">Given a batch of inputs <code class="inline">X</code> of shape <code class="inline">(batch, in_features)</code>, weights/biases <code class="inline">W1, b1, W2, b2</code>, compute:</p>
+          <ol style="font-size:.9rem;">
+            <li><code class="inline">Z1 = X @ W1 + b1</code>, then apply ReLU → <code class="inline">A1</code></li>
+            <li><code class="inline">Z2 = A1 @ W2 + b2</code> → the final output, no activation (raw scores)</li>
+          </ol>
+          <details class="exercise">
+            <summary>💻 Attempt it, then reveal the reference solution</summary>
+            <div class="exercise-body">
+<pre class="code-block"><span class="c-kw">import</span> numpy <span class="c-kw">as</span> np
+
+<span class="c-kw">def</span> <span class="c-fn">relu</span>(x):
+    <span class="c-kw">return</span> np.maximum(<span class="c-num">0</span>, x)
+
+<span class="c-kw">def</span> <span class="c-fn">forward</span>(X, W1, b1, W2, b2):
+    Z1 <span class="c-kw">=</span> X @ W1 <span class="c-kw">+</span> b1      <span class="c-cmt"># hidden layer pre-activation</span>
+    A1 <span class="c-kw">=</span> relu(Z1)          <span class="c-cmt"># hidden layer activation</span>
+    Z2 <span class="c-kw">=</span> A1 @ W2 <span class="c-kw">+</span> b2     <span class="c-cmt"># output layer (raw scores / logits)</span>
+    <span class="c-kw">return</span> Z2
+
+X  <span class="c-kw">=</span> np.random.randn(<span class="c-num">8</span>, <span class="c-num">20</span>)      <span class="c-cmt"># batch of 8, 20 features</span>
+W1 <span class="c-kw">=</span> np.random.randn(<span class="c-num">20</span>, <span class="c-num">16</span>) <span class="c-kw">*</span> <span class="c-num">0.1</span>
+b1 <span class="c-kw">=</span> np.zeros(<span class="c-num">16</span>)
+W2 <span class="c-kw">=</span> np.random.randn(<span class="c-num">16</span>, <span class="c-num">3</span>)  <span class="c-kw">*</span> <span class="c-num">0.1</span>
+b2 <span class="c-kw">=</span> np.zeros(<span class="c-num">3</span>)
+
+out <span class="c-kw">=</span> forward(X, W1, b1, W2, b2)
+<span class="c-fn">print</span>(out.shape)   <span class="c-cmt"># (8, 3) — 8 samples, 3 output classes</span></pre>
+            </div>
+          </details>
+        </div>
+        <button class="btn btn-primary" id="claimChallengeBtn" onclick="claimChallenge()">🏆 Mark Challenge Complete — Claim Badge</button>
+        </div>
+      </section>
+
+      <!-- ============ CHEAT SHEET ============ -->
+      <section id="cheatsheet" class="module-section">
+        <div class="module-head"><span class="module-num">📋</span><h2>Cheat Sheet</h2></div>
+        <div class="print-btn-wrap"><button class="btn" onclick="window.print()">🖨 Print / Save as PDF</button></div>
+        <div class="grid-2">
+          <div class="card card-tight">
+            <h4 style="font-size:.9rem;">Creation</h4>
+            <pre class="code-block" style="margin:0;">np.array([1,2,3])
+np.zeros((r,c)) / np.ones((r,c))
+np.arange(start,stop,step)
+np.linspace(start,stop,n)
+np.random.randn(r,c)</pre>
+          </div>
+          <div class="card card-tight">
+            <h4 style="font-size:.9rem;">Inspecting</h4>
+            <pre class="code-block" style="margin:0;">arr.shape / arr.dtype
+arr.ndim / arr.size</pre>
+          </div>
+          <div class="card card-tight">
+            <h4 style="font-size:.9rem;">Indexing &amp; Slicing</h4>
+            <pre class="code-block" style="margin:0;">arr[i, j]
+arr[i, :] / arr[:, j]
+arr[a:b, c:d]
+arr[mask]  # boolean indexing</pre>
+          </div>
+          <div class="card card-tight">
+            <h4 style="font-size:.9rem;">Reshaping</h4>
+            <pre class="code-block" style="margin:0;">arr.reshape(r, c)
+arr.T
+np.vstack([a,b]) / np.hstack([a,b])
+np.stack([a,b])</pre>
+          </div>
+          <div class="card card-tight">
+            <h4 style="font-size:.9rem;">Math &amp; Aggregation</h4>
+            <pre class="code-block" style="margin:0;">a + b / a * b   # element-wise
+a @ b           # matrix multiply
+a.sum(axis=0/1)
+a.mean() / a.max() / a.argmax()</pre>
+          </div>
+          <div class="card card-tight">
+            <h4 style="font-size:.9rem;">A Dense Layer, in Full</h4>
+            <pre class="code-block" style="margin:0;">Z = X @ W + b
+A = np.maximum(0, Z)  # ReLU</pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size:1rem;">Summary Notes</h3>
+          <ul class="key-takeaways">
+            <li>NumPy arrays trade Python's flexibility for uniform, contiguous memory — that's the entire speed story</li>
+            <li>Vectorize first, loop never (in AI code): reach for array ops before <code class="inline">for</code> loops</li>
+            <li>Broadcasting rules compare shapes from the right; match or 1, every time</li>
+            <li><code class="inline">axis</code> names the dimension that disappears from the result</li>
+            <li><code class="inline">*</code> is element-wise, <code class="inline">@</code> is matrix multiplication — never confuse them</li>
+            <li>A neural network layer is <code class="inline">X @ W + b</code> followed by an element-wise activation — nothing more mystical than that</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ============ CONTINUE LEARNING ============ -->
+      <section id="continue" class="module-section">
+        <div class="module-head"><span class="module-num">🚀</span><h2>Continue Learning</h2></div>
+        <p>You've covered the core of NumPy. Here's where to go deeper into Python for AI roles.</p>
+        <div class="resource-grid">
+          <div class="resource-card">
+            <h4>📚 Books</h4>
+            <ul>
+              <li><i>Python for Data Analysis</i> — Wes McKinney</li>
+              <li><i>Deep Learning</i> — Goodfellow, Bengio, Courville</li>
+              <li><i>Hands-On Machine Learning</i> — Aurélien Géron</li>
+            </ul>
+          </div>
+          <div class="resource-card">
+            <h4>📖 Documentation</h4>
+            <ul>
+              <li>NumPy official user guide (numpy.org/doc)</li>
+              <li>NumPy "Absolute Beginners" guide</li>
+              <li>Broadcasting rules reference (numpy.org)</li>
+            </ul>
+          </div>
+          <div class="resource-card">
+            <h4>📄 Research &amp; Reference Papers</h4>
+            <ul>
+              <li>"Array Programming with NumPy" — Harris et al., <i>Nature</i>, 2020</li>
+              <li>"A Guide to NumPy" — Travis Oliphant (foundational reference)</li>
+            </ul>
+          </div>
+          <div class="resource-card">
+            <h4>👥 Communities</h4>
+            <ul>
+              <li>r/learnmachinelearning, r/Python</li>
+              <li>NumPy &amp; SciPy Discourse forum</li>
+              <li>Kaggle discussion boards</li>
+            </ul>
+          </div>
+          <div class="resource-card">
+            <h4>🧪 Practice Platforms</h4>
+            <ul>
+              <li>Kaggle Learn — "Pandas" &amp; "Intro to Deep Learning"</li>
+              <li>LeetCode / HackerRank — NumPy array challenges</li>
+              <li>Google Colab — free notebooks to run every snippet above</li>
+            </ul>
+          </div>
+          <div class="resource-card">
+            <h4>🔎 Search Keywords</h4>
+            <ul>
+              <li>"numpy broadcasting rules explained"</li>
+              <li>"vectorization vs for loop numpy benchmark"</li>
+              <li>"numpy axis parameter visual explanation"</li>
+              <li>"implement neural network from scratch numpy"</li>
+            </ul>
+          </div>
+          <div class="resource-card">
+            <h4>🤖 AI Prompts for Further Learning</h4>
+            <ul>
+              <li>"Quiz me on NumPy broadcasting edge cases with tricky shape pairs"</li>
+              <li>"Walk me through backpropagation using only NumPy, step by step"</li>
+              <li>"Show me how Pandas DataFrames relate to NumPy arrays under the hood"</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <footer class="site-footer">Interactive Learning Studio — NumPy Fundamentals for AI · Built for focused, self-contained learning.</footer>
+  </main>
+</div>
+
+<div class="toast" id="toast"><div class="badge-icon">🏅</div><div id="toastText">Badge earned!</div></div>
+
+<script>
+/* ============================================================
+   STATE
+   ============================================================ */
+const STORAGE_KEY = 'ils_numpy_progress_v1';
+let state = {
+  moduleComplete: {1:false,2:false,3:false,4:false},
+  challengeComplete: false,
+  xp: 0,
+  theme: 'dark'
+};
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){ state = Object.assign(state, JSON.parse(raw)); }
+  }catch(e){ /* localStorage unavailable — continue with in-memory state */ }
+}
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+}
+
+function addXP(n){
+  state.xp += n;
+  document.getElementById('xpCount').textContent = state.xp;
+  saveState();
+}
+
+function showToast(text){
+  const t = document.getElementById('toast');
+  document.getElementById('toastText').textContent = text;
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>t.classList.remove('show'), 3600);
+}
+
+/* ============================================================
+   THEME
+   ============================================================ */
+function applyTheme(){
+  document.documentElement.classList.toggle('light', state.theme === 'light');
+  document.getElementById('themeToggle').textContent = state.theme === 'light' ? '☀' : '◐';
+}
+document.getElementById('themeToggle').addEventListener('click', ()=>{
+  state.theme = state.theme === 'light' ? 'dark' : 'light';
+  applyTheme();
+  saveState();
+});
+
+/* ============================================================
+   SIDEBAR / NAV
+   ============================================================ */
+document.getElementById('menuToggle').addEventListener('click', ()=>{
+  document.getElementById('sidebar').classList.toggle('open');
+});
+document.querySelectorAll('.nav-item').forEach(item=>{
+  item.addEventListener('click', ()=>{
+    if(item.classList.contains('locked')) return;
+    const target = item.getAttribute('data-target');
+    scrollToId(target.replace('#',''));
+    document.getElementById('sidebar').classList.remove('open');
+  });
+});
+function scrollToId(id){
+  const el = document.getElementById(id);
+  if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+/* Highlight active nav on scroll */
+const sections = ['intro','module-1','module-2','module-3','module-4','challenge','cheatsheet','continue'];
+window.addEventListener('scroll', ()=>{
+  let current = sections[0];
+  for(const id of sections){
+    const el = document.getElementById(id);
+    if(el && el.getBoundingClientRect().top < 140) current = id;
+  }
+  document.querySelectorAll('.nav-item').forEach(item=>{
+    item.classList.toggle('active', item.getAttribute('data-target') === '#'+current);
+  });
+}, {passive:true});
+
+/* ============================================================
+   ARRAY VISUALIZER (signature component)
+   ============================================================ */
+function renderArrayViz(container, values, opts){
+  opts = opts || {};
+  const highlight = opts.highlight || [];
+  const highlight2 = opts.highlight2 || [];
+  const showIdx = opts.showIdx !== false;
+  const caption = opts.caption || '';
+  const meta = opts.meta || '';
+  let html = '<div class="array-viz">';
+  values.forEach((v,i)=>{
+    let cls = 'arr-cell';
+    if(highlight.includes(i)) cls += ' hl';
+    if(highlight2.includes(i)) cls += ' hl2';
+    html += `<div class="cell-stack">${showIdx? `<div class="idx-label">${i}</div>`:''}<div class="${cls}">${v}</div></div>`;
+  });
+  html += '</div>';
+  if(meta) html += `<div class="arr-meta">${meta}</div>`;
+  if(caption) html += `<div class="viz-caption">${caption}</div>`;
+  container.innerHTML = html;
+}
+
+/* Hero: animated array build */
+(function heroViz(){
+  const el = document.getElementById('heroViz');
+  const wrap = document.createElement('div');
+  wrap.className = 'card card-tight';
+  wrap.innerHTML = `<div class="mono" style="font-size:.78rem;color:var(--text-faint);margin-bottom:4px;">np.array([1, 1, 2, 3, 5, 8, 13])</div><div id="heroArr"></div>`;
+  el.appendChild(wrap);
+  const target = [1,1,2,3,5,8,13];
+  const container = wrap.querySelector('#heroArr');
+  let shown = [];
+  let i = 0;
+  function step(){
+    shown.push(target[i]);
+    renderArrayViz(container, shown, {highlight:[shown.length-1], meta:`shape (${shown.length},) · dtype int64`, caption:'Contiguous memory: each new element appends right next to the last.'});
+    i++;
+    if(i < target.length) setTimeout(step, 260);
+  }
+  step();
+})();
+
+/* Module 1: basic array + indexing/slicing viz */
+renderArrayViz(document.getElementById('viz1'), [1,2,3,4], {highlight:[0,1,2,3], meta:'shape (4,) · dtype int64', caption:'a = np.array([1, 2, 3, 4]) — four values, one contiguous block of memory.'});
+
+(function viz1b(){
+  const el = document.getElementById('viz1b');
+  el.innerHTML = '<div class="mono" style="font-size:.78rem;color:var(--text-faint);margin-bottom:2px;">m[0:2, 1:] — rows 0–1, columns 1 onward</div>';
+  const rows = [[10,20,30],[40,50,60],[70,80,90]];
+  rows.forEach((row,ri)=>{
+    const rowDiv = document.createElement('div');
+    let html = '<div class="array-viz" style="margin:4px 0;">';
+    row.forEach((v,ci)=>{
+      const isSel = ri <= 1 && ci >= 1;
+      html += `<div class="cell-stack"><div class="arr-cell${isSel?' hl':''}" style="width:44px;height:44px;font-size:.85rem;">${v}</div></div>`;
+    });
+    html += '</div>';
+    rowDiv.innerHTML = html;
+    el.appendChild(rowDiv);
+  });
+})();
+
+/* Module 2: broadcasting viz */
+(function vizBroadcast(){
+  const el = document.getElementById('vizBroadcast');
+  el.className='card card-tight';
+  el.innerHTML = `<div class="mono" style="font-size:.78rem;color:var(--text-faint);margin-bottom:8px;">batch (4×3) − mean (3,) → mean row is virtually repeated for every row</div>`;
+  const batch = [[12,20,31],[9,22,29],[15,19,33],[11,21,30]];
+  const mean = [10,20,30];
+  batch.forEach(row=>{
+    let html = '<div class="array-viz" style="margin:2px 0;">';
+    row.forEach(v=>{ html += `<div class="cell-stack"><div class="arr-cell" style="width:42px;height:38px;font-size:.78rem;">${v}</div></div>`; });
+    html += '</div>';
+    const d = document.createElement('div'); d.innerHTML = html; el.appendChild(d);
+  });
+  const divider = document.createElement('div');
+  divider.style.cssText='border-top:1px dashed var(--border);margin:8px 0;padding-top:6px;';
+  let html = '<div class="array-viz" style="margin:2px 0;">';
+  mean.forEach(v=>{ html += `<div class="cell-stack"><div class="arr-cell hl2" style="width:42px;height:38px;font-size:.78rem;">${v}</div></div>`; });
+  html += '</div><div class="viz-caption">↑ mean, shape (3,) — broadcast virtually across all 4 rows above, no copies made</div>';
+  divider.innerHTML = html;
+  el.appendChild(divider);
+})();
+
+/* Module 3: reshape viz */
+(function vizReshape(){
+  const el = document.getElementById('vizReshape');
+  el.className='card card-tight';
+  const flat = Array.from({length:12},(_,i)=>i);
+  const div1 = document.createElement('div');
+  div1.innerHTML = '<div class="mono" style="font-size:.78rem;color:var(--text-faint);">flat — shape (12,)</div>';
+  el.appendChild(div1);
+  renderArrayViz(el.appendChild(document.createElement('div')), flat, {showIdx:false, meta:''});
+  const div2 = document.createElement('div');
+  div2.innerHTML = '<div class="mono" style="font-size:.78rem;color:var(--text-faint);margin-top:10px;">grid = flat.reshape(3, 4) — shape (3, 4)</div>';
+  el.appendChild(div2);
+  for(let r=0;r<3;r++){
+    let html = '<div class="array-viz" style="margin:2px 0;">';
+    for(let c=0;c<4;c++){ html += `<div class="cell-stack"><div class="arr-cell" style="width:44px;height:40px;font-size:.82rem;">${flat[r*4+c]}</div></div>`; }
+    html += '</div>';
+    const d = document.createElement('div'); d.innerHTML = html; el.appendChild(d);
+  }
+})();
+
+/* Module 3: axis viz */
+(function vizAxis(){
+  const el = document.getElementById('vizAxis');
+  el.className='card card-tight';
+  el.innerHTML = `<div class="grid-2">
+    <div>
+      <div class="mono" style="font-size:.76rem;color:var(--text-faint);margin-bottom:6px;">axis=0 collapses ↓ (result per column)</div>
+      <div class="array-viz" style="margin:2px 0;"><div class="cell-stack"><div class="arr-cell hl" style="width:40px;height:36px;font-size:.78rem;">1</div></div><div class="cell-stack"><div class="arr-cell hl" style="width:40px;height:36px;font-size:.78rem;">2</div></div><div class="cell-stack"><div class="arr-cell hl" style="width:40px;height:36px;font-size:.78rem;">3</div></div></div>
+      <div class="array-viz" style="margin:2px 0;"><div class="cell-stack"><div class="arr-cell hl" style="width:40px;height:36px;font-size:.78rem;">4</div></div><div class="cell-stack"><div class="arr-cell hl" style="width:40px;height:36px;font-size:.78rem;">5</div></div><div class="cell-stack"><div class="arr-cell hl" style="width:40px;height:36px;font-size:.78rem;">6</div></div></div>
+      <div class="viz-caption">→ [5, 7, 9]</div>
+    </div>
+    <div>
+      <div class="mono" style="font-size:.76rem;color:var(--text-faint);margin-bottom:6px;">axis=1 collapses → (result per row)</div>
+      <div class="array-viz" style="margin:2px 0;"><div class="cell-stack"><div class="arr-cell hl2" style="width:40px;height:36px;font-size:.78rem;">1</div></div><div class="cell-stack"><div class="arr-cell hl2" style="width:40px;height:36px;font-size:.78rem;">2</div></div><div class="cell-stack"><div class="arr-cell hl2" style="width:40px;height:36px;font-size:.78rem;">3</div></div></div>
+      <div class="array-viz" style="margin:2px 0;"><div class="cell-stack"><div class="arr-cell" style="width:40px;height:36px;font-size:.78rem;">4</div></div><div class="cell-stack"><div class="arr-cell" style="width:40px;height:36px;font-size:.78rem;">5</div></div><div class="cell-stack"><div class="arr-cell" style="width:40px;height:36px;font-size:.78rem;">6</div></div></div>
+      <div class="viz-caption">→ [6, 15]</div>
+    </div>
+  </div>`;
+})();
+
+/* Module 4: matmul viz */
+(function vizMatmul(){
+  const el = document.getElementById('vizMatmul');
+  el.className='card card-tight';
+  el.innerHTML = `<div class="mono" style="font-size:.8rem; text-align:center;">
+    <span style="color:var(--accent);">X</span> (32 × 784)  <span style="color:var(--text-faint);">@</span>  <span style="color:var(--accent-2);">W</span> (784 × 128)  <span style="color:var(--text-faint);">=</span>  <span style="color:var(--text);">Z</span> (32 × 128)
+  </div>
+  <div class="viz-caption" style="text-align:center;">The shared inner dimension (784) cancels out — it must match exactly, or NumPy raises a shape error.</div>`;
+})();
+
+/* ============================================================
+   QUIZ ENGINE
+   ============================================================ */
+const QUIZZES = {
+  1: [
+    {q:"What is the key structural difference between a Python list and a NumPy ndarray?", options:["ndarrays can hold mixed types just like lists","ndarrays store one fixed dtype in contiguous memory","Lists are always faster for numeric work","ndarrays cannot be indexed with [ ]"], correct:1, explain:"NumPy arrays require a single, fixed dtype and store elements contiguously in memory — this uniformity is what enables fast vectorized math, unlike Python lists which can mix arbitrary types scattered across memory."},
+    {q:"Given g = np.arange(6).reshape(2,3), what does g[1, 2] return?", options:["2","5","3","g itself"], correct:1, explain:"g is [[0,1,2],[3,4,5]]. Row index 1 is [3,4,5], and column index 2 within that row is 5."},
+    {q:"What does slicing an array (e.g. arr[1:3]) return, in terms of memory?", options:["A brand-new independent copy of the data","A view sharing memory with the original array","A Python list conversion","An error, since arrays can't be sliced"], correct:1, explain:"Unlike Python list slicing, NumPy slicing returns a view — it shares the same underlying memory. Modifying the slice modifies the original array unless you call .copy()."},
+    {q:"Which attribute tells you how many axes (dimensions) an array has?", options:[".size", ".dtype", ".ndim", ".shape[0]"], correct:2, explain:".ndim reports the number of axes directly — 1 for a vector, 2 for a matrix, 3+ for higher-dimensional tensors. .shape gives sizes per axis, and .size gives the total element count."}
+  ],
+  2: [
+    {q:"Why is a vectorized NumPy operation typically much faster than an equivalent Python for-loop?", options:["NumPy skips floating point precision","The loop runs in compiled C code instead of the Python interpreter, often using CPU-level parallelism","Vectorized code uses less RAM automatically","Python loops are only slow on Windows"], correct:1, explain:"Vectorized NumPy operations push the loop down into pre-compiled, optimized C code and can leverage CPU SIMD instructions across contiguous memory — the Python interpreter overhead per element disappears."},
+    {q:"For broadcasting, shapes (4, 3) and (3,) are compared. Are they compatible, and why?", options:["No — 4 and 3 don't match","Yes — comparing from the right, 3 matches 3, and the missing dimension is treated as 1","No — arrays must have identical shapes to combine","Yes, but only for addition, not multiplication"], correct:1, explain:"Broadcasting compares dimensions from the rightmost axis inward. Here 3 matches 3, and (3,) is treated as if it had a leading 1, so it broadcasts across all 4 rows."},
+    {q:"What does broadcasting actually do in memory when 'stretching' a smaller array?", options:["It physically duplicates the smaller array to match the larger shape","It simulates the stretch without allocating extra memory for the repeated values","It converts both arrays to Python lists first","It raises a warning but still copies data every time"], correct:1, explain:"Broadcasting is a virtual operation — NumPy computes as if the smaller array were repeated, without actually allocating that extra memory, keeping it both fast and memory-efficient."},
+    {q:"What is the key difference between `*` and `@` on two 2-D arrays?", options:["They are identical for all array shapes","`*` multiplies element-wise; `@` performs matrix multiplication (row·column dot products)","`@` only works on 1-D arrays","`*` is only for scalars"], correct:1, explain:"`*` multiplies corresponding elements one-to-one (shapes must match or broadcast). `@` performs true matrix multiplication, summing products across a shared dimension — a fundamentally different computation."}
+  ],
+  3: [
+    {q:"After flat = np.arange(12); grid = flat.reshape(3,4), what happened to the underlying data?", options:["12 new values were generated for grid","The same 12 values were reorganized into a new shape without copying","Only 4 of the 12 values were kept","The data was converted to a Python list"], correct:1, explain:"reshape() reorganizes the same underlying memory into a new shape (as long as total element count matches) — no new data is created or discarded."},
+    {q:"For m of shape (2,3), what does m.sum(axis=0) collapse?", options:["It collapses the column axis, giving one result per row","It collapses the row axis, giving one result per column","It collapses everything to a single scalar","It has no effect on the array"], correct:1, explain:"axis=0 refers to the row axis — summing 'down' across rows merges values from each column together, producing one result per column (shape (3,))."},
+    {q:"Which function stacks two 1-D arrays of shape (3,) into a new array of shape (2,3)?", options:["np.hstack", "np.vstack", "np.reshape", "np.dot"], correct:1, explain:"np.vstack stacks arrays as new rows, turning two shape-(3,) arrays into one shape-(2,3) array. hstack would instead concatenate them side by side into shape (6,)."},
+    {q:"scores has shape (100, 5) — 100 students, 5 scores each. Which call gives one average per student?", options:["scores.mean(axis=0)", "scores.mean(axis=1)", "scores.mean()", "scores.T.mean(axis=0)... twice"], correct:1, explain:"axis=1 collapses the 5-score dimension for each student, leaving one average per student — result shape (100,). axis=0 would instead average across students per test."}
+  ],
+  4: [
+    {q:"What does a dot product between two equal-length vectors compute?", options:["The element-wise maximum of the two vectors","The element-wise product, summed into a single number","A new vector of the same length","The average of both vectors"], correct:1, explain:"A dot product multiplies corresponding elements and sums the results into one scalar — exactly how a neuron combines weighted inputs into a single value."},
+    {q:"For X @ W to succeed, what must be true of their shapes?", options:["X and W must have identical shapes", "X's number of columns must equal W's number of rows", "Both arrays must be 1-dimensional", "W must be a square matrix"], correct:1, explain:"Matrix multiplication requires the inner dimensions to match: for X of shape (n,k) and W of shape (k,m), the shared dimension k cancels, producing an (n,m) result."},
+    {q:"In Z = X @ W + b, what role does broadcasting play?", options:["It has no role — b must already match Z's full shape", "The bias vector b is broadcast across every row of the batch automatically", "Broadcasting only applies to X, not b", "It converts Z into a 1-D array"], correct:1, explain:"b typically has shape (features,) while Z has shape (batch, features). Broadcasting applies the same bias vector to every row in the batch without manually repeating it."},
+    {q:"Why is confusing `*` with `@` a particularly dangerous bug in AI code?", options:["It always crashes immediately with a clear error", "It can run without error but silently compute the wrong values, so the model 'trains' on nonsense", "NumPy automatically corrects the mistake", "It only affects the array's dtype, not its values"], correct:1, explain:"When shapes happen to allow both operations, using `*` instead of `@` (or vice versa) runs without crashing, but computes a fundamentally different, incorrect result — a silent bug that's hard to detect from an error message."}
+  ]
+};
+
+function buildQuiz(moduleId){
+  const wrap = document.getElementById('quiz-'+moduleId);
+  const data = QUIZZES[moduleId];
+  let html = `<h3 style="margin-top:0;">Module ${moduleId} Quiz</h3>
+  <div class="quiz-header"><div class="quiz-progress" id="qprog-${moduleId}">0 / ${data.length} answered</div></div>`;
+  data.forEach((q, qi)=>{
+    html += `<div class="q-block" data-qi="${qi}">
+      <div class="q-title">${qi+1}. ${q.q}</div>
+      <div class="q-options">`;
+    q.options.forEach((opt, oi)=>{
+      html += `<label class="q-option" data-oi="${oi}">
+        <input type="radio" name="m${moduleId}q${qi}" value="${oi}"> <span>${opt}</span>
+      </label>`;
+    });
+    html += `</div><div class="q-feedback" id="fb-${moduleId}-${qi}"></div></div>`;
+  });
+  html += `<div class="quiz-summary" id="summary-${moduleId}">
+    <h3>Module ${moduleId} Complete!</h3>
+    <p id="summary-score-${moduleId}" style="font-size:1.1rem;font-weight:700;color:var(--accent);"></p>
+    <p id="summary-msg-${moduleId}" style="color:var(--text-muted);font-size:.9rem;"></p>
+    <div class="quiz-actions">
+      <button class="btn btn-primary" id="unlock-btn-${moduleId}" onclick="unlockNext(${moduleId})">Unlock Module ${moduleId+1} →</button>
+      <button class="btn btn-ghost" onclick="retakeQuiz(${moduleId})">Retake Quiz</button>
+    </div>
+  </div>`;
+  wrap.innerHTML = html;
+
+  data.forEach((q, qi)=>{
+    const block = wrap.querySelector(`.q-block[data-qi="${qi}"]`);
+    block.querySelectorAll('.q-option').forEach(optEl=>{
+      optEl.addEventListener('click', ()=>{
+        if(block.classList.contains('answered')) return;
+        block.classList.add('answered');
+        const chosen = parseInt(optEl.getAttribute('data-oi'));
+        const correctIdx = q.correct;
+        block.querySelectorAll('.q-option').forEach(o=>{
+          const oi = parseInt(o.getAttribute('data-oi'));
+          o.style.pointerEvents = 'none';
+          if(oi === correctIdx) o.classList.add('correct');
+          else if(oi === chosen) o.classList.add('incorrect');
+        });
+        const fb = document.getElementById(`fb-${moduleId}-${qi}`);
+        const isCorrect = chosen === correctIdx;
+        fb.className = 'q-feedback show ' + (isCorrect ? 'correct' : 'incorrect');
+        fb.innerHTML = `<span class="verdict">${isCorrect ? '✓ Correct' : '✗ Not quite'}</span><br>${q.explain}`;
+        if(isCorrect) addXP(10);
+        quizProgress[moduleId] = quizProgress[moduleId] || {};
+        quizProgress[moduleId][qi] = isCorrect;
+        updateQuizProgress(moduleId);
+      });
+    });
+  });
+}
+
+const quizProgress = {};
+function updateQuizProgress(moduleId){
+  const data = QUIZZES[moduleId];
+  const answered = Object.keys(quizProgress[moduleId] || {}).length;
+  document.getElementById(`qprog-${moduleId}`).textContent = `${answered} / ${data.length} answered`;
+  if(answered === data.length){
+    const correctCount = Object.values(quizProgress[moduleId]).filter(Boolean).length;
+    const pct = Math.round((correctCount/data.length)*100);
+    document.getElementById(`summary-score-${moduleId}`).textContent = `${correctCount} / ${data.length} correct (${pct}%)`;
+    let msg = pct === 100 ? "Flawless — you've fully internalized this module." : pct >= 75 ? "Strong grasp. Review the missed explanation above before moving on." : "Worth a second pass — reread the callouts above, then retake if you'd like.";
+    document.getElementById(`summary-msg-${moduleId}`).textContent = msg;
+    document.getElementById('summary-'+moduleId).classList.add('show');
+    document.getElementById('badge-'+moduleId).textContent = pct+'%';
+    document.getElementById('badge-'+moduleId).classList.add('done');
+    state.moduleComplete[moduleId] = true;
+    saveState();
+    showToast(`Module ${moduleId} badge earned — ${pct}% score!`);
+    updateOverallProgress();
+  }
+}
+
+function retakeQuiz(moduleId){
+  quizProgress[moduleId] = {};
+  buildQuiz(moduleId);
+}
+
+function unlockNext(moduleId){
+  const next = moduleId + 1;
+  if(next <= 4){
+    document.getElementById('lock-'+next).style.display = 'none';
+    document.getElementById('content-'+next).style.display = 'block';
+    const navItem = document.querySelector(`.nav-item[data-module="${next}"]`);
+    navItem.classList.remove('locked');
+    document.getElementById('badge-'+next).textContent = '0%';
+    buildQuiz(next);
+    scrollToId('module-'+next);
+  } else if(next === 5){
+    document.getElementById('lock-5').style.display = 'none';
+    document.getElementById('content-5').style.display = 'block';
+    document.querySelector('.nav-item[data-module="5"]').classList.remove('locked');
+    scrollToId('challenge');
+  }
+}
+
+function claimChallenge(){
+  if(state.challengeComplete) return;
+  state.challengeComplete = true;
+  addXP(50);
+  saveState();
+  document.getElementById('claimChallengeBtn').textContent = '✓ NumPy Practitioner Badge Earned';
+  document.getElementById('claimChallengeBtn').disabled = true;
+  showToast('🏆 NumPy Practitioner badge earned! +50 XP');
+}
+
+function updateOverallProgress(){
+  const total = 4;
+  const done = Object.values(state.moduleComplete).filter(Boolean).length;
+  const pct = Math.round((done/total)*100);
+  document.getElementById('progressFill').style.width = pct+'%';
+  document.getElementById('sidebarProgress').style.width = pct+'%';
+  document.getElementById('sidebarProgressText').textContent = `${done} of ${total} modules complete`;
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+function restoreProgress(){
+  document.getElementById('xpCount').textContent = state.xp;
+  for(let m=1;m<=4;m++){
+    if(state.moduleComplete[m]){
+      document.getElementById('badge-'+m).textContent = '✓';
+      document.getElementById('badge-'+m).classList.add('done');
+      if(m < 4){
+        document.getElementById('lock-'+(m+1)).style.display = 'none';
+        document.getElementById('content-'+(m+1)).style.display = 'block';
+        const navItem = document.querySelector(`.nav-item[data-module="${m+1}"]`);
+        if(navItem) navItem.classList.remove('locked');
+      } else {
+        document.getElementById('lock-5').style.display = 'none';
+        document.getElementById('content-5').style.display = 'block';
+        document.querySelector('.nav-item[data-module="5"]').classList.remove('locked');
+      }
+    }
+  }
+  if(state.challengeComplete){
+    document.getElementById('claimChallengeBtn').textContent = '✓ NumPy Practitioner Badge Earned';
+    document.getElementById('claimChallengeBtn').disabled = true;
+  }
+  updateOverallProgress();
+}
+
+loadState();
+applyTheme();
+buildQuiz(1);
+restoreProgress();
+</script>
+</body>
+</html>
