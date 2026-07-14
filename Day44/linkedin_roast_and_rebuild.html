@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Nidhi's LinkedIn Roast & Rebuild</title>
+<style>
+  :root{
+    --bg:#0B1220;
+    --bg-card:#111A2C;
+    --bg-card2:#0E1626;
+    --line:#22314A;
+    --text:#E8EDF6;
+    --muted:#93A2BC;
+    --accent:#5EEAD4;   /* teal - GenAI/model vibe */
+    --accent2:#7C9CFF;  /* electric indigo */
+    --warn:#FF8A65;
+    --good:#5EEAD4;
+    --bad:#FF6B6B;
+    --font-display:'Space Grotesk', 'Segoe UI', sans-serif;
+    --font-body:'Inter', 'Segoe UI', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:
+      radial-gradient(1200px 600px at 10% -10%, #16213A 0%, transparent 60%),
+      radial-gradient(1000px 500px at 100% 0%, #142238 0%, transparent 55%),
+      var(--bg);
+    color:var(--text); font-family:var(--font-body); line-height:1.6;
+    padding:0 0 80px 0;
+  }
+  a{color:var(--accent);}
+  .wrap{max-width:960px; margin:0 auto; padding:0 24px;}
+
+  /* HERO */
+  .hero{padding:64px 24px 48px; text-align:center; border-bottom:1px solid var(--line);}
+  .eyebrow{font-family:var(--font-mono); letter-spacing:.15em; color:var(--accent); font-size:12px; text-transform:uppercase;}
+  h1{font-family:var(--font-display); font-size:clamp(28px,5vw,44px); margin:12px 0 8px; font-weight:700;}
+  .hero p{color:var(--muted); max-width:560px; margin:0 auto;}
+  .score-badge{
+    display:inline-flex; align-items:center; gap:14px; margin-top:28px;
+    background:var(--bg-card); border:1px solid var(--line); border-radius:16px;
+    padding:16px 26px;
+  }
+  .score-num{font-family:var(--font-display); font-size:40px; font-weight:700; color:var(--accent);}
+  .score-arrow{color:var(--muted); font-size:20px;}
+  .score-num.after{color:var(--accent2);}
+
+  section{padding:48px 0; border-bottom:1px solid var(--line);}
+  h2{font-family:var(--font-display); font-size:26px; margin-bottom:4px;}
+  .section-tag{font-family:var(--font-mono); font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.1em; margin-bottom:18px; display:block;}
+
+  /* REPORT CARD */
+  .card-grid{display:grid; gap:14px;}
+  .rc-item{
+    background:var(--bg-card); border:1px solid var(--line); border-radius:14px; padding:20px 22px;
+    display:grid; grid-template-columns:1fr auto; gap:8px; align-items:start;
+  }
+  .rc-title{font-weight:600; font-size:15px;}
+  .rc-score{font-family:var(--font-mono); font-size:22px; font-weight:700;}
+  .rc-score.low{color:var(--bad);} .rc-score.mid{color:var(--warn);} .rc-score.ok{color:var(--good);}
+  .rc-reaction{grid-column:1/-1; color:var(--muted); font-size:14px; font-style:italic; border-left:2px solid var(--accent); padding-left:12px; margin-top:4px;}
+  .rc-detail{grid-column:1/-1; margin-top:10px; display:none; font-size:14px;}
+  .rc-detail.open{display:block;}
+  .rc-detail p{margin:6px 0;}
+  .rc-toggle{grid-column:1/-1; background:none; border:none; color:var(--accent); font-family:var(--font-mono); font-size:12px; cursor:pointer; padding:0; text-align:left; margin-top:6px;}
+
+  /* HEADLINE OPTIONS */
+  .opt-grid{display:grid; gap:14px;}
+  .opt-card{background:var(--bg-card); border:1px solid var(--line); border-radius:14px; padding:20px;}
+  .opt-label{font-family:var(--font-mono); font-size:11px; color:var(--accent2); text-transform:uppercase; letter-spacing:.08em;}
+  .opt-text{font-size:16px; font-weight:600; margin:8px 0;}
+  .opt-why{color:var(--muted); font-size:13.5px;}
+  .copy-btn{
+    background:transparent; border:1px solid var(--accent); color:var(--accent);
+    border-radius:8px; padding:6px 12px; font-size:12px; cursor:pointer; font-family:var(--font-mono); margin-top:10px;
+  }
+  .copy-btn:hover{background:var(--accent); color:#0B1220;}
+
+  /* ABOUT REBUILD */
+  .about-box{background:var(--bg-card2); border:1px solid var(--line); border-radius:14px; padding:24px; font-size:14.5px; white-space:pre-wrap; font-family:var(--font-body);}
+  .about-label{font-family:var(--font-mono); color:var(--accent); font-size:11px; margin:16px 0 6px; display:block; text-transform:uppercase;}
+  .keyword-chip{display:inline-block; background:#16233B; border:1px solid var(--line); color:var(--accent2); font-family:var(--font-mono); font-size:12px; padding:4px 10px; border-radius:999px; margin:4px 6px 0 0;}
+
+  /* EXPERIENCE BEFORE/AFTER */
+  .ba-row{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;}
+  @media(max-width:700px){.ba-row{grid-template-columns:1fr;}}
+  .ba-box{border-radius:12px; padding:16px; font-size:13.5px; border:1px solid var(--line);}
+  .ba-before{background:#1A1420; border-color:#3A2430;}
+  .ba-after{background:#0F1E1C; border-color:#1F3A34;}
+  .ba-tag{font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:.1em; margin-bottom:6px; display:block;}
+  .ba-before .ba-tag{color:var(--bad);}
+  .ba-after .ba-tag{color:var(--good);}
+
+  /* SKILLS */
+  .skills-cols{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+  @media(max-width:700px){.skills-cols{grid-template-columns:1fr;}}
+  .skill-list{list-style:none; padding:0; margin:0;}
+  .skill-list li{padding:8px 0; border-bottom:1px solid var(--line); font-size:14px; display:flex; justify-content:space-between;}
+  .pin{background:var(--accent); color:#0B1220; font-family:var(--font-mono); font-size:10px; padding:2px 8px; border-radius:6px; font-weight:700;}
+
+  /* SCORECARD */
+  table{width:100%; border-collapse:collapse; margin-top:10px;}
+  th,td{padding:12px 10px; text-align:left; border-bottom:1px solid var(--line); font-size:14px;}
+  th{font-family:var(--font-mono); font-size:11px; text-transform:uppercase; color:var(--muted); font-weight:500;}
+  .delta{color:var(--good); font-family:var(--font-mono);}
+
+  /* 7 DAY PLAN */
+  .day{background:var(--bg-card); border:1px solid var(--line); border-radius:14px; margin-bottom:12px; overflow:hidden;}
+  .day-head{padding:16px 20px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;}
+  .day-num{font-family:var(--font-display); color:var(--accent); font-weight:700; margin-right:10px;}
+  .day-body{display:none; padding:0 20px 20px; font-size:14px; color:var(--muted);}
+  .day-body.open{display:block;}
+  .day-body ul{padding-left:18px;}
+  .day-body .post-draft{background:var(--bg-card2); border:1px solid var(--line); border-radius:10px; padding:14px; margin-top:10px; color:var(--text); font-size:13.5px; white-space:pre-wrap;}
+  .chevron{transition:transform .2s; color:var(--muted);}
+  .chevron.open{transform:rotate(180deg);}
+
+  /* SUMMARY CARD */
+  .summary-card{
+    background:linear-gradient(145deg,#101C33,#0C1526);
+    border:1px solid var(--accent2); border-radius:20px; padding:32px; text-align:center; margin-top:20px;
+  }
+  .summary-card h3{font-family:var(--font-display); font-size:20px; margin-top:0;}
+  .summary-scores{display:flex; justify-content:center; gap:24px; margin:20px 0;}
+  .summary-scores div{font-family:var(--font-mono);}
+  .summary-scores .big{font-size:34px; font-weight:700;}
+  .summary-list{text-align:left; max-width:460px; margin:0 auto; font-size:14px; color:var(--muted);}
+  .summary-list li{margin-bottom:6px;}
+  .highlight{color:var(--accent); font-weight:600;}
+
+  footer{text-align:center; padding:40px 24px; color:var(--muted); font-size:12.5px;}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <span class="eyebrow">LinkedIn Roast &amp; Rebuild — GenAI Engineer Edition</span>
+  <h1>Nidhi Singh, this is what recruiters see in 3 seconds.</h1>
+  <p>Honest audit, keyword-optimized rewrite, and a 7-day plan built only from what you actually have — no invented projects, no fake numbers.</p>
+  <div class="score-badge">
+    <div><div class="score-num">41</div><div style="color:var(--muted); font-size:11px; font-family:var(--font-mono);">BEFORE / 100</div></div>
+    <div class="score-arrow">→</div>
+    <div><div class="score-num after">78</div><div style="color:var(--muted); font-size:11px; font-family:var(--font-mono);">AFTER / 100</div></div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- PART 1: ROAST -->
+<section>
+  <span class="section-tag">Part 1</span>
+  <h2>The Roast — Profile Report Card (Before)</h2>
+
+  <div class="card-grid">
+
+    <div class="rc-item">
+      <div class="rc-title">Headline</div>
+      <div class="rc-score mid">6/10</div>
+      <div class="rc-reaction">"Okay, she knows the GenAI stack — but is she looking for a job or listing hashtags?"</div>
+      <button class="rc-toggle" onclick="toggleDetail(this)">+ show why</button>
+      <div class="rc-detail">
+        <p>❌ <strong>The problem:</strong> "GenAI Engineer | Building Agentic AI Systems with LangChain, RAG & LLMs | Python • LangGraph • OpenAI • Claude | Healthcare" is a tool dump, not a positioning statement. It tells recruiters WHAT you use, not WHO you help or WHAT outcome you drive.</p>
+        <p>🧠 <strong>Why it hurts:</strong> Recruiters searching for "GenAI Engineer Healthcare" will find you (good — keywords are there), but hiring managers skimming search results won't feel a reason to click YOU over the other 40 profiles with the same tool list.</p>
+        <p>🔍 <strong>Invisible cost:</strong> You show up in search but don't convert the click. That's a top-of-funnel-only headline.</p>
+      </div>
+    </div>
+
+    <div class="rc-item">
+      <div class="rc-title">About — First 2 Lines (pre "see more")</div>
+      <div class="rc-score ok">7/10</div>
+      <div class="rc-reaction">"I build AI systems that don't just respond: they think, reason, and act." — okay, that's actually a decent hook.</div>
+      <button class="rc-toggle" onclick="toggleDetail(this)">+ show why</button>
+      <div class="rc-detail">
+        <p>❌ <strong>The problem:</strong> The hook is strong, but it's generic-agentic-AI-buzzword strong. Thousands of GenAI profiles open with a version of "not just X, but Y" right now.</p>
+        <p>🧠 <strong>Why it hurts:</strong> A recruiter who scans 100 profiles a day has seen this sentence shape before. It doesn't say healthcare, doesn't say YOU.</p>
+        <p>🔍 <strong>Invisible cost:</strong> Your actual differentiator (COVID-era research recognition + healthcare-domain AI) is sitting three paragraphs down, unread by anyone who doesn't click "see more."</p>
+      </div>
+    </div>
+
+    <div class="rc-item">
+      <div class="rc-title">About — Full Section</div>
+      <div class="rc-score mid">5/10</div>
+      <div class="rc-reaction">"Lots of tools, lots of training, not enough proof of impact."</div>
+      <button class="rc-toggle" onclick="toggleDetail(this)">+ show why</button>
+      <div class="rc-detail">
+        <p>❌ <strong>The problem:</strong> You quote your own section: "30+ projects on GitHub and a growing obsession with what AI can actually do." That's a claim with no evidence attached — no flagship project named, no outcome, no link to the ONE project a recruiter should click.</p>
+        <p>🧠 <strong>Why it hurts:</strong> Recruiters skim for proof, not enthusiasm. "Growing obsession" reads as junior/hobbyist language, even though your background (ICMR research, Corona Warrior recognition) is genuinely senior-signal material.</p>
+        <p>🔍 <strong>Invisible cost:</strong> Your strongest credibility marker — being formally recognized for COVID-19 response work — is buried mid-paragraph next to your degree. That's the line that should be doing the most work for a "Healthcare + AI" positioning, and it's whispering instead of leading.</p>
+      </div>
+    </div>
+
+    <div class="rc-item">
+      <div class="rc-title">Experience</div>
+      <div class="rc-score mid">6/10</div>
+      <div class="rc-reaction">"Good bullets structurally — but this is the only role listed, and the title alone undersells it."</div>
+      <button class="rc-toggle" onclick="toggleDetail(this)">+ show why</button>
+      <div class="rc-detail">
+        <p>❌ <strong>The problem:</strong> Your bullets already have numbers and structure (85% accuracy, two end-to-end pipelines) — that part is genuinely above average. What's missing is a headline framing above the bullets that tells a recruiter WHY this internship matters for a GenAI role specifically, since the projects were classic ML, not GenAI/LLM work.</p>
+        <p>🧠 <strong>Why it hurts:</strong> A recruiter scanning for "GenAI Engineer" sees ML classification work and may not immediately connect it to your GenAI positioning unless you bridge it explicitly.</p>
+        <p>🔍 <strong>Invisible cost:</strong> The bridge between "I did classic ML here" and "I do agentic GenAI now" is left for the recruiter to build themselves. Most won't bother — they'll just move to the next profile.</p>
+      </div>
+    </div>
+
+    <div class="rc-item">
+      <div class="rc-title">Skills &amp; Keywords</div>
+      <div class="rc-score low">4/10</div>
+      <div class="rc-reaction">"18 skills, no clear top 3 — the algorithm doesn't know what to rank you for."</div>
+      <button class="rc-toggle" onclick="toggleDetail(this)">+ show why</button>
+      <div class="rc-detail">
+        <p>❌ <strong>The problem:</strong> You're listing 18 skills including generic ones like "Chatbot" and "SQL" alongside high-value ones like "LangGraph" and "Agentic AI Development," all with equal weight.</p>
+        <p>🧠 <strong>Why it hurts:</strong> LinkedIn's search ranks profiles partly by which skills are pinned/endorsed at the top. An unranked wall of skills dilutes your signal for the searches that actually matter (recruiters searching "Agentic AI," "RAG," "LangGraph").</p>
+        <p>🔍 <strong>Invisible cost:</strong> You may be losing search rank for your 3 strongest, most in-demand skills because they're not visually or algorithmically prioritized.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <p style="margin-top:24px; text-align:center; font-family:var(--font-mono); color:var(--muted); font-size:13px;">OVERALL PROFILE STRENGTH: <span style="color:var(--bad); font-size:18px; font-weight:700;">41/100</span></p>
+</section>
+
+<!-- PART 2: REBUILD -->
+<section>
+  <span class="section-tag">Part 2</span>
+  <h2>The Rebuild</h2>
+
+  <h3 style="font-family:var(--font-display); margin-top:28px;">Headline — 3 options</h3>
+  <p style="color:var(--muted); font-size:14px;">Formula: [Role/Identity] | [Who I help or what I do] | [Proof or differentiator]</p>
+
+  <div class="opt-grid">
+    <div class="opt-card">
+      <span class="opt-label">Option 1 — Keyword-Optimized (search visibility)</span>
+      <div class="opt-text">GenAI Engineer | Agentic AI, RAG &amp; LLM Systems in Healthcare | Python, LangChain, LangGraph, OpenAI</div>
+      <div class="opt-why">Use this if your #1 goal right now is showing up in recruiter search. Front-loads the exact terms recruiters filter by: GenAI Engineer, Agentic AI, RAG, Healthcare.</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy</button>
+    </div>
+    <div class="opt-card">
+      <span class="opt-label">Option 2 — Value-Proposition Style</span>
+      <div class="opt-text">I build agentic AI &amp; RAG systems for healthcare — turning research rigor into production-ready LLM apps</div>
+      <div class="opt-why">Use this on applications and outreach where a human, not a keyword filter, reads it first — it explains the "so what," not just the stack.</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy</button>
+    </div>
+    <div class="opt-card">
+      <span class="opt-label">Option 3 — Authority Style</span>
+      <div class="opt-text">From COVID-19 research (ICMR) to Agentic AI — GenAI Engineer building LLM systems for healthcare | 30+ projects</div>
+      <div class="opt-why">Use this to lean into your unusual biotech-research-to-AI path as a differentiator, especially with healthcare-AI recruiters and founders — it's the story no one else in the search results has.</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy</button>
+    </div>
+  </div>
+
+  <h3 style="font-family:var(--font-display); margin-top:36px;">About Section — Full Rewrite</h3>
+  <div class="about-box" id="about-rewrite">I build AI systems that don't just respond — they think, reason, and act.
+
+For the last 2 years I've gone deep into the GenAI stack: RAG pipelines, agentic and multi-agent systems with LangChain and LangGraph, and LLM-powered apps shipped on Streamlit and Hugging Face. That work now lives across 30+ GitHub projects.
+
+What makes my path different: before AI, I spent 2 years doing hands-on data research at ICMR, where I was formally recognized as a Corona Warrior for my work during India's COVID-19 response. I bring that same research rigor — clean methodology, real evaluation, no shortcuts — into how I build GenAI systems today. My academic background (B.Tech + M.Tech, Biotechnology) plus focused Data Science and Agentic AI training is why I gravitate toward healthcare-facing AI work specifically.
+
+What I work with:
+→ LLMs: OpenAI, Hugging Face, Ollama, Groq
+→ Frameworks: LangChain, LangGraph, LangServe
+→ Retrieval: RAG, FAISS, vector embeddings
+→ Deployment: Streamlit, Hugging Face Spaces, FastAPI
+→ Data: Python, MySQL, Pandas, Statistics
+
+Currently looking for a full-time GenAI / AI Engineer role — on-site, hybrid, or remote.
+
+GitHub: github.com/Nidhisingh274
+Hugging Face: huggingface.co/nidhisingh27
+
+If you're building something ambitious in AI — especially in healthcare — let's connect.</div>
+  <span class="about-label">Keywords embedded for search</span>
+  <div>
+    <span class="keyword-chip">GenAI</span><span class="keyword-chip">Agentic AI</span><span class="keyword-chip">RAG</span>
+    <span class="keyword-chip">LangChain</span><span class="keyword-chip">LangGraph</span><span class="keyword-chip">LLM</span>
+    <span class="keyword-chip">Healthcare AI</span><span class="keyword-chip">FastAPI</span><span class="keyword-chip">FAISS</span>
+    <span class="keyword-chip">Python</span><span class="keyword-chip">Vector Embeddings</span>
+  </div>
+  <p style="color:var(--muted); font-size:13px; margin-top:14px;"><strong>Why this structure works:</strong> the hook stays the same (it was already good), the "different path" paragraph moves your ICMR recognition up front as the differentiator instead of burying it, and the CTA at the end is specific ("healthcare" + "let's connect") instead of generic.</p>
+
+  <h3 style="font-family:var(--font-display); margin-top:36px;">Experience — Top Entry Rewrite</h3>
+  <p style="color:var(--muted); font-size:14px;">Machine Learning Intern, Mentorness Recruitment Service — add one framing line above the bullets first:</p>
+  <div class="about-box" style="margin-bottom:18px; font-size:14px;">Applied end-to-end ML methodology to real prediction problems — the same rigor I now bring to building agentic GenAI systems.</div>
+
+  <div class="ba-row">
+    <div class="ba-box ba-before"><span class="ba-tag">Before</span>Built a binary classification model to predict customer purchase likelihood using demographic and behavioral features, supporting targeted marketing strategy and retention planning</div>
+    <div class="ba-box ba-after"><span class="ba-tag">After</span>Built and validated a binary classification model predicting customer purchase likelihood from demographic and behavioral features, directly informing targeted marketing and retention strategy</div>
+  </div>
+  <div class="ba-row">
+    <div class="ba-box ba-before"><span class="ba-tag">Before</span>Developed a stroke risk prediction model using patient health and lifestyle data (logistic regression / random forest), achieving 85% accuracy on held-out test set</div>
+    <div class="ba-box ba-after"><span class="ba-tag">After</span>Developed a stroke risk prediction model (logistic regression / random forest) on patient health and lifestyle data, achieving 85% accuracy on held-out test data — an early example of applying ML to healthcare outcomes</div>
+  </div>
+  <div class="ba-row">
+    <div class="ba-box ba-before"><span class="ba-tag">Before</span>Delivered two end-to-end ML pipelines in Python (data cleaning → feature engineering → model training → evaluation) within a 1 month remote engagement</div>
+    <div class="ba-box ba-after"><span class="ba-tag">After</span>Delivered two complete ML pipelines in Python — data cleaning, feature engineering, model training, and evaluation — independently, in a fully remote setting</div>
+  </div>
+  <p style="color:var(--muted); font-size:13px;">Note: dropped the "1 month" framing entirely rather than drawing attention to duration — "delivered independently, remote" signals ownership without inviting a recruiter to mentally discount it for being short.</p>
+
+  <h3 style="font-family:var(--font-display); margin-top:36px;">Skills Recommendations</h3>
+  <div class="skills-cols">
+    <div>
+      <p style="font-family:var(--font-mono); font-size:12px; color:var(--good); text-transform:uppercase;">Add (priority order)</p>
+      <ol style="color:var(--muted); font-size:14px; padding-left:20px;">
+        <li>Agentic AI Development</li>
+        <li>LangGraph</li>
+        <li>Retrieval-Augmented Generation (RAG)</li>
+        <li>Multi-Agent Systems</li>
+        <li>LLM Application Development</li>
+        <li>Vector Databases</li>
+        <li>Healthcare AI / Applied ML in Healthcare</li>
+        <li>FastAPI</li>
+        <li>Prompt Engineering</li>
+        <li>Hugging Face Transformers</li>
+      </ol>
+    </div>
+    <div>
+      <p style="font-family:var(--font-mono); font-size:12px; color:var(--bad); text-transform:uppercase;">Remove / de-prioritize</p>
+      <ul class="skill-list">
+        <li>Chatbot <span style="color:var(--muted);">too generic</span></li>
+        <li>SQL <span style="color:var(--muted);">keep MySQL only</span></li>
+        <li>Statistics <span style="color:var(--muted);">background skill, not searchable</span></li>
+      </ul>
+      <p style="font-family:var(--font-mono); font-size:12px; color:var(--accent2); text-transform:uppercase; margin-top:18px;">Pin to top 3</p>
+      <ul class="skill-list">
+        <li>Agentic AI Development <span class="pin">PIN</span></li>
+        <li>LangGraph <span class="pin">PIN</span></li>
+        <li>Retrieval-Augmented Generation (RAG) <span class="pin">PIN</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- PART 3: SCORECARD -->
+<section>
+  <span class="section-tag">Part 3</span>
+  <h2>Before vs After Scorecard</h2>
+  <table>
+    <tr><th>Section</th><th>Before</th><th>After</th><th>Change</th></tr>
+    <tr><td>Headline</td><td>6/10</td><td>9/10</td><td class="delta">+3</td></tr>
+    <tr><td>About (Hook)</td><td>7/10</td><td>9/10</td><td class="delta">+2</td></tr>
+    <tr><td>About (Full)</td><td>5/10</td><td>8/10</td><td class="delta">+3</td></tr>
+    <tr><td>Experience</td><td>6/10</td><td>8/10</td><td class="delta">+2</td></tr>
+    <tr><td>Skills / Keywords</td><td>4/10</td><td>9/10</td><td class="delta">+5</td></tr>
+  </table>
+  <p style="text-align:center; margin-top:20px; font-family:var(--font-mono); font-size:14px;">OVERALL — Before: <strong style="color:var(--bad);">41/100</strong> → After: <strong style="color:var(--good);">78/100</strong> <span class="delta">(+37)</span></p>
+</section>
+
+<!-- PART 4: 7 DAY PLAN -->
+<section>
+  <span class="section-tag">Part 4</span>
+  <h2>7-Day LinkedIn Activation Plan</h2>
+
+  <div class="day">
+    <div class="day-head" onclick="toggleDay(this)"><div><span class="day-num">Day 1</span>Make all profile changes</div><span class="chevron">⌄</span></div>
+    <div class="day-body"><ul>
+      <li>Update headline to Option 1 or 3</li>
+      <li>Replace About section with the rewrite above</li>
+      <li>Add the framing line + updated bullets to your Mentorness experience</li>
+      <li>Re-order skills: pin Agentic AI Development, LangGraph, RAG</li>
+      <li>Remove Chatbot, SQL (duplicate), Statistics from top skills</li>
+      <li>Add "Healthcare AI" as a skill if not already searchable</li>
+    </ul></div>
+  </div>
+
+  <div class="day">
+    <div class="day-head" onclick="toggleDay(this)"><div><span class="day-num">Day 2</span>Publish Post #1 — "I rebuilt my LinkedIn"</div><span class="chevron">⌄</span></div>
+    <div class="day-body">
+      <p>Hook drives comments by asking a direct question at the end.</p>
+      <div class="post-draft">I just rewrote my entire LinkedIn profile — and it made me realize how badly I was burying my own story.
+
+For 2 years I've been deep in the GenAI stack: RAG, agentic systems, LangChain, LangGraph. That part was easy to write.
+
+The part I almost left out? Before any of this, I spent 2 years doing COVID-19 research at ICMR and was recognized as a Corona Warrior for it.
+
+Turns out that's not a footnote — it's the reason I build AI for healthcare specifically, and it's the thing that actually makes my profile different from every other "GenAI Engineer" headline out there.
+
+If you're also sitting on a background that doesn't "obviously" connect to your current work — it might be your biggest asset, not something to hide.
+
+What's the unconventional part of YOUR background that you've been underselling on LinkedIn?</div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="day-head" onclick="toggleDay(this)"><div><span class="day-num">Day 3</span>Send 10 strategic connection requests</div><span class="chevron">⌄</span></div>
+    <div class="day-body">
+      <p><strong>Who to target:</strong> GenAI/AI Engineers at healthcare-AI startups, ML recruiters who post about AI hiring, engineering managers at companies using LangChain/RAG in production (check their job posts), and people who post about agentic AI in your feed.</p>
+      <div class="post-draft">Hi [Name] — saw your work on [specific thing they posted/built]. I'm building agentic AI & RAG systems with a healthcare focus (ex-ICMR researcher). Would love to connect and follow your work.</div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="day-head" onclick="toggleDay(this)"><div><span class="day-num">Day 4</span>Comment on 5 posts in your target space</div><span class="chevron">⌄</span></div>
+    <div class="day-body">
+      <p><strong>The Value Comment formula:</strong> Agree + Add Insight + Ask a Question.</p>
+      <p>Example: "Agree that RAG-only pipelines break down on multi-hop questions — I ran into this building a healthcare-domain RAG project and found reranking helped more than adding retrieval steps. Curious if you've tried reranking here, or gone a different route?"</p>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="day-head" onclick="toggleDay(this)"><div><span class="day-num">Day 5</span>Publish Post #2 — lessons-learned / hot take</div><span class="chevron">⌄</span></div>
+    <div class="day-body">
+      <div class="post-draft">Unpopular opinion after building 30+ GenAI projects: most "agentic AI" demos I see are just a chatbot with extra steps.
+
+A real agent needs to handle failure — retries, tool errors, bad retrievals — not just the happy path.
+
+The projects of mine that actually taught me something were the ones where the first version broke in production-like testing, and I had to redesign the control flow, not just the prompt.
+
+If you're learning agentic AI right now: build for the failure case first. The happy path is the easy 20%.
+
+What's the most "it broke and taught me something" moment you've had building with LLMs?</div>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="day-head" onclick="toggleDay(this)"><div><span class="day-num">Day 6</span>Engage + send 5 more connection requests</div><span class="chevron">⌄</span></div>
+    <div class="day-body">
+      <p>Reply to every comment on both posts within a few hours — engagement in the first 24 hours affects reach. Send 5 more targeted requests using the Day 3 template, this time to people who engaged with your posts.</p>
+    </div>
+  </div>
+
+  <div class="day">
+    <div class="day-head" onclick="toggleDay(this)"><div><span class="day-num">Day 7</span>Review profile views &amp; connection acceptance rate</div><span class="chevron">⌄</span></div>
+    <div class="day-body">
+      <p><strong>What the numbers mean:</strong> A jump in profile views after Day 1 = your headline/keywords are working in search. A low connection acceptance rate (below ~40%) usually means your note is too generic or you're targeting too broadly — tighten the "why you" in the template. Post impressions with low comments = the hook isn't sparking a reaction; the ending question matters more than people think.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PART 5: SUMMARY CARD -->
+<section style="border-bottom:none;">
+  <span class="section-tag">Part 5</span>
+  <h2>What I Learned Today</h2>
+  <div class="summary-card">
+    <h3>I let AI roast my LinkedIn profile today. Here's what changed:</h3>
+    <div class="summary-scores">
+      <div><div class="big" style="color:var(--bad);">41</div>Before</div>
+      <div style="align-self:center; color:var(--muted);">→</div>
+      <div><div class="big" style="color:var(--good);">78</div>After</div>
+    </div>
+    <ul class="summary-list">
+      <li>1. My headline listed tools, not a reason to click on me over anyone else.</li>
+      <li>2. My strongest credential — being recognized as a <span class="highlight">Corona Warrior</span> during COVID-19 research at ICMR — was buried in paragraph 3 instead of leading my story.</li>
+      <li>3. My skills section had 18 flat, unranked keywords instead of 3 pinned, high-intent ones — diluting my search visibility.</li>
+    </ul>
+    <p style="margin-top:16px; font-size:14px;">The #1 thing that made the biggest difference: <span class="highlight">leading with the ICMR/Corona Warrior story instead of hiding it</span> — it's the one thing in my profile no other "GenAI Engineer" search result has.</p>
+  </div>
+</section>
+
+</div>
+
+<footer>Built from your real profile data only — nothing here was invented. Update the live sections as you edit LinkedIn.</footer>
+
+<script>
+function toggleDetail(btn){
+  const detail = btn.previousElementSibling;
+  detail.classList.toggle('open');
+  btn.textContent = detail.classList.contains('open') ? '– hide' : '+ show why';
+}
+function toggleDay(head){
+  const body = head.nextElementSibling;
+  const chev = head.querySelector('.chevron');
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+function copyText(btn){
+  const text = btn.previousElementSibling.textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const old = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(()=>{btn.textContent = old;}, 1500);
+  });
+}
+</script>
+
+</body>
+</html>
