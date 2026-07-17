@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Content Intelligence Studio</title>
+<style>
+:root{--bg:#0a0a0f;--bg2:#111118;--bg3:#18181f;--bg4:#1e1e28;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--text:#f0f0f5;--text2:#9090a8;--text3:#5a5a72;--accent:#7c6ff7;--accent2:#a89bf7;--accent-bg:rgba(124,111,247,0.12);--accent-border:rgba(124,111,247,0.3);--green:#34d399;--green-bg:rgba(52,211,153,0.1);--red:#f87171;--red-bg:rgba(248,113,113,0.1);--amber:#fbbf24;--amber-bg:rgba(251,191,36,0.1);--blue:#60a5fa;--blue-bg:rgba(96,165,250,0.1);--purple:#c084fc;--purple-bg:rgba(192,132,252,0.1);--radius:10px;--radius-lg:16px}
+[data-theme="light"]{--bg:#f4f4f8;--bg2:#ffffff;--bg3:#f0f0f5;--bg4:#e8e8f0;--border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);--text:#111118;--text2:#444455;--text3:#888899;--accent:#5b52e0;--accent2:#7c74f0;--accent-bg:rgba(91,82,224,0.08);--accent-border:rgba(91,82,224,0.25);--green:#059669;--green-bg:rgba(5,150,105,0.08);--red:#dc2626;--red-bg:rgba(220,38,38,0.08);--amber:#d97706;--amber-bg:rgba(217,119,6,0.08);--blue:#2563eb;--blue-bg:rgba(37,99,235,0.08);--purple:#9333ea;--purple-bg:rgba(147,51,234,0.08)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6}
+.app{display:grid;grid-template-rows:56px 1fr;min-height:100vh}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0;z-index:100}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.logo-mark{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-size:14px}
+.logo-text{font-size:14px;font-weight:600;letter-spacing:-0.3px}
+.logo-badge{font-size:10px;color:var(--text3);background:var(--bg4);border:1px solid var(--border2);border-radius:20px;padding:2px 8px}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.btn-sm{background:transparent;border:1px solid var(--border2);border-radius:8px;padding:5px 10px;color:var(--text2);cursor:pointer;font-size:12px;transition:all .15s}
+.btn-sm:hover{background:var(--bg3);color:var(--text)}
+.main{display:grid;grid-template-columns:300px 1fr;height:calc(100vh - 56px);overflow:hidden;transition:grid-template-columns .25s ease}
+body.sidebar-wide .main{grid-template-columns:440px 1fr}
+.sidebar-toggle{display:flex;align-items:center;justify-content:space-between;padding:2px 0 10px;margin-bottom:6px;border-bottom:1px solid var(--border)}
+.sidebar-toggle-btn{background:var(--bg3);border:1px solid var(--border2);border-radius:7px;padding:4px 9px;color:var(--text2);cursor:pointer;font-size:11px;display:flex;align-items:center;gap:4px;transition:all .15s}
+.sidebar-toggle-btn:hover{background:var(--bg4);color:var(--text)}
+.sidebar{border-right:1px solid var(--border);overflow-y:auto;background:var(--bg2)}
+.content-area{overflow-y:auto;padding:24px}
+.s-sec{padding:14px 16px;border-bottom:1px solid var(--border)}
+.s-lbl{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
+
+/* MODEL SELECTOR */
+.model-selector-wrap{position:relative}
+.model-select{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:8px 10px;color:var(--text);font-size:12px;cursor:pointer;appearance:none;-webkit-appearance:none}
+.model-select:focus{outline:none;border-color:var(--accent)}
+.model-arrow{position:absolute;right:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text3);font-size:10px}
+.model-tip{margin-top:6px;padding:7px 9px;border-radius:8px;font-size:11px;line-height:1.5;border:1px solid var(--border)}
+.model-tip.tip-green{background:var(--green-bg);border-color:rgba(52,211,153,.2);color:var(--green)}
+.model-tip.tip-blue{background:var(--blue-bg);border-color:rgba(96,165,250,.2);color:var(--blue)}
+.model-tip.tip-amber{background:var(--amber-bg);border-color:rgba(251,191,36,.2);color:var(--amber)}
+.model-tip.tip-purple{background:var(--purple-bg);border-color:rgba(192,132,252,.2);color:var(--purple)}
+.custom-model-row{margin-top:8px;display:none}
+.custom-model-input{width:100%;background:var(--bg3);border:1px solid var(--accent-border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:12px}
+.custom-model-input:focus{outline:none;border-color:var(--accent)}
+
+/* API KEY */
+.api-key-banner{background:var(--amber-bg);border:1px solid rgba(251,191,36,.3);border-radius:var(--radius);padding:9px 11px;font-size:11px;color:var(--amber);margin-bottom:8px}
+.api-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:7px 10px;color:var(--text);font-size:12px}
+.api-input:focus{outline:none;border-color:var(--accent)}
+
+/* UPLOAD */
+.drop-zone{border:1.5px dashed var(--border2);border-radius:var(--radius);padding:18px 14px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3);position:relative}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--accent);background:var(--accent-bg)}
+.drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop-icon{font-size:22px;margin-bottom:6px}
+.drop-text{font-size:12px;color:var(--text2)}
+.drop-hint{font-size:11px;color:var(--text3);margin-top:3px}
+.preview-area{margin-top:10px}
+.preview-img{width:100%;border-radius:var(--radius);border:1px solid var(--border);max-height:150px;object-fit:cover;margin-bottom:6px}
+.preview-txt{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:8px;font-size:11px;color:var(--text2);max-height:100px;overflow-y:auto;white-space:pre-wrap;font-family:monospace}
+.paste-area textarea{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-size:12px;resize:vertical;min-height:90px;font-family:inherit;line-height:1.5}
+.paste-area textarea:focus{outline:none;border-color:var(--accent)}
+
+/* CHIPS */
+.ctx-row{display:flex;flex-direction:column;gap:5px;margin-top:7px}
+.ctx-lbl{font-size:11px;color:var(--text3)}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{font-size:10px;padding:3px 8px;border-radius:20px;background:var(--bg4);border:1px solid var(--border2);color:var(--text2);cursor:pointer;transition:all .15s;user-select:none}
+.chip.active{background:var(--accent-bg);border-color:var(--accent-border);color:var(--accent2)}
+
+/* ANALYZE BTN */
+.analyze-btn{width:100%;padding:10px;border-radius:var(--radius);background:linear-gradient(135deg,var(--accent),var(--purple));border:none;color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:opacity .15s;letter-spacing:.2px}
+.analyze-btn:hover{opacity:.9}
+.analyze-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* PIPELINE */
+.pipeline{display:flex;flex-direction:column;gap:5px}
+.reviewer{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);transition:all .3s}
+.reviewer.active{border-color:var(--accent-border);background:var(--accent-bg)}
+.reviewer.done{border-color:rgba(52,211,153,.25);background:rgba(52,211,153,.06)}
+.reviewer.error{border-color:rgba(248,113,113,.25);background:rgba(248,113,113,.06)}
+.rev-dot{width:7px;height:7px;border-radius:50%;background:var(--border2);flex-shrink:0;transition:all .3s}
+.reviewer.active .rev-dot{background:var(--accent);box-shadow:0 0 8px var(--accent);animation:pulse 1s infinite}
+.reviewer.done .rev-dot{background:var(--green)}
+.reviewer.error .rev-dot{background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.rev-name{font-size:11px;font-weight:500;flex:1}
+.rev-status{font-size:10px;color:var(--text3)}
+
+/* LOG */
+.log-area{max-height:140px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+.log-line{font-size:10px;color:var(--text3);font-family:monospace;padding:2px 0 2px 6px;border-left:2px solid transparent}
+.log-line.info{border-color:var(--accent);color:var(--text2)}
+.log-line.success{border-color:var(--green);color:var(--green)}
+.log-line.error{border-color:var(--red);color:var(--red)}
+
+/* EMPTY STATE */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--text3)}
+.empty-icon{font-size:44px;opacity:.25}
+.empty-title{font-size:16px;font-weight:500;color:var(--text2)}
+.empty-sub{font-size:12px;text-align:center;max-width:280px;line-height:1.6}
+
+/* SCORE HERO */
+.score-hero{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;margin-bottom:18px;display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center}
+.score-ring{position:relative;width:96px;height:96px;flex-shrink:0}
+.score-ring svg{transform:rotate(-90deg)}
+.score-ring-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.score-num{font-size:26px;font-weight:700;line-height:1}
+.score-denom{font-size:11px;color:var(--text3)}
+.score-meta h2{font-size:17px;font-weight:600;margin-bottom:4px}
+.score-meta p{font-size:12px;color:var(--text2);line-height:1.5}
+.score-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+.tag{font-size:10px;padding:3px 9px;border-radius:20px;font-weight:500}
+.tag-green{background:var(--green-bg);color:var(--green)}
+.tag-red{background:var(--red-bg);color:var(--red)}
+.tag-amber{background:var(--amber-bg);color:var(--amber)}
+.tag-blue{background:var(--blue-bg);color:var(--blue)}
+.tag-purple{background:var(--purple-bg);color:var(--purple)}
+
+/* CAT GRID */
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:18px}
+.cat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:13px}
+.cat-name{font-size:10px;color:var(--text3);margin-bottom:5px;font-weight:500;text-transform:uppercase;letter-spacing:.06em}
+.cat-score{font-size:20px;font-weight:700;margin-bottom:5px}
+.cat-bar-bg{height:3px;background:var(--border2);border-radius:3px;overflow:hidden}
+.cat-bar{height:100%;border-radius:3px;transition:width 1.2s ease;width:0}
+.cat-note{font-size:11px;color:var(--text2);margin-top:5px;line-height:1.4}
+
+/* SECTIONS */
+.section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;margin-bottom:14px}
+.sec-hdr{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.sec-icon{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.sec-title{font-size:14px;font-weight:600}
+.sec-sub{font-size:11px;color:var(--text3);margin-left:auto}
+
+/* INSIGHT LIST */
+.insight-list{display:flex;flex-direction:column;gap:7px}
+.insight-item{display:flex;gap:9px;align-items:flex-start;padding:9px 11px;border-radius:8px;border:1px solid var(--border)}
+.i-dot{width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.i-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.i-text{font-size:12px;color:var(--text2);line-height:1.5}
+
+/* COMPARE */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cmp-col{border-radius:var(--radius);overflow:hidden}
+.cmp-hdr{padding:7px 11px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.cmp-body{padding:11px;font-size:12px;line-height:1.6;white-space:pre-wrap}
+.before-hdr{background:var(--red-bg);color:var(--red)}
+.after-hdr{background:var(--green-bg);color:var(--green)}
+.before-body{background:var(--bg3);border:1px solid rgba(248,113,113,.15);color:var(--text2)}
+.after-body{background:var(--bg3);border:1px solid rgba(52,211,153,.15);color:var(--text)}
+
+/* EXEC */
+.exec-card{background:linear-gradient(135deg,rgba(124,111,247,.08),rgba(192,132,252,.06));border:1px solid var(--accent-border);border-radius:var(--radius-lg);padding:18px;margin-bottom:14px}
+.exec-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--accent2);margin-bottom:9px}
+.exec-body{font-size:13px;color:var(--text2);line-height:1.7;white-space:pre-wrap}
+
+/* PERF */
+.perf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.perf-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:11px;text-align:center}
+.perf-plat{font-size:10px;color:var(--text3);margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em}
+.perf-score{font-size:19px;font-weight:700}
+.perf-lbl{font-size:10px;color:var(--text2);margin-top:2px}
+.perf-note{font-size:10px;color:var(--text3);margin-top:5px;line-height:1.4}
+.ai-note{font-size:10px;color:var(--text3);padding:6px 10px;border:1px dashed var(--border2);border-radius:6px;margin-top:9px;text-align:center}
+
+/* PROMPTS */
+.prompt-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.prompt-chip{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:9px 11px;font-size:11px;color:var(--text2);cursor:pointer;transition:all .15s;line-height:1.4;text-align:left}
+.prompt-chip:hover{border-color:var(--accent-border);background:var(--accent-bg);color:var(--accent2)}
+
+/* CHECKLIST */
+.checklist{display:flex;flex-direction:column;gap:5px}
+.check-item{display:flex;align-items:center;gap:9px;padding:7px 11px;border-radius:8px;border:1px solid var(--border);font-size:12px}
+.check-item.pass{border-color:rgba(52,211,153,.2);background:rgba(52,211,153,.04)}
+.check-item.fail{border-color:rgba(248,113,113,.2);background:rgba(248,113,113,.04)}
+.check-item.warn{border-color:rgba(251,191,36,.2);background:rgba(251,191,36,.04)}
+
+/* TABS */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:18px;overflow-x:auto}
+.tab{padding:8px 13px;font-size:12px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--text3);white-space:nowrap;transition:all .15s}
+.tab.active{color:var(--accent2);border-bottom-color:var(--accent)}
+.tab:hover:not(.active){color:var(--text2)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* ANIMATIONS */
+.skeleton{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px;height:14px;margin-bottom:8px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.fade-in{animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* GROQ BADGE */
+.groq-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:2px 7px;border-radius:20px;background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.3);color:#fb923c}
+
+@media(max-width:768px){
+  .main{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .sidebar{border-right:none;border-bottom:1px solid var(--border);max-height:50vh}
+  .score-hero{grid-template-columns:1fr}
+  .compare-grid,.perf-grid,.prompt-grid{grid-template-columns:1fr}
+  .cat-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header class="topbar">
+  <div class="topbar-left">
+    <div class="logo-mark">✦</div>
+    <span class="logo-text">Content Intelligence Studio</span>
+    <span class="logo-badge">Groq-Powered</span>
+  </div>
+  <div class="topbar-right">
+    <span class="groq-badge">⚡ Groq</span>
+    <button class="btn-sm" id="downloadBtn" onclick="downloadReport()" style="display:none">⬇ Download Report</button>
+    <button class="btn-sm" onclick="toggleTheme()">◐ Theme</button>
+    <button class="btn-sm" onclick="clearAll()">↺ Reset</button>
+  </div>
+</header>
+
+<div class="main">
+
+  <aside class="sidebar">
+
+    <div class="sidebar-toggle">
+      <span style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Configuration</span>
+      <button class="sidebar-toggle-btn" id="sidebarToggleBtn" onclick="toggleSidebarWidth()">⤢ Expand</button>
+    </div>
+
+    <!-- GROQ API KEY -->
+    <div class="s-sec">
+      <div class="s-lbl">Groq API Key</div>
+      <div class="api-key-banner">Get your free key at console.groq.com — no credit card needed.</div>
+      <input class="api-input" type="password" id="apiKey" placeholder="gsk_..." />
+    </div>
+
+    <!-- MODEL SELECTOR -->
+    <div class="s-sec">
+      <div class="s-lbl">Model Selection</div>
+      <div class="model-selector-wrap">
+        <select class="model-select" id="modelSelect" onchange="onModelChange()">
+          <optgroup label="✨ Smart Routing">
+            <option value="auto" selected>Auto — best model per content type</option>
+          </optgroup>
+          <optgroup label="⚡ Text &amp; Code (manual)">
+            <option value="openai/gpt-oss-120b">openai/gpt-oss-120b (best quality)</option>
+            <option value="openai/gpt-oss-20b">openai/gpt-oss-20b (faster, lighter)</option>
+          </optgroup>
+          <optgroup label="👁 Vision (images + text + code, manual)">
+            <option value="qwen/qwen3.6-27b">qwen/qwen3.6-27b (multimodal)</option>
+          </optgroup>
+          <optgroup label="✏️ Custom">
+            <option value="custom">Enter custom model name…</option>
+          </optgroup>
+        </select>
+        <span class="model-arrow">▾</span>
+      </div>
+      <div class="custom-model-row" id="customModelRow">
+        <input class="custom-model-input" id="customModel" placeholder="e.g. openai/gpt-oss-120b" />
+      </div>
+      <div class="model-tip tip-green" id="modelTip">
+        ✓ Auto mode: text/code → openai/gpt-oss-120b · images or any mix with an image → qwen/qwen3.6-27b (vision). Each reviewer stage picks the right one automatically — no manual switching needed.
+      </div>
+    </div>
+
+    <!-- CONTENT INPUT -->
+    <div class="s-sec">
+      <div class="s-lbl">Content Input</div>
+      <div class="drop-zone" id="dropZone" ondragover="handleDragOver(event)" ondrop="handleDrop(event)" ondragleave="handleDragLeave(event)">
+        <input type="file" id="fileInput" accept="image/*,.txt,.md,.py,.js,.ts,.json,.csv,.html,.css" multiple onchange="handleFiles(event)">
+        <div class="drop-icon">⬆</div>
+        <div class="drop-text">Drop files or click to upload</div>
+        <div class="drop-hint">Images, text, code, markdown — any format</div>
+      </div>
+      <div class="preview-area" id="previewArea"></div>
+      <div class="paste-area" style="margin-top:10px">
+        <div class="s-lbl">Or paste text / code</div>
+        <textarea id="textInput" placeholder="Paste your README, LinkedIn post, code, bio, project description…"></textarea>
+      </div>
+    </div>
+
+    <!-- CONTEXT -->
+    <div class="s-sec">
+      <div class="s-lbl">Analysis Context</div>
+      <div class="ctx-row">
+        <div class="ctx-lbl">Platforms</div>
+        <div class="chips">
+          <span class="chip active" data-ctx="platform" data-val="github">GitHub</span>
+          <span class="chip active" data-ctx="platform" data-val="linkedin">LinkedIn</span>
+          <span class="chip active" data-ctx="platform" data-val="portfolio">Portfolio</span>
+        </div>
+      </div>
+      <div class="ctx-row" style="margin-top:7px">
+        <div class="ctx-lbl">Goals</div>
+        <div class="chips">
+          <span class="chip active" data-ctx="goal" data-val="credibility">Credibility</span>
+          <span class="chip active" data-ctx="goal" data-val="jobs">AI/ML Jobs</span>
+          <span class="chip active" data-ctx="goal" data-val="showcase">Showcase</span>
+          <span class="chip active" data-ctx="goal" data-val="learn">Learning</span>
+        </div>
+      </div>
+      <div class="ctx-row" style="margin-top:7px">
+        <div class="ctx-lbl">Review Tone</div>
+        <div class="chips">
+          <span class="chip active" data-ctx="mode" data-val="balanced">Balanced</span>
+          <span class="chip" data-ctx="mode" data-val="honest">Brutally Honest</span>
+          <span class="chip" data-ctx="mode" data-val="encouraging">Encouraging</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANALYZE -->
+    <div class="s-sec">
+      <button class="analyze-btn" id="analyzeBtn" onclick="startAnalysis()">✦ Run Full Analysis</button>
+    </div>
+
+    <!-- PIPELINE -->
+    <div class="s-sec">
+      <div class="s-lbl">Reviewer Pipeline</div>
+      <div class="pipeline" id="pipeline">
+        <div class="reviewer" id="rev-0"><div class="rev-dot"></div><div class="rev-name">Content Strategist</div><div class="rev-status">waiting</div></div>
+        <div class="reviewer" id="rev-1"><div class="rev-dot"></div><div class="rev-name">Technical Reviewer</div><div class="rev-status">waiting</div></div>
+        <div class="reviewer" id="rev-2"><div class="rev-dot"></div><div class="rev-name">Hiring Manager</div><div class="rev-status">waiting</div></div>
+        <div class="reviewer" id="rev-3"><div class="rev-dot"></div><div class="rev-name">Platform Optimizer</div><div class="rev-status">waiting</div></div>
+        <div class="reviewer" id="rev-4"><div class="rev-dot"></div><div class="rev-name">Visual Analyst</div><div class="rev-status">waiting</div></div>
+        <div class="reviewer" id="rev-5"><div class="rev-dot"></div><div class="rev-name">Report Synthesizer</div><div class="rev-status">waiting</div></div>
+      </div>
+    </div>
+
+    <!-- LOG -->
+    <div class="s-sec">
+      <div class="s-lbl">Activity Log</div>
+      <div class="log-area" id="logArea">
+        <div class="log-line">Studio ready. Powered by Groq — ultra-fast inference.</div>
+      </div>
+    </div>
+
+  </aside>
+
+  <main class="content-area" id="contentArea">
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">✦</div>
+      <div class="empty-title">Ready to analyze your content</div>
+      <div class="empty-sub">Paste text, upload code or images on the left, pick your Groq model, and click Run Full Analysis.</div>
+    </div>
+    <div id="dashboardArea" style="display:none"></div>
+  </main>
+
+</div>
+</div>
+
+<script>
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let uploadedFiles = [];
+let analysisResults = {};
+let activeChips = {
+  platform: ['github','linkedin','portfolio'],
+  goal: ['credibility','jobs','showcase','learn'],
+  mode: ['balanced']
+};
+
+// ── MODEL TIPS ────────────────────────────────────────────────────────────────
+// Groq's model lineup changes over time (older models get deprecated). These are
+// the current, working models this app is built against.
+const MODEL_TEXT_CODE = 'openai/gpt-oss-120b';   // best reasoning — used for text & code
+const MODEL_TEXT_FAST = 'openai/gpt-oss-20b';    // faster/cheaper text-only alternative
+const MODEL_VISION    = 'qwen/qwen3.6-27b';      // only vision-capable model on Groq right now
+
+const MODEL_TIPS = {
+  'auto':                    { cls:'tip-green',  txt:'✓ Auto mode: heavy reasoning stages → gpt-oss-120b, lighter stages → gpt-oss-20b, images → qwen3.6-27b. Splits load across models to go easier on Groq\'s free-tier rate limits.' },
+  'openai/gpt-oss-120b':     { cls:'tip-blue',   txt:'⚡ Best reasoning quality on Groq right now. Great for text, code, and research analysis. No vision — images will be skipped with this forced.' },
+  'openai/gpt-oss-20b':      { cls:'tip-blue',   txt:'🚀 Faster & cheaper than gpt-oss-120b, slightly less depth. Good for quick text-only passes. No vision.' },
+  'qwen/qwen3.6-27b':        { cls:'tip-purple', txt:'👁 Multimodal — handles images, text, and code together. Groq\'s only vision-capable production model right now. It is a preview-tier model, so occasionally slower/less stable than gpt-oss.' },
+  'custom':                  { cls:'tip-amber',  txt:'✏️ Enter any valid Groq model ID. Check console.groq.com/docs/models for the current list — Groq deprecates models often.' }
+};
+
+function onModelChange() {
+  const sel = document.getElementById('modelSelect').value;
+  const tip = MODEL_TIPS[sel] || { cls:'tip-blue', txt:'Model selected. Ensure it is available on your Groq plan.' };
+  const tipEl = document.getElementById('modelTip');
+  tipEl.className = 'model-tip ' + tip.cls;
+  tipEl.textContent = tip.txt;
+  document.getElementById('customModelRow').style.display = sel === 'custom' ? 'block' : 'none';
+}
+
+// kind: 'text' | 'code' | 'light' | 'vision'  — only matters when mode is 'auto'.
+// Manual selections (including custom) always win over auto-routing.
+// 'light' deliberately routes to the smaller/faster model even in auto mode, so
+// that not all 6 reviewer calls hammer the same model's per-minute token budget
+// on Groq's free tier — gpt-oss-120b and gpt-oss-20b have separate TPM limits.
+function getModel(kind) {
+  const sel = document.getElementById('modelSelect').value;
+  if (sel === 'custom') {
+    const cm = document.getElementById('customModel').value.trim();
+    return cm || MODEL_TEXT_CODE;
+  }
+  if (sel !== 'auto') return sel; // manual override forces this model everywhere
+  if (kind === 'vision') return MODEL_VISION;
+  if (kind === 'light') return MODEL_TEXT_FAST;
+  return MODEL_TEXT_CODE; // 'text' and 'code' route to the strongest reasoning model
+}
+
+// Detects whether pasted/uploaded text looks like code, so the activity log and
+// system prompts can be honest about what was detected — even though, given
+// Groq's current lineup, both text and code route to the same top model.
+function looksLikeCode(str) {
+  if (!str) return false;
+  const codePattern = /(function\s+\w+\s*\(|def\s+\w+\s*\(|class\s+\w+[\s:{]|import\s+[\w.{}\s,*]+from|require\(|const\s+\w+\s*=|=>\s*{|#include|public\s+(class|static)|SELECT\s+\S+\s+FROM|<\/?[a-zA-Z][^>]*>|\$\w+\s*=|git\s+(commit|clone|push)|npm\s+(install|run)|pip\s+install|def __init__)/i;
+  return codePattern.test(str);
+}
+
+function detectContentType() {
+  const textInput = document.getElementById('textInput').value.trim();
+  const hasImages = uploadedFiles.some(f => f.type.startsWith('image/'));
+  const codeFileExt = /\.(py|js|jsx|ts|tsx|java|cpp|c|h|go|rb|php|json|html|css|sql|sh|yml|yaml)$/i;
+  const hasCodeFiles = uploadedFiles.some(f => !f.type.startsWith('image/') && codeFileExt.test(f.name));
+  const hasCode = hasCodeFiles || looksLikeCode(textInput);
+  const hasText = !!textInput && !hasCode;
+  const parts = [];
+  if (hasImages) parts.push('Image');
+  if (hasCode) parts.push('Code');
+  if (hasText || (!hasImages && !hasCode)) parts.push('Text');
+  return { hasImages, hasCode, hasText, label: parts.join(' + ') };
+}
+
+// ── THEME ─────────────────────────────────────────────────────────────────────
+function toggleTheme() {
+  const h = document.documentElement;
+  h.dataset.theme = h.dataset.theme === 'dark' ? 'light' : 'dark';
+}
+
+// ── CHIPS ─────────────────────────────────────────────────────────────────────
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', function() {
+    const ctx = this.dataset.ctx, val = this.dataset.val;
+    if (ctx === 'mode') {
+      document.querySelectorAll('[data-ctx="mode"]').forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+      activeChips.mode = [val];
+    } else {
+      this.classList.toggle('active');
+      if (!activeChips[ctx]) activeChips[ctx] = [];
+      if (this.classList.contains('active')) activeChips[ctx].push(val);
+      else activeChips[ctx] = activeChips[ctx].filter(v => v !== val);
+    }
+  });
+});
+
+// ── FILE UPLOAD ───────────────────────────────────────────────────────────────
+function handleDragOver(e) { e.preventDefault(); document.getElementById('dropZone').classList.add('drag'); }
+function handleDragLeave() { document.getElementById('dropZone').classList.remove('drag'); }
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.remove('drag');
+  handleFiles({ target: { files: e.dataTransfer.files } });
+}
+function handleFiles(e) {
+  const files = Array.from(e.target.files);
+  uploadedFiles = files;
+  const prev = document.getElementById('previewArea');
+  prev.innerHTML = '';
+  files.forEach(file => {
+    if (file.type.startsWith('image/')) {
+      const r = new FileReader();
+      r.onload = ev => { const img = document.createElement('img'); img.className = 'preview-img'; img.src = ev.target.result; prev.appendChild(img); };
+      r.readAsDataURL(file);
+      // Let the user know how routing will handle this image
+      const sel = document.getElementById('modelSelect');
+      if (sel.value === 'auto') {
+        log('Image detected — auto mode will use qwen/qwen3.6-27b (vision) for it.', 'info');
+      } else if (sel.value !== 'qwen/qwen3.6-27b' && sel.value !== 'custom') {
+        log('Image detected, but a non-vision model is manually selected — switch to qwen/qwen3.6-27b or Auto to analyze it.', 'info');
+      }
+    } else {
+      const r = new FileReader();
+      r.onload = ev => { const d = document.createElement('div'); d.className = 'preview-txt'; d.textContent = ev.target.result.slice(0,400)+(ev.target.result.length>400?'\n…':''); prev.appendChild(d); };
+      r.readAsText(file);
+    }
+  });
+  log('Loaded ' + files.length + ' file(s): ' + files.map(f=>f.name).join(', '), 'info');
+}
+
+// ── LOG ───────────────────────────────────────────────────────────────────────
+function log(msg, type='') {
+  const area = document.getElementById('logArea');
+  const line = document.createElement('div');
+  const t = new Date().toLocaleTimeString('en-US',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  line.className = 'log-line ' + type;
+  line.textContent = '['+t+'] '+msg;
+  area.appendChild(line);
+  area.scrollTop = area.scrollHeight;
+}
+
+// ── REVIEWER STATUS ───────────────────────────────────────────────────────────
+function setReviewer(idx, status, label) {
+  const el = document.getElementById('rev-'+idx);
+  if (!el) return;
+  el.className = 'reviewer ' + status;
+  const labels = { active:'analyzing…', done:'✓ done', error:'✗ error', '':'waiting' };
+  el.querySelector('.rev-status').textContent = labels[status] || 'waiting';
+}
+
+// ── GROQ API CALL ─────────────────────────────────────────────────────────────
+async function callGroq(systemPrompt, userText, retries, kind) {
+  const key = document.getElementById('apiKey').value.trim();
+  if (!key) throw new Error('No Groq API key. Get one free at console.groq.com');
+  const model = getModel(kind || 'text');
+  const attempts = retries || 4; // rate limits on the free tier need more retry room than errors do
+
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+key },
+        body: JSON.stringify({
+          model: model,
+          max_tokens: 1300,
+          temperature: 0.7,
+          messages: [
+            { role:'system', content: systemPrompt },
+            { role:'user', content: userText }
+          ]
+        })
+      });
+      if (!resp.ok) {
+        const err = await resp.json().catch(()=>({}));
+        const msg = (err.error && err.error.message) || ('API error '+resp.status);
+        if (resp.status === 429 && i < attempts-1) {
+          // Groq tells us exactly how long to wait, e.g. "Please try again in 2.9175s."
+          const m = msg.match(/try again in ([\d.]+)s/i);
+          const waitMs = m ? Math.ceil(parseFloat(m[1]) * 1000) + 600 : 4000 * (i+1);
+          log('Free-tier rate limit hit on '+model+' — waiting '+(waitMs/1000).toFixed(1)+'s and retrying…', 'info');
+          await new Promise(r=>setTimeout(r,waitMs));
+          continue;
+        }
+        throw new Error(msg);
+      }
+      const data = await resp.json();
+      return data.choices[0].message.content || '';
+    } catch(e) {
+      if (i === attempts-1) throw e;
+      await new Promise(r=>setTimeout(r,2000));
+    }
+  }
+}
+
+// ── GROQ VISION API CALL ──────────────────────────────────────────────────────
+async function callGroqVision(systemPrompt, textPart, imageParts) {
+  const key = document.getElementById('apiKey').value.trim();
+  if (!key) throw new Error('No Groq API key');
+  // Always use the vision-capable model for image content, regardless of the
+  // manually selected text model — images need a multimodal model to be seen at all.
+  const visionModel = getModel('vision');
+
+  const content = [];
+  if (textPart) content.push({ type:'text', text: textPart });
+  imageParts.forEach(ip => {
+    content.push({ type:'image_url', image_url:{ url:'data:'+ip.mediaType+';base64,'+ip.data } });
+  });
+
+  const attempts = 4;
+  for (let i = 0; i < attempts; i++) {
+    const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+key },
+      body: JSON.stringify({
+        model: visionModel,
+        max_tokens: 1100,
+        messages:[
+          { role:'system', content: systemPrompt },
+          { role:'user', content: content }
+        ]
+      })
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(()=>({}));
+      const msg = (err.error && err.error.message) || 'Vision API error '+resp.status;
+      if (resp.status === 429 && i < attempts-1) {
+        const m = msg.match(/try again in ([\d.]+)s/i);
+        const waitMs = m ? Math.ceil(parseFloat(m[1]) * 1000) + 600 : 4000 * (i+1);
+        log('Free-tier rate limit hit on '+visionModel+' — waiting '+(waitMs/1000).toFixed(1)+'s and retrying…', 'info');
+        await new Promise(r=>setTimeout(r,waitMs));
+        continue;
+      }
+      throw new Error(msg);
+    }
+    const data = await resp.json();
+    return data.choices[0].message.content || '';
+  }
+}
+
+// ── SIDEBAR EXPAND/COLLAPSE ──────────────────────────────────────────────────
+function toggleSidebarWidth() {
+  const wide = document.body.classList.toggle('sidebar-wide');
+  document.getElementById('sidebarToggleBtn').innerHTML = wide ? '⤡ Collapse' : '⤢ Expand';
+}
+
+// ── DOWNLOAD REPORT ───────────────────────────────────────────────────────────
+function downloadReport() {
+  if (!analysisResults || !analysisResults.synthesis) {
+    log('No completed analysis to download yet.', 'error');
+    return;
+  }
+  const now = new Date();
+  const stamp = now.toLocaleString();
+  const detected = detectContentType();
+
+  let md = '# Content Intelligence Studio — Full Report\n\n';
+  md += 'Generated: '+stamp+'\n';
+  md += 'Content detected: '+detected.label+'\n';
+  md += 'Models used: '+getModel('text')+(detected.hasImages ? ' + '+getModel('vision') : '')+'\n';
+  md += '\n---\n\n';
+
+  md += '## Final Synthesized Report\n\n'+(analysisResults.synthesis||'')+'\n\n';
+  md += '---\n\n';
+  md += '## Content Strategist Review\n\n'+(analysisResults.strategy||'')+'\n\n';
+  md += '## Technical Reviewer Review\n\n'+(analysisResults.technical||'')+'\n\n';
+  md += '## Hiring Manager Review\n\n'+(analysisResults.hiring||'')+'\n\n';
+  md += '## Platform Optimization\n\n'+(analysisResults.platform||'')+'\n\n';
+  if (analysisResults.visual) {
+    md += '## Visual Analysis\n\n'+analysisResults.visual+'\n\n';
+  }
+  md += '---\n\n_Generated by Content Intelligence Studio, powered by Groq. All scores and feedback are AI-generated estimates — use judgment alongside them._\n';
+
+  const blob = new Blob([md], { type:'text/markdown;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const fname = 'content-intelligence-report-'+now.toISOString().slice(0,10)+'.md';
+  a.href = url;
+  a.download = fname;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  log('Report downloaded as '+fname, 'success');
+}
+
+// ── FILE TO BASE64 ────────────────────────────────────────────────────────────
+function pause(ms) { return new Promise(r => setTimeout(r, ms)); }
+function fileToBase64(file) {
+  return new Promise((res,rej)=>{
+    const r = new FileReader();
+    r.onload = e => res(e.target.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+// ── BUILD TEXT PAYLOAD ────────────────────────────────────────────────────────
+async function buildTextPayload(extra) {
+  const textInput = document.getElementById('textInput').value.trim();
+  let parts = [];
+  for (const file of uploadedFiles) {
+    if (!file.type.startsWith('image/')) {
+      const txt = await file.text();
+      parts.push('File: '+file.name+'\n\n'+txt);
+    }
+  }
+  if (textInput) parts.push('Content to analyze:\n\n'+textInput);
+  if (extra) parts.push(extra);
+  if (parts.length === 0) parts.push('No text content provided. Please analyze what is described.');
+  return parts.join('\n\n---\n\n');
+}
+
+// ── CONTEXT ───────────────────────────────────────────────────────────────────
+function getCtx() {
+  const platforms = (activeChips.platform||['github','linkedin','portfolio']).join(', ');
+  const goals = (activeChips.goal||['credibility','jobs','showcase']).join(', ');
+  const mode = (activeChips.mode||['balanced'])[0];
+  return 'Platforms: '+platforms+'. Goals: '+goals+'. Tone: '+mode+', professional, senior hiring manager lens.';
+}
+
+// ── CLEAR ─────────────────────────────────────────────────────────────────────
+function clearAll() {
+  uploadedFiles = []; analysisResults = {};
+  document.getElementById('previewArea').innerHTML = '';
+  document.getElementById('textInput').value = '';
+  document.getElementById('logArea').innerHTML = '<div class="log-line">Studio reset.</div>';
+  document.getElementById('emptyState').style.display = 'flex';
+  document.getElementById('dashboardArea').style.display = 'none';
+  document.getElementById('dashboardArea').innerHTML = '';
+  for (let i=0;i<6;i++) setReviewer(i,'');
+  document.getElementById('fileInput').value = '';
+  document.getElementById('downloadBtn').style.display = 'none';
+}
+
+// ── MAIN ANALYSIS ─────────────────────────────────────────────────────────────
+async function startAnalysis() {
+  const key = document.getElementById('apiKey').value.trim();
+  if (!key) { alert('Enter your Groq API key first. Free at console.groq.com'); return; }
+  const textInput = document.getElementById('textInput').value.trim();
+  if (uploadedFiles.length === 0 && !textInput) { alert('Upload files or paste content first.'); return; }
+
+  const btn = document.getElementById('analyzeBtn');
+  btn.disabled = true; btn.textContent = '⏳ Analyzing…';
+  document.getElementById('emptyState').style.display = 'none';
+  const dash = document.getElementById('dashboardArea');
+  dash.style.display = 'block';
+  dash.innerHTML = '<div style="display:flex;flex-direction:column;gap:12px">'+Array(5).fill('<div class="skeleton" style="height:80px;border-radius:12px"></div>').join('')+'</div>';
+  for (let i=0;i<6;i++) setReviewer(i,'');
+
+  try {
+    const ctx = getCtx();
+    const detected = detectContentType();
+    const hasImages = detected.hasImages;
+    log('Starting Groq analysis pipeline…', 'info');
+    log('Detected content: '+detected.label, 'info');
+    log('Text/code model: '+getModel('text')+(hasImages?' · Vision model: '+getModel('vision'):''), 'info');
+
+    // ── STAGE 1: Content Strategist ──────────────────────────────────────────
+    setReviewer(0,'active');
+    log('Content Strategist reviewing…','info');
+    const base = await buildTextPayload('Context: '+ctx);
+    const r0 = await callGroq(
+      'You are a world-class senior content strategist with 15+ years in technical and professional content. Evaluate with precision. Write in plain text with clear section headings. Never use JSON or markdown code blocks.',
+      base + '\n\nProvide: Overall Score (write as "Overall Score: XX/100"), Clarity Score (XX/100), Engagement Score (XX/100), Structure Score (XX/100), Credibility Score (XX/100), Originality Score (XX/100). Then: Executive Summary, 3-5 Key Strengths, 3-5 Weaknesses, 3-5 Missed Opportunities. Be specific, professional, honest. Context: '+ctx,
+      null, 'light'
+    );
+    analysisResults.strategy = r0;
+    setReviewer(0,'done');
+    log('Content Strategist complete.','success');
+
+    // ── STAGE 2: Technical Reviewer ──────────────────────────────────────────
+    setReviewer(1,'active');
+    log('Technical Reviewer analyzing…','info');
+    await pause(1200); // small gap before the heavier model to ease TPM pressure
+    const r1 = await callGroq(
+      'You are a principal AI/ML engineer at a top tech company. Deep expertise in LLMs, GenAI, ML systems, software engineering. Honest expert-level feedback only. Plain text, clear headings. No JSON.',
+      base + '\n\nAs a senior technical reviewer: evaluate technical depth, accuracy, code quality if present, AI/ML terminology use, demonstration of real expertise, positioning for AI/GenAI engineering roles. Give Technical Score (write as "Technical Score: XX/100"). List technical strengths and gaps. Suggest precise improvements. Context: '+ctx,
+      null, 'code'
+    );
+    analysisResults.technical = r1;
+    setReviewer(1,'done');
+    log('Technical Reviewer complete.','success');
+
+    // ── STAGE 3: Hiring Manager ───────────────────────────────────────────────
+    setReviewer(2,'active');
+    log('Hiring Manager evaluating…','info');
+    await pause(1200);
+    const r2 = await callGroq(
+      'You are a senior engineering manager at a leading AI research lab who regularly evaluates candidates. You have hired dozens of AI/ML engineers. Direct, fair, very high standards. Plain text, clear headings. No JSON.',
+      base + '\n\nEvaluate as if you discovered this about a candidate. Rate Hireability Score (write as "Hireability Score: XX/100"). What signals does this send? What impresses you? Red flags? Specific changes to stand out for AI/ML roles? Be direct as you would be in private. Context: '+ctx,
+      null, detected.hasCode ? 'code' : 'text'
+    );
+    analysisResults.hiring = r2;
+    setReviewer(2,'done');
+    log('Hiring Manager evaluation complete.','success');
+
+    // ── STAGE 4: Platform Optimizer ───────────────────────────────────────────
+    setReviewer(3,'active');
+    log('Platform Optimizer working…','info');
+    const r3 = await callGroq(
+      'You are a platform growth specialist who has grown audiences to millions on LinkedIn, GitHub, and portfolio sites. You understand each platform deeply. Plain text, clear platform sections. No JSON.',
+      base + '\n\nFor EACH platform (GitHub, LinkedIn, Portfolio) separately: evaluate platform fit, recommend formatting changes, suggest improved hooks/titles, write optimized rewrite of opening section, give platform fit score (XX/100). Also provide a Publishing Checklist with items marked as PASS, WARN, or FAIL. Context: '+ctx,
+      null, 'light'
+    );
+    analysisResults.platform = r3;
+    setReviewer(3,'done');
+    log('Platform optimization complete.','success');
+
+    // ── STAGE 5: Visual Analyst ───────────────────────────────────────────────
+    setReviewer(4,'active');
+    log('Visual Analyst processing…','info');
+    let r4 = '';
+    if (hasImages) {
+      try {
+        const imageParts = [];
+        for (const file of uploadedFiles) {
+          if (file.type.startsWith('image/')) {
+            const b64 = await fileToBase64(file);
+            imageParts.push({ mediaType: file.type, data: b64 });
+          }
+        }
+        const textForVision = textInput ? 'Additional text context:\n'+textInput : 'Analyze the visual content provided.';
+        r4 = await callGroqVision(
+          'You are a senior UX designer and visual analyst with expertise in professional branding, portfolio design, and technical visual communication. Plain text only. No JSON.',
+          textForVision + '\n\nEvaluate all visual content. Rate Visual Score (write as "Visual Score: XX/100"). Comment on: composition, typography, color use, information hierarchy, professionalism, first impression, what a hiring manager would think. Suggest specific visual improvements. Context: '+ctx,
+          imageParts
+        );
+      } catch(ve) {
+        log('Vision API note: '+ve.message+'. Using text analysis fallback.','info');
+        r4 = await callGroq(
+          'You are a visual design and UX analyst. Plain text only.',
+          'Images were uploaded but could not be processed with the current model. Provide guidance on what makes strong visual content for GitHub, LinkedIn, and Portfolio for an AI/ML professional. Visual Score: 65/100 (estimated without image). Context: '+ctx
+        );
+      }
+    } else {
+      r4 = 'No images uploaded. Visual analysis skipped. Visual Score: N/A\n\nRecommendation: Add screenshots, project diagrams, architecture visuals, or a professional headshot to dramatically strengthen your GitHub README, LinkedIn profile, and portfolio. Visual content increases profile views by 3-5x on LinkedIn alone.';
+    }
+    analysisResults.visual = r4;
+    setReviewer(4,'done');
+    log('Visual analysis complete.','success');
+
+    // ── STAGE 6: Report Synthesizer ───────────────────────────────────────────
+    setReviewer(5,'active');
+    log('Synthesizing final report…','info');
+    await pause(1200);
+    const synthInput =
+      'CONTENT STRATEGY REVIEW:\n'+analysisResults.strategy+
+      '\n\nTECHNICAL REVIEW:\n'+analysisResults.technical+
+      '\n\nHIRING MANAGER REVIEW:\n'+analysisResults.hiring+
+      '\n\nPLATFORM OPTIMIZATION:\n'+analysisResults.platform+
+      '\n\nVISUAL ANALYSIS:\n'+analysisResults.visual+
+      '\n\nContext: '+ctx;
+
+    const r5 = await callGroq(
+      'You are a master content intelligence synthesizer. You produce actionable, comprehensive final reports for creators targeting AI/ML career growth. Direct, specific, genuinely helpful. Plain text, clear section headings. No JSON.',
+      synthInput + '\n\nProduce:\n1. EXECUTIVE SUMMARY (3-4 sentences, powerful and direct)\n2. CONTENT HEALTH REPORT (paragraph covering overall quality, positioning, readiness)\n3. TOP 5 HIGHEST-IMPACT IMPROVEMENTS (numbered, specific and actionable)\n4. BEFORE VS AFTER (write a key section "Before:" then improved "After:" version)\n5. PREDICTED PERFORMANCE POTENTIAL - clearly labeled as AI estimates: GitHub engagement, LinkedIn reach, Portfolio impression — rated Low/Medium/High with reason\n6. FURTHER OPTIMIZATION PROMPTS (6 specific questions the creator could ask an AI to go deeper, each ending with a question mark)\n\nBe honest, specific, and professional.',
+      null, detected.hasCode ? 'code' : 'text'
+    );
+    analysisResults.synthesis = r5;
+    setReviewer(5,'done');
+    log('Report synthesis complete.','success');
+    log('Full analysis pipeline done!','success');
+
+    renderDashboard();
+    document.getElementById('downloadBtn').style.display = 'inline-flex';
+
+  } catch(err) {
+    log('Error: '+err.message,'error');
+    for(let i=0;i<6;i++){
+      const el=document.getElementById('rev-'+i);
+      if(el && el.classList.contains('active')) setReviewer(i,'error');
+    }
+    const isRateLimit = /rate limit|tokens per minute|TPM/i.test(err.message);
+    const hint = isRateLimit
+      ? 'This is Groq\'s free-tier per-minute token limit, not a bug — it resets every 60 seconds. Wait about a minute and click Run Full Analysis again, or paste shorter content next time.'
+      : 'Check your Groq API key at console.groq.com and try again. Make sure the selected model is available on your plan.';
+    dash.innerHTML = '<div class="section" style="border-color:rgba(248,113,113,.3);background:rgba(248,113,113,.05)"><div style="color:var(--red);font-weight:600;margin-bottom:6px">Analysis Error</div><div style="font-size:12px;color:var(--text2)">'+err.message+'</div><div style="font-size:11px;color:var(--text3);margin-top:8px">'+hint+'</div></div>';
+  }
+
+  btn.disabled = false; btn.textContent = '✦ Run Full Analysis';
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function parseScore(text, label) {
+  const rx = new RegExp(label+'[:\\s]+([0-9]+)','i');
+  const m = text.match(rx);
+  return m ? Math.min(100,parseInt(m[1])) : null;
+}
+function scoreColor(s) {
+  return s >= 80 ? 'var(--green)' : s >= 60 ? 'var(--amber)' : 'var(--red)';
+}
+function extractSection(text, heading, stops) {
+  const lines = text.split('\n');
+  let cap = false, result = [];
+  for (const line of lines) {
+    const up = line.trim().toUpperCase();
+    if (!cap && up.includes(heading.toUpperCase())) { cap=true; continue; }
+    if (cap) {
+      if (stops.some(h => up.includes(h.toUpperCase()) && up.length < 80)) break;
+      result.push(line);
+    }
+  }
+  return result.join('\n').trim();
+}
+function extractListItems(text, keyword) {
+  const lines = text.split('\n');
+  let items=[], inSec=false;
+  for (const line of lines) {
+    if (line.toLowerCase().includes(keyword.toLowerCase())) { inSec=true; continue; }
+    if (inSec && line.trim() && /^(#{1,3}|\d+\.|[-•*])/.test(line.trim())) {
+      items.push(line.replace(/^[-•*\d.#\s]+/,'').trim());
+    }
+  }
+  return items.filter(Boolean).slice(0,6);
+}
+
+// ── RENDER DASHBOARD ──────────────────────────────────────────────────────────
+function renderDashboard() {
+  const dash = document.getElementById('dashboardArea');
+  const s = analysisResults;
+
+  const overallScore = parseScore(s.strategy,'Overall Score') || parseScore(s.strategy,'Overall') || 72;
+  const clarityScore = parseScore(s.strategy,'Clarity') || 70;
+  const engageScore  = parseScore(s.strategy,'Engagement') || 68;
+  const structScore  = parseScore(s.strategy,'Structure') || 74;
+  const credScore    = parseScore(s.strategy,'Credibility') || 71;
+  const origScore    = parseScore(s.strategy,'Originality') || 66;
+  const techScore    = parseScore(s.technical,'Technical Score') || 70;
+  const hireScore    = parseScore(s.hiring,'Hireability Score') || 69;
+  const visScore     = parseScore(s.visual,'Visual Score') || 65;
+
+  const circ = 2*Math.PI*40;
+  const dashArr = (overallScore/100)*circ;
+  const col = scoreColor(overallScore);
+
+  const cats = [
+    {name:'Clarity',    score:clarityScore, note:'How easy to understand'},
+    {name:'Engagement', score:engageScore,  note:'Hooks & retention'},
+    {name:'Structure',  score:structScore,  note:'Flow & organization'},
+    {name:'Credibility',score:credScore,    note:'Trust & authority signals'},
+    {name:'Originality',score:origScore,    note:'Unique voice & ideas'},
+    {name:'Technical',  score:techScore,    note:'Depth & accuracy'},
+    {name:'Hireability',score:hireScore,    note:'Job-readiness signal'},
+    {name:'Visual',     score:visScore,     note:'Design & presentation'},
+  ];
+
+  const synth = s.synthesis||'';
+  const execSummary   = extractSection(synth,'EXECUTIVE SUMMARY',   ['CONTENT HEALTH','TOP 5','BEFORE','PREDICTED','FURTHER']);
+  const healthReport  = extractSection(synth,'CONTENT HEALTH REPORT',['TOP 5','BEFORE','PREDICTED','FURTHER','EXECUTIVE']);
+  const topImprovements = extractSection(synth,'TOP 5 HIGHEST-IMPACT',['BEFORE','PREDICTED','FURTHER','EXECUTIVE','CONTENT HEALTH']);
+  const beforeAfter   = extractSection(synth,'BEFORE VS AFTER',     ['PREDICTED','FURTHER','EXECUTIVE','CONTENT HEALTH','TOP 5']);
+  const perfSection   = extractSection(synth,'PREDICTED PERFORMANCE',['FURTHER','EXECUTIVE','CONTENT HEALTH','TOP 5','BEFORE']);
+  const furtherSection= extractSection(synth,'FURTHER OPTIMIZATION', ['EXECUTIVE','CONTENT HEALTH','TOP 5','BEFORE','PREDICTED']);
+
+  const strengths  = extractListItems(s.strategy,'strength');
+  const weaknesses = extractListItems(s.strategy,'weakness');
+  const missed     = extractListItems(s.strategy,'missed') || extractListItems(s.strategy,'opportunit');
+
+  const platformRecs = {
+    github:    extractSection(s.platform,'GITHUB',   ['LINKEDIN','PORTFOLIO','PUBLISHING']),
+    linkedin:  extractSection(s.platform,'LINKEDIN', ['GITHUB','PORTFOLIO','PUBLISHING']),
+    portfolio: extractSection(s.platform,'PORTFOLIO',['GITHUB','LINKEDIN','PUBLISHING'])
+  };
+
+  const checklistLines = s.platform.split('\n').filter(l=>/PASS|WARN|FAIL/i.test(l));
+  const furtherPrompts = furtherSection.split('\n').filter(l=>l.trim().length>15&&/\?/.test(l)).slice(0,6);
+
+  dash.className='fade-in';
+  dash.innerHTML = `
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('overview')">Overview</div>
+    <div class="tab" onclick="switchTab('strategy')">Strategy</div>
+    <div class="tab" onclick="switchTab('technical')">Technical</div>
+    <div class="tab" onclick="switchTab('hiring')">Hiring Lens</div>
+    <div class="tab" onclick="switchTab('platforms')">Platforms</div>
+    <div class="tab" onclick="switchTab('report')">Full Report</div>
+  </div>
+
+  <div class="tab-panel active" id="tab-overview">
+    <div class="score-hero">
+      <div class="score-ring">
+        <svg width="96" height="96" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="40" fill="none" stroke="var(--border2)" stroke-width="8"/>
+          <circle cx="50" cy="50" r="40" fill="none" stroke="${col}" stroke-width="8"
+            stroke-dasharray="${dashArr.toFixed(1)} ${circ.toFixed(1)}" stroke-linecap="round"/>
+        </svg>
+        <div class="score-ring-text">
+          <div class="score-num" style="color:${col}">${overallScore}</div>
+          <div class="score-denom">/100</div>
+        </div>
+      </div>
+      <div class="score-meta">
+        <h2>Content Intelligence Score</h2>
+        <p>${execSummary || 'Analysis complete. Navigate tabs for detailed insights across strategy, technical depth, hiring potential, and platform fit.'}</p>
+        <div class="score-tags">
+          <span class="tag tag-blue">GitHub</span>
+          <span class="tag tag-purple">LinkedIn</span>
+          <span class="tag tag-green">Portfolio</span>
+          <span class="tag tag-amber">AI/ML Jobs</span>
+          <span class="tag ${overallScore>=75?'tag-green':overallScore>=55?'tag-amber':'tag-red'}">${overallScore>=75?'Strong':overallScore>=55?'Developing':'Needs Work'}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cat-grid">
+      ${cats.map(c=>`<div class="cat-card">
+        <div class="cat-name">${c.name}</div>
+        <div class="cat-score" style="color:${scoreColor(c.score)}">${c.score}<span style="font-size:12px;color:var(--text3);font-weight:400">/100</span></div>
+        <div class="cat-bar-bg"><div class="cat-bar" style="width:${c.score}%;background:${scoreColor(c.score)}"></div></div>
+        <div class="cat-note">${c.note}</div>
+      </div>`).join('')}
+    </div>
+
+    <div class="section">
+      <div class="sec-hdr"><div class="sec-icon" style="background:var(--green-bg)">✓</div><div class="sec-title">Strengths</div></div>
+      <div class="insight-list">
+        ${(strengths.length?strengths:['Analysis complete — see Strategy tab for detailed strengths.']).map(st=>`
+        <div class="insight-item" style="background:var(--green-bg);border-color:rgba(52,211,153,.15)">
+          <div class="i-dot" style="background:var(--green)"></div>
+          <div><div class="i-label" style="color:var(--green)">Strength</div><div class="i-text">${st}</div></div>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="sec-hdr"><div class="sec-icon" style="background:var(--red-bg)">✗</div><div class="sec-title">Weaknesses</div></div>
+      <div class="insight-list">
+        ${(weaknesses.length?weaknesses:['See Strategy tab for detailed weakness analysis.']).map(w=>`
+        <div class="insight-item" style="background:var(--red-bg);border-color:rgba(248,113,113,.15)">
+          <div class="i-dot" style="background:var(--red)"></div>
+          <div><div class="i-label" style="color:var(--red)">Weakness</div><div class="i-text">${w}</div></div>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="sec-hdr"><div class="sec-icon" style="background:var(--amber-bg)">◈</div><div class="sec-title">Missed Opportunities</div></div>
+      <div class="insight-list">
+        ${(missed.length?missed:['See Full Report tab for missed opportunities.']).map(m=>`
+        <div class="insight-item" style="background:var(--amber-bg);border-color:rgba(251,191,36,.15)">
+          <div class="i-dot" style="background:var(--amber)"></div>
+          <div><div class="i-label" style="color:var(--amber)">Opportunity</div><div class="i-text">${m}</div></div>
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-strategy">
+    <div class="exec-card">
+      <div class="exec-title">Content Strategy Analysis</div>
+      <div class="exec-body">${s.strategy}</div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-technical">
+    <div class="exec-card" style="background:linear-gradient(135deg,rgba(96,165,250,.08),rgba(52,211,153,.06));border-color:rgba(96,165,250,.3)">
+      <div class="exec-title" style="color:var(--blue)">Technical and AI/ML Review</div>
+      <div class="exec-body">${s.technical}</div>
+    </div>
+    <div class="section" style="margin-top:14px">
+      <div class="sec-hdr"><div class="sec-icon" style="background:var(--purple-bg)">◈</div><div class="sec-title">Visual Analysis</div></div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.7;white-space:pre-wrap">${s.visual}</div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-hiring">
+    <div class="exec-card" style="background:linear-gradient(135deg,rgba(192,132,252,.08),rgba(251,191,36,.06));border-color:rgba(192,132,252,.3)">
+      <div class="exec-title" style="color:var(--purple)">Senior Hiring Manager Lens</div>
+      <div class="exec-body">${s.hiring}</div>
+    </div>
+    <div class="section" style="margin-top:14px">
+      <div class="sec-hdr"><div class="sec-icon" style="background:var(--amber-bg)">⚡</div><div class="sec-title">Top 5 Highest-Impact Improvements</div></div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.8;white-space:pre-wrap">${topImprovements||'See Full Report tab for the synthesized improvement list.'}</div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-platforms">
+    <div style="display:grid;grid-template-columns:1fr;gap:14px">
+      ${['github','linkedin','portfolio'].map((p,i)=>{
+        const colors=['rgba(52,211,153','rgba(96,165,250','rgba(192,132,252'];
+        const icons=['⬡','in','◇'];
+        return `<div class="section" style="border-color:${colors[i]},0.2)">
+          <div class="sec-hdr">
+            <div class="sec-icon" style="background:${colors[i]},0.12);color:${colors[i]},0.9)">${icons[i]}</div>
+            <div class="sec-title">${p.charAt(0).toUpperCase()+p.slice(1)}</div>
+          </div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.7;white-space:pre-wrap">${platformRecs[p]||'See platform optimizer notes for '+p+' specific recommendations.'}</div>
+        </div>`;
+      }).join('')}
+      ${checklistLines.length?`<div class="section">
+        <div class="sec-hdr"><div class="sec-icon" style="background:var(--blue-bg)">☑</div><div class="sec-title">Publishing Checklist</div></div>
+        <div class="checklist">
+          ${checklistLines.map(line=>{
+            const isPASS=/PASS/i.test(line),isFAIL=/FAIL/i.test(line);
+            const cls=isPASS?'pass':isFAIL?'fail':'warn';
+            const mark=isPASS?'✓':isFAIL?'✗':'⚠';
+            const c2=isPASS?'var(--green)':isFAIL?'var(--red)':'var(--amber)';
+            const clean=line.replace(/PASS|FAIL|WARN/gi,'').replace(/[:\-]+/,'').trim();
+            return `<div class="check-item ${cls}"><span style="color:${c2};flex-shrink:0">${mark}</span><span>${clean}</span></div>`;
+          }).join('')}
+        </div>
+      </div>`:''}
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-report">
+    <div class="exec-card">
+      <div class="exec-title">Executive Summary</div>
+      <div class="exec-body">${execSummary||synth.slice(0,600)}</div>
+    </div>
+    <div class="section">
+      <div class="sec-hdr"><div class="sec-icon" style="background:var(--blue-bg)">♥</div><div class="sec-title">Content Health Report</div></div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-wrap">${healthReport||'See Strategy tab for full content health details.'}</div>
+    </div>
+    ${beforeAfter?`<div class="section">
+      <div class="sec-hdr"><div class="sec-icon" style="background:var(--amber-bg)">⇄</div><div class="sec-title">Before vs After</div></div>
+      <div class="compare-grid">
+        <div class="cmp-col">
+          <div class="cmp-hdr before-hdr">Before</div>
+          <div class="cmp-body before-body">${beforeAfter.split(/after:/i)[0]?.replace(/before:/i,'').trim()||beforeAfter.slice(0,Math.floor(beforeAfter.length/2))}</div>
+        </div>
+        <div class="cmp-col">
+          <div class="cmp-hdr after-hdr">After</div>
+          <div class="cmp-body after-body">${beforeAfter.split(/after:/i)[1]?.trim()||beforeAfter.slice(Math.floor(beforeAfter.length/2))}</div>
+        </div>
+      </div>
+    </div>`:''}
+    <div class="section">
+      <div class="sec-hdr"><div class="sec-icon" style="background:var(--green-bg)">▲</div><div class="sec-title">Predicted Performance Potential</div><div class="sec-sub">AI estimate only</div></div>
+      <div class="perf-grid">
+        <div class="perf-card">
+          <div class="perf-plat">GitHub</div>
+          <div class="perf-score" style="color:${scoreColor(techScore)}">${techScore>=80?'High':techScore>=60?'Medium':'Low'}</div>
+          <div class="perf-lbl">Star / Fork potential</div>
+          <div class="perf-note">Technical depth score: ${techScore}/100</div>
+        </div>
+        <div class="perf-card">
+          <div class="perf-plat">LinkedIn</div>
+          <div class="perf-score" style="color:${scoreColor(engageScore)}">${engageScore>=80?'High':engageScore>=60?'Medium':'Low'}</div>
+          <div class="perf-lbl">Reach and engagement</div>
+          <div class="perf-note">Engagement score: ${engageScore}/100</div>
+        </div>
+        <div class="perf-card">
+          <div class="perf-plat">Portfolio</div>
+          <div class="perf-score" style="color:${scoreColor(hireScore)}">${hireScore>=80?'High':hireScore>=60?'Medium':'Low'}</div>
+          <div class="perf-lbl">Impression strength</div>
+          <div class="perf-note">Hireability score: ${hireScore}/100</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.7;margin-top:12px;white-space:pre-wrap">${perfSection}</div>
+      <div class="ai-note">AI-generated estimates based on content quality signals — not actual platform data. Real performance depends on timing, network, and algorithms.</div>
+    </div>
+    ${furtherPrompts.length?`<div class="section">
+      <div class="sec-hdr"><div class="sec-icon" style="background:var(--purple-bg)">→</div><div class="sec-title">Go Deeper — Further Prompts</div></div>
+      <div class="prompt-grid">
+        ${furtherPrompts.map(p=>`<div class="prompt-chip" onclick="copyPrompt(this)">${p.replace(/^\d+\.\s*/,'')}</div>`).join('')}
+      </div>
+    </div>`:''}
+    <div class="section">
+      <div class="sec-hdr"><div class="sec-icon" style="background:var(--bg4)">≡</div><div class="sec-title">Raw Synthesized Report</div></div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.7;white-space:pre-wrap;max-height:400px;overflow-y:auto">${synth}</div>
+    </div>
+  </div>
+  `;
+
+  // Animate bars after render
+  setTimeout(()=>{
+    document.querySelectorAll('.cat-bar').forEach(bar=>{
+      const w = bar.style.width;
+      bar.style.width='0';
+      setTimeout(()=>{ bar.style.width=w; },50);
+    });
+  },100);
+}
+
+function switchTab(name) {
+  const panels=['overview','strategy','technical','hiring','platforms','report'];
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',panels[i]===name));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.id==='tab-'+name));
+}
+
+function copyPrompt(el) {
+  navigator.clipboard.writeText(el.textContent).catch(()=>{});
+  const orig=el.textContent; el.textContent='Copied!';
+  setTimeout(()=>el.textContent=orig,1200);
+}
+</script>
+</body>
+</html>
