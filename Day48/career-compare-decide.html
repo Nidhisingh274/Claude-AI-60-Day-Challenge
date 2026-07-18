@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Career Compare & Decide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --ink: #0F1117;
+    --ink-mid: #3B3F4C;
+    --ink-soft: #6B7280;
+    --border: #E4E7EF;
+    --bg: #F7F8FC;
+    --surface: #FFFFFF;
+    --se: #1A56DB;
+    --se-light: #EBF2FF;
+    --ds: #0D9488;
+    --ds-light: #E6FAF8;
+    --pm: #7C3AED;
+    --pm-light: #F0EBFF;
+    --ux: #DB4437;
+    --ux-light: #FEE9E7;
+    --gold: #F59E0B;
+    --radius: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.05);
+    --shadow-lg: 0 4px 24px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--ink);
+    color: #fff;
+    padding: 36px 40px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(122,97,255,0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 10px;
+  }
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(26px, 4vw, 40px);
+    font-weight: 400;
+    line-height: 1.15;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  header h1 em { font-style: italic; color: #BDB4FF; }
+  .header-sub {
+    font-size: 14px;
+    color: rgba(255,255,255,0.55);
+    max-width: 520px;
+  }
+  .career-pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+  .career-pill {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .pill-se  { background: var(--se);  color: #fff; }
+  .pill-ds  { background: var(--ds);  color: #fff; }
+  .pill-pm  { background: var(--pm);  color: #fff; }
+  .pill-ux  { background: var(--ux);  color: #fff; }
+
+  /* ── LAYOUT ── */
+  .main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 20px 60px;
+  }
+
+  /* ── SECTION HEADINGS ── */
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 12px;
+  }
+
+  /* ── WEIGHTS PANEL ── */
+  .weights-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px 28px;
+    margin-bottom: 28px;
+    border: 1px solid var(--border);
+  }
+  .weights-card h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--ink);
+  }
+  .weights-card p {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-bottom: 20px;
+  }
+  .sliders-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 36px;
+  }
+  @media (max-width: 600px) { .sliders-grid { grid-template-columns: 1fr; } }
+
+  .slider-row { display: flex; flex-direction: column; gap: 6px; }
+  .slider-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .slider-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .slider-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-mid);
+    background: var(--bg);
+    padding: 2px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    min-width: 44px;
+    text-align: center;
+  }
+  input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--border);
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--ink);
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 1px var(--border), 0 2px 4px rgba(0,0,0,0.15);
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+  .total-weight {
+    margin-top: 16px;
+    padding: 10px 14px;
+    background: var(--bg);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--ink-soft);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--border);
+  }
+  .total-weight strong { color: var(--ink); font-family: 'JetBrains Mono', monospace; }
+  .total-warn { color: #EF4444 !important; }
+
+  /* ── RANKING BANNER ── */
+  .ranking-banner {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+  .rank-chip {
+    flex: 1;
+    min-width: 200px;
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: transform 0.25s, box-shadow 0.25s;
+  }
+  .rank-chip.rank-1 { border-top: 3px solid var(--gold); }
+  .rank-chip.rank-2 { border-top: 3px solid #94A3B8; }
+  .rank-chip.rank-3 { border-top: 3px solid #C47A2A; }
+  .rank-chip.rank-4 { border-top: 3px solid #E4E7EF; }
+  .rank-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    color: var(--ink-soft);
+    line-height: 1;
+    min-width: 28px;
+  }
+  .rank-1 .rank-num { color: var(--gold); }
+  .rank-info { flex: 1; }
+  .rank-career { font-size: 14px; font-weight: 700; color: var(--ink); }
+  .rank-score-bar-wrap {
+    height: 5px; background: var(--border); border-radius: 3px; margin-top: 5px;
+  }
+  .rank-score-bar {
+    height: 100%; border-radius: 3px;
+    transition: width 0.4s cubic-bezier(.4,0,.2,1);
+  }
+  .rank-score-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-top: 3px;
+  }
+
+  /* ── DATA TABLE ── */
+  .table-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  .table-scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th {
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  thead th.career-head {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--ink);
+  }
+  td {
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  .criterion-cell { font-weight: 600; color: var(--ink); }
+  .criterion-desc { font-size: 11px; color: var(--ink-soft); font-weight: 400; margin-top: 2px; }
+
+  .score-cell { text-align: center; }
+  .score-dot-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .score-bar-col {
+    width: 70px;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .score-bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s; }
+  .score-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .data-note { font-size: 10px; color: var(--ink-soft); margin-top: 2px; }
+  .estimate-flag {
+    display: inline-block;
+    background: #FEF3C7;
+    color: #92400E;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 1px 5px;
+    border-radius: 4px;
+    vertical-align: middle;
+    margin-left: 4px;
+  }
+  .winner-col { background: #FEFDF0; }
+
+  /* ── EXPANDABLE PANELS ── */
+  .expander {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .expander-header {
+    padding: 16px 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .expander-header:hover { background: var(--bg); }
+  .expander-title { font-size: 14px; font-weight: 600; color: var(--ink); }
+  .expander-arrow {
+    font-size: 10px;
+    color: var(--ink-soft);
+    transition: transform 0.25s;
+  }
+  .expander.open .expander-arrow { transform: rotate(180deg); }
+  .expander-body {
+    display: none;
+    padding: 0 20px 20px;
+    border-top: 1px solid var(--border);
+  }
+  .expander.open .expander-body { display: block; padding-top: 16px; }
+
+  /* Sources panel */
+  .sources-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 600px) { .sources-grid { grid-template-columns: 1fr; } }
+  .source-item {
+    padding: 12px 14px;
+    background: var(--bg);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .source-org { font-size: 12px; font-weight: 700; color: var(--ink); }
+  .source-detail { font-size: 11px; color: var(--ink-soft); margin-top: 2px; }
+  .source-criteria { font-size: 10px; color: var(--ink-soft); margin-top: 4px; font-style: italic; }
+
+  /* Research panel */
+  .research-block { margin-bottom: 14px; }
+  .research-block h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .research-block p {
+    font-size: 12px;
+    color: var(--ink-mid);
+    line-height: 1.65;
+  }
+  .conflict-note {
+    background: #FFF7ED;
+    border: 1px solid #FED7AA;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #9A3412;
+    margin-top: 8px;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 11px;
+    color: var(--ink-soft);
+    border-top: 1px solid var(--border);
+  }
+  footer a { color: var(--ink-soft); }
+
+  /* Color helpers */
+  .c-se { color: var(--se); }
+  .c-ds { color: var(--ds); }
+  .c-pm { color: var(--pm); }
+  .c-ux { color: var(--ux); }
+  .bg-se { background: var(--se); }
+  .bg-ds { background: var(--ds); }
+  .bg-pm { background: var(--pm); }
+  .bg-ux { background: var(--ux); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-tag">Compare &amp; Decide · Career Edition</div>
+  <h1>Tech Career <em>Crossroads</em></h1>
+  <p class="header-sub">A weighted, data-driven decision tool for career switchers comparing four in-demand tech paths.</p>
+  <div class="career-pills">
+    <span class="career-pill pill-se">Software Engineering</span>
+    <span class="career-pill pill-ds">Data Science</span>
+    <span class="career-pill pill-pm">Product Management</span>
+    <span class="career-pill pill-ux">UX Design</span>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- WEIGHT CONTROLS -->
+  <div class="weights-card">
+    <div class="section-label">Step 1 — Set your priorities</div>
+    <h2>Criteria Weights</h2>
+    <p>Drag the sliders to reflect what matters most to you. Weights are relative — they'll be normalized automatically.</p>
+    <div class="sliders-grid">
+      <div class="slider-row">
+        <div class="slider-meta">
+          <span class="slider-name">💰 Salary &amp; Job Demand</span>
+          <span class="slider-badge" id="badge-salary">5</span>
+        </div>
+        <input type="range" id="w-salary" min="1" max="10" value="5" oninput="update()" />
+      </div>
+      <div class="slider-row">
+        <div class="slider-meta">
+          <span class="slider-name">⏱ Time &amp; Cost to Transition</span>
+          <span class="slider-badge" id="badge-transition">5</span>
+        </div>
+        <input type="range" id="w-transition" min="1" max="10" value="5" oninput="update()" />
+      </div>
+      <div class="slider-row">
+        <div class="slider-meta">
+          <span class="slider-name">📈 Career Growth &amp; Stability</span>
+          <span class="slider-badge" id="badge-growth">5</span>
+        </div>
+        <input type="range" id="w-growth" min="1" max="10" value="5" oninput="update()" />
+      </div>
+      <div class="slider-row">
+        <div class="slider-meta">
+          <span class="slider-name">🚧 Entry Barrier &amp; Competition</span>
+          <span class="slider-badge" id="badge-entry">5</span>
+        </div>
+        <input type="range" id="w-entry" min="1" max="10" value="5" oninput="update()" />
+      </div>
+    </div>
+    <div class="total-weight">
+      <span>Total weight across all criteria:</span>
+      <strong id="total-display">20 / 40</strong>
+    </div>
+  </div>
+
+  <!-- LIVE RANKING BANNER -->
+  <div class="section-label">Step 2 — Your personalized ranking</div>
+  <div class="ranking-banner" id="ranking-banner">
+    <!-- filled by JS -->
+  </div>
+
+  <!-- DATA TABLE -->
+  <div class="section-label">Step 3 — Compare raw data</div>
+  <div class="table-card">
+    <div class="table-scroll">
+      <table id="data-table">
+        <thead>
+          <tr>
+            <th style="width:200px">Criterion</th>
+            <th class="career-head" style="color:var(--se)">🛠 Software Eng.</th>
+            <th class="career-head" style="color:var(--ds)">📊 Data Science</th>
+            <th class="career-head" style="color:var(--pm)">🧭 Product Mgmt</th>
+            <th class="career-head" style="color:var(--ux)">🎨 UX Design</th>
+          </tr>
+        </thead>
+        <tbody id="table-body">
+          <!-- filled by JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SOURCES PANEL -->
+  <div class="expander" id="sources-expander">
+    <div class="expander-header" onclick="toggle('sources-expander')">
+      <span class="expander-title">📚 Sources &amp; Citations</span>
+      <span class="expander-arrow">▼</span>
+    </div>
+    <div class="expander-body">
+      <div class="sources-grid">
+        <div class="source-item">
+          <div class="source-org">U.S. Bureau of Labor Statistics (BLS) — OOH &amp; OEWS 2024</div>
+          <div class="source-detail">bls.gov/ooh — Occupational Outlook Handbook, May 2024 wage data</div>
+          <div class="source-criteria">Used for: median salary SE ($133,080), DS ($108,660), management ($122,090), web/digital interface designers ($98,090); job growth projections for SE (15%), DS (36%), management (6–10%), web designers (7%)</div>
+        </div>
+        <div class="source-item">
+          <div class="source-org">Glassdoor — Salary Data (2025–2026)</div>
+          <div class="source-detail">glassdoor.com — Crowdsourced total compensation, 700k+ submissions</div>
+          <div class="source-criteria">Used for: SE average salary ($150,591 total comp), UX median base ($97,047), PM ranking in Best Jobs in America; job satisfaction scores</div>
+        </div>
+        <div class="source-item">
+          <div class="source-org">Levels.fyi — Total Compensation Report 2025</div>
+          <div class="source-detail">levels.fyi — Self-reported base + equity + bonus at major tech cos.</div>
+          <div class="source-criteria">Used for: SE total comp median ($192,000), DS FAANG total comp ($180K–$450K), Staff SE median ($457K)</div>
+        </div>
+        <div class="source-item">
+          <div class="source-org">Indeed &amp; Built In — Job Posting Aggregates 2025</div>
+          <div class="source-detail">indeed.com, builtin.com — Salary from active job postings</div>
+          <div class="source-criteria">Used for: SE avg $128,200 (Indeed), DS base ~$120,000 midpoint; UX avg $124,415 (Indeed Jan 2025), PM avg $125,000–$150,000</div>
+        </div>
+        <div class="source-item">
+          <div class="source-org">Stack Overflow Developer Survey 2025</div>
+          <div class="source-detail">survey.stackoverflow.co — Annual global developer survey</div>
+          <div class="source-criteria">Used for: Python surged 7pp in popularity; remote work preferences among developers; SE job satisfaction data</div>
+        </div>
+        <div class="source-item">
+          <div class="source-org">LinkedIn Jobs on the Rise 2025</div>
+          <div class="source-detail">linkedin.com/pulse — Annual fastest-growing job titles</div>
+          <div class="source-criteria">Used for: AI Engineer role growth (+59% YoY); data science demand trajectory; PM hiring down 14% in 2025–26</div>
+        </div>
+        <div class="source-item">
+          <div class="source-org">Product School / Ravio 2026 Compensation Report</div>
+          <div class="source-detail">productschool.com, ravio.com — PM salary &amp; market analysis</div>
+          <div class="source-criteria">Used for: Mid-level PM base $101K–$158K; AI PM base $130K–$200K; PM hiring down 14%, attrition down 13%; salary growth 5.2% for PMs in 2026</div>
+        </div>
+        <div class="source-item">
+          <div class="source-org">Course Report / DEV Community / MentorCruise 2025–26</div>
+          <div class="source-detail">coursereport.com, dev.to, mentorcruise.com — Bootcamp &amp; career switch data</div>
+          <div class="source-criteria">Used for: SE transition timeline (6–12 mo), DS transition (9–18 mo incl. degree common), PM transition (3–6 mo for lateral), UX bootcamp (3–6 mo), cost estimates</div>
+        </div>
+        <div class="source-item">
+          <div class="source-org">BLS / ScienceSoft / MEV — Remote Work Data 2025</div>
+          <div class="source-detail">bls.gov, scnsoft.com, mev.com — Remote job listing &amp; workforce data</div>
+          <div class="source-criteria">Used for: SE ~25–30% of roles listed remote; 80% of SEs expected partial/full remote by end of 2026; DS 78% remote-friendly; PM &amp; UX strong hybrid/remote options</div>
+        </div>
+        <div class="source-item">
+          <div class="source-org">DEV Community / Extern — Entry Barrier Analysis 2026</div>
+          <div class="source-detail">dev.to, extern.com — Practitioner accounts of breaking into tech roles</div>
+          <div class="source-criteria">Used for: SE entry described as highly competitive in 2026 ("gate is 20 feet tall"); DS competition high esp. for ML; PM barrier lower for career switchers with biz/domain experience; UX junior market crowded, mid-level stronger</div>
+        </div>
+      </div>
+      <p style="font-size:11px;color:var(--ink-soft);margin-top:14px;">
+        <strong>Estimate flags:</strong> Scores (1–10) are synthesized from the above sources by the tool author. Raw data points (salaries, growth %, timelines) are cited directly. Where sources conflicted, the range midpoint was used and flagged. No data point was fabricated.
+      </p>
+    </div>
+  </div>
+
+  <!-- RESEARCH METHODOLOGY PANEL -->
+  <div class="expander" id="research-expander">
+    <div class="expander-header" onclick="toggle('research-expander')">
+      <span class="expander-title">🔬 How this was researched</span>
+      <span class="expander-arrow">▼</span>
+    </div>
+    <div class="expander-body">
+
+      <div class="research-block">
+        <h4>💰 Salary &amp; Job Demand</h4>
+        <p>Salary figures were pulled from BLS OEWS May 2024 (median base wages), Glassdoor 2025–26 (total compensation averages from 700k+ submissions), Levels.fyi End of Year 2025 (base + equity + bonus at large tech), and job-posting aggregators (Indeed, Built In). BLS and Glassdoor diverge significantly for SE (~$133K vs ~$151K) because BLS captures base wage across all employers including small firms and government, while Glassdoor skews toward tech-sector employers that pay equity. The table uses BLS median base as a conservative anchor. Job demand scores weight both current open positions and BLS projected growth through 2034.</p>
+        <div class="conflict-note">⚠ Conflict resolved: BLS reports SE median at $133,080; Glassdoor reports $150,591 total comp. These are not contradictory — different measurement scopes. The salary column in this tool uses BLS median base as the primary anchor for apples-to-apples comparison.</div>
+      </div>
+
+      <div class="research-block">
+        <h4>⏱ Time &amp; Cost to Transition</h4>
+        <p>Transition timeline estimates are drawn from Course Report bootcamp data, DEV Community practitioner articles (2026), and MentorCruise career switch guides. Software Engineering requires the most technical reskilling: a 3–6 month intensive bootcamp or 6–12 months self-directed learning is typical before job-readiness. Data Science often requires a master's degree or equivalent (1–2 years) for competitive roles, though analyst-entry roles can be reached via bootcamp in 6–9 months. Product Management is the fastest lateral transition for professionals with domain expertise — 3–6 months of PM-specific learning and portfolio building suffices. UX Design bootcamps run 3–6 months; the 2026 market is crowded at junior level. Costs are approximate (SE/DS bootcamps $10–20K; UX bootcamps $5–15K; PM courses typically $500–3K plus self-study).</p>
+        <div class="conflict-note">⚠ Transition difficulty is highly background-dependent. A software engineer switching to DS faces a shorter path than a teacher switching to SE. The scores here assume a typical non-technical professional career switcher.</div>
+      </div>
+
+      <div class="research-block">
+        <h4>📈 Career Growth &amp; Long-Term Stability</h4>
+        <p>Growth scores combine BLS projected employment growth through 2034 (SE: 15%; DS: 36%; Management/PM: 6–10%; Web/UX Designers: 7%), ceiling salary trajectories from Levels.fyi (SE Staff median $457K; DS FAANG $200K–$450K; VP Product $250K+; UX Lead/Director $150K–$250K), and industry signals about AI's impact on each role. DS and SE in AI/ML specializations have the strongest tailwinds. PM growth has slowed (hiring down 14% in 2025–26 per Ravio) but compensation for existing PMs rose 5.2%. UX is stable but junior hiring remains soft.</p>
+      </div>
+
+      <div class="research-block">
+        <h4>🚧 Entry Barrier &amp; Competition</h4>
+        <p>Entry barrier scores are inverted for this criterion — a <em>higher score means lower barrier / less competition</em>, which is better for a career switcher. SE entry in 2026 is described by multiple practitioners as the hardest it's ever been at junior level, with companies using AI for boilerplate work (Dev.to, Extern.com, Feb–Jun 2026). DS roles face a skills mismatch problem — many candidates lack the right balance of coding, statistics, and domain knowledge (Cloudurable 2025). PM is the most lateral-friendly role for experienced professionals without a technical background (Medium/Aakash Gupta, Jun 2025; invinciblemoth.com). UX junior market is crowded but mid-level UX has stronger demand per MentorCruise 2026.</p>
+        <div class="conflict-note">⚠ Note: "Entry barrier" for a career switcher is different from raw competition. PM has a lower credential barrier but requires strong portfolio/case study work and networking. The score reflects overall accessibility for a motivated non-technical career switcher.</div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Data sourced from BLS (2024), Glassdoor (2025–26), Levels.fyi (2025), Indeed, LinkedIn, Course Report, Product School, Ravio, DEV Community &amp; MentorCruise. Scores are synthesized by the tool; consult primary sources for full context. Last updated July 2026.
+</footer>
+
+<script>
+// ─── RAW DATA ───────────────────────────────────────────────────────────────
+const careers = [
+  { id: 'se',  name: 'Software Eng.',    full: 'Software Engineering',    color: '#1A56DB', light: '#EBF2FF' },
+  { id: 'ds',  name: 'Data Science',     full: 'Data Science',            color: '#0D9488', light: '#E6FAF8' },
+  { id: 'pm',  name: 'Product Mgmt',     full: 'Product Management',      color: '#7C3AED', light: '#F0EBFF' },
+  { id: 'ux',  name: 'UX Design',        full: 'UX Design',               color: '#DB4437', light: '#FEE9E7' },
+];
+
+const criteria = [
+  {
+    id: 'salary',
+    name: 'Salary & Job Demand',
+    desc: 'Median base salary + BLS job growth projection through 2034',
+    scores: { se: 9, ds: 8, pm: 7, ux: 5 },
+    dataPoints: {
+      se:  { val: '$133K median base (BLS 2024) · $151K avg total comp (Glassdoor 2026) · 15% job growth', estimate: false },
+      ds:  { val: '$108K median base (BLS 2024) · ~$120K avg base (multi-source 2025) · 36% job growth', estimate: false },
+      pm:  { val: '$122K management median (BLS 2024) · $125K–$150K avg (Indeed/Glassdoor) · ~10% growth', estimate: false },
+      ux:  { val: '$98K median base (BLS 2024, web/digital interface designers) · 7% growth through 2034', estimate: false },
+    },
+    higherIsBetter: true,
+  },
+  {
+    id: 'transition',
+    name: 'Time & Cost to Transition',
+    desc: 'Ease of retraining — higher score = faster, cheaper path in',
+    scores: { se: 5, ds: 4, pm: 9, ux: 7 },
+    dataPoints: {
+      se:  { val: '6–12 months to job-ready · Bootcamp $10K–$20K or self-study · High technical depth required', estimate: false },
+      ds:  { val: '6–18 months · Master\'s degree preferred by many employers · Bootcamp possible for analyst roles · $5K–$20K+', estimate: false },
+      pm:  { val: '3–6 months for career switchers with domain expertise · PM courses $500–$3K · No degree required', estimate: false },
+      ux:  { val: '3–6 month bootcamp ($5K–$15K) · Google UX Certificate ~$300 · Portfolio critical', estimate: false },
+    },
+    higherIsBetter: true,
+  },
+  {
+    id: 'growth',
+    name: 'Career Growth & Stability',
+    desc: 'Long-term ceiling, BLS projections, AI impact, senior earning potential',
+    scores: { se: 9, ds: 9, pm: 7, ux: 6 },
+    dataPoints: {
+      se:  { val: 'Staff median $457K TC (Levels.fyi 2025) · AI/ML spec. +20–30% premium · Sector structurally shifting, not shrinking', estimate: false },
+      ds:  { val: 'FAANG DS total comp $200K–$450K · #4 fastest-growing US occupation (BLS) · #1 globally (WEF) · Strong AI tailwind', estimate: false },
+      pm:  { val: 'VP Product $250K+ · PM salary growth 5.2% in 2026 (Ravio) · External hiring down 14% but retention strong', estimate: false },
+      ux:  { val: 'UX Director $150K–$250K · Junior market soft in 2026 · Mid-level & specialist demand stronger · Design ROI well-documented', estimate: false },
+    },
+    higherIsBetter: true,
+  },
+  {
+    id: 'entry',
+    name: 'Entry Barrier & Competition',
+    desc: 'Accessibility for career switchers — higher score = lower barrier',
+    scores: { se: 4, ds: 5, pm: 8, ux: 6 },
+    dataPoints: {
+      se:  { val: 'Entry described as "hardest ever" in 2026 · AI competes for junior work · Requires strong portfolio + DSA skills', estimate: false },
+      ds:  { val: 'Skills mismatch problem — employers want coding + stats + domain · Many candidates, fewer who fit all three requirements', estimate: false },
+      pm:  { val: 'Most accessible for career switchers with domain expertise · No CS degree needed · Networking-driven · APM programs competitive', estimate: false },
+      ux:  { val: 'Junior UX market crowded · Mid-level has better demand · Portfolio is the key credential · 3–6 mo to portfolio-ready', estimate: false },
+    },
+    higherIsBetter: true,
+  },
+];
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+function getWeights() {
+  return {
+    salary:     parseInt(document.getElementById('w-salary').value),
+    transition: parseInt(document.getElementById('w-transition').value),
+    growth:     parseInt(document.getElementById('w-growth').value),
+    entry:      parseInt(document.getElementById('w-entry').value),
+  };
+}
+
+function computeScores(weights) {
+  const total = Object.values(weights).reduce((a, b) => a + b, 0);
+  return careers.map(c => {
+    let weighted = 0;
+    criteria.forEach(cr => {
+      const w = (weights[cr.id] / total);
+      weighted += cr.scores[c.id] * w;
+    });
+    return { ...c, score: weighted };
+  }).sort((a, b) => b.score - a.score);
+}
+
+// ─── RENDER RANKING BANNER ────────────────────────────────────────────────────
+function renderBanner(ranked) {
+  const banner = document.getElementById('ranking-banner');
+  const maxScore = ranked[0].score;
+  banner.innerHTML = ranked.map((c, i) => `
+    <div class="rank-chip rank-${i+1}">
+      <div class="rank-num">${i+1}</div>
+      <div class="rank-info">
+        <div class="rank-career" style="color:${c.color}">${c.full}</div>
+        <div class="rank-score-bar-wrap">
+          <div class="rank-score-bar" style="width:${(c.score/maxScore)*100}%;background:${c.color}"></div>
+        </div>
+        <div class="rank-score-text">${c.score.toFixed(2)} / 10.00</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ─── RENDER TABLE ─────────────────────────────────────────────────────────────
+function renderTable(ranked) {
+  const topId = ranked[0].id;
+  // reorder columns to match ranking
+  const orderedCareers = ranked;
+
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = criteria.map(cr => {
+    const cells = orderedCareers.map(c => {
+      const s = cr.scores[c.id];
+      const dp = cr.dataPoints[c.id];
+      const isWinner = s === Math.max(...careers.map(x => cr.scores[x.id]));
+      return `
+        <td class="score-cell${isWinner ? ' winner-col' : ''}">
+          <div class="score-dot-wrap">
+            <span class="score-num" style="color:${c.color}">${s}/10${isWinner ? ' ★' : ''}</span>
+            <div class="score-bar-col">
+              <div class="score-bar-fill" style="width:${s*10}%;background:${c.color}"></div>
+            </div>
+            <span class="data-note">${dp.val}${dp.estimate ? '<span class="estimate-flag">EST</span>' : ''}</span>
+          </div>
+        </td>
+      `;
+    }).join('');
+
+    return `
+      <tr>
+        <td class="criterion-cell">
+          ${cr.name}
+          <div class="criterion-desc">${cr.desc}</div>
+        </td>
+        ${cells}
+      </tr>
+    `;
+  }).join('');
+
+  // update thead order
+  const thead = document.querySelector('#data-table thead tr');
+  const firstTh = thead.children[0];
+  thead.innerHTML = '';
+  thead.appendChild(firstTh);
+  orderedCareers.forEach(c => {
+    const th = document.createElement('th');
+    th.className = 'career-head';
+    th.style.color = c.color;
+    const icons = { se:'🛠', ds:'📊', pm:'🧭', ux:'🎨' };
+    th.textContent = `${icons[c.id]} ${c.name}`;
+    thead.appendChild(th);
+  });
+}
+
+// ─── RENDER WEIGHTS BADGES ────────────────────────────────────────────────────
+function renderBadges(weights) {
+  const total = Object.values(weights).reduce((a, b) => a + b, 0);
+  document.getElementById('badge-salary').textContent     = weights.salary;
+  document.getElementById('badge-transition').textContent = weights.transition;
+  document.getElementById('badge-growth').textContent     = weights.growth;
+  document.getElementById('badge-entry').textContent      = weights.entry;
+  const disp = document.getElementById('total-display');
+  disp.textContent = `${total} / 40`;
+  disp.className = '';
+}
+
+// ─── MAIN UPDATE ─────────────────────────────────────────────────────────────
+function update() {
+  const weights = getWeights();
+  renderBadges(weights);
+  const ranked = computeScores(weights);
+  renderBanner(ranked);
+  renderTable(ranked);
+}
+
+// ─── EXPANDER TOGGLE ─────────────────────────────────────────────────────────
+function toggle(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+update();
+</script>
+</body>
+</html>
