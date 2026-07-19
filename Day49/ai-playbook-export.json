@@ -1,0 +1,265 @@
+{
+  "workflows": [
+    {
+      "id": "wf_mrrf28h88u7rl",
+      "favorite": false,
+      "createdAt": 1784442618476,
+      "title": "Custom loop",
+      "category": "automation",
+      "desc": "Built with Loop Builder",
+      "template": "TASK TO LOOP ON:\nWrite an \"LLM-as-a-Judge\" evaluation prompt for a RAG pipeline. The judge must evaluate an AI's answer against retrieved context for \"Contextual Faithfulness\" (hallucination detection) and output a strict JSON with {\"score\": 1-5, \"reasoning\": \"...\", \"hallucinated_spans\": []}.\n\nWhen working on this, run the following loop:\n\n## GOAL\nSimulate 3 complex RAG test cases: 1. A perfectly faithful answer. 2. A subtle hallucination (mixing real retrieved facts with fake numbers). 3. An answer that ignores the context entirely. Run your drafted Judge prompt against these 3 cases. Iterate and patch the Judge prompt's instructions until it correctly identifies the subtle hallucination without false positives and returns 100% valid JSON.\n\n## EVALUATION CRITERIA\n- All tests pass\n- No linter or type errors\n\n## IMPROVEMENT STRATEGY\nFix one failing check at a time, smallest change first.\n\n## STOP CONDITIONS\n- All evaluation criteria are met\n- No improvement for 2 consecutive iterations\n- Maximum of 5 iterations reached\n\n## SAFETY RULES\n- Never delete or overwrite files without explicit confirmation\n- Stop and report if stuck, rather than guessing indefinitely\n- Never fabricate test results — always show actual output",
+      "example": "",
+      "practices": [],
+      "tags": [
+        "loop-builder"
+      ],
+      "updatedAt": 1784442618476
+    },
+    {
+      "id": "wf_seed_0",
+      "title": "Root Cause Debugger",
+      "category": "debug",
+      "desc": "Systematically trace a bug to its actual cause before proposing a fix.",
+      "template": "You are a methodical debugging partner. I have a bug in my {{language_or_stack}} code.\n\nSymptom: {{symptom}}\nWhat I expected: {{expected_behavior}}\nRelevant code / error output:\n{{code_or_error}}\n\nWalk through this step by step:\n1. List the most likely causes, ranked by probability.\n2. Identify what evidence would confirm or rule out each one.\n3. Ask me for any missing information before guessing.\n4. Only propose a fix once the root cause is confirmed, not just the symptom.\nKeep the fix minimal and isolated to the actual cause.",
+      "example": "Filled with \"Node.js / Express\", a 500 error on file upload, and a stack trace — produces a ranked list of 3 likely causes before any fix is suggested.",
+      "practices": [
+        "State the expected behavior, not just the error — it narrows the search fast",
+        "Paste the actual stack trace or logs, not a paraphrase",
+        "Ask the AI to rank causes before jumping to a fix"
+      ],
+      "tags": [
+        "debugging",
+        "root-cause",
+        "backend"
+      ],
+      "favorite": false,
+      "createdAt": 1784438179130,
+      "updatedAt": 1784438413398
+    },
+    {
+      "id": "wf_seed_1",
+      "title": "Error Trace Interpreter",
+      "category": "debug",
+      "desc": "Turn a dense stack trace or log dump into a plain-language explanation and next steps.",
+      "template": "Act as a senior engineer reading this error trace for the first time.\n\nStack trace / log output:\n{{trace}}\n\nEnvironment: {{environment}}\n\n1. Explain in plain language what actually failed and where.\n2. Identify the single most likely trigger line in my code (not library internals).\n3. List 2-3 concrete things to check next, in order.\nDo not suggest a fix until the trigger is identified.",
+      "example": "Paste a Python traceback + \"Django 5, Postgres\" — get a plain-language explanation of the failing line and 3 things to check.",
+      "practices": [
+        "Include the full trace, not just the last line",
+        "Mention framework + version — error meanings shift between versions"
+      ],
+      "tags": [
+        "debugging",
+        "logs",
+        "stack-trace"
+      ],
+      "favorite": false,
+      "createdAt": 1784438178130,
+      "updatedAt": 1784438178130
+    },
+    {
+      "id": "wf_seed_2",
+      "title": "Structured Code Review",
+      "category": "review",
+      "desc": "Get a thorough, standards-based review instead of a vague \"looks good\".",
+      "template": "You are a strict but fair code reviewer. Review the following {{language}} code for:\n- Correctness and edge cases\n- Security issues\n- Readability and naming\n- Performance concerns (only if material)\n\nCode:\n{{code}}\n\nConstraints: {{constraints}}\n\nOutput format: a numbered list of issues, each with severity (blocker / suggestion / nit), the line it applies to, and a one-line fix. End with a short overall verdict.",
+      "example": "Paste a PR diff with \"no new dependencies\" as a constraint — get issues tagged blocker/suggestion/nit with line references.",
+      "practices": [
+        "Ask for severity tags so you know what to fix before merging",
+        "State constraints (style guide, no new deps) up front so suggestions stay usable"
+      ],
+      "tags": [
+        "review",
+        "quality",
+        "standards"
+      ],
+      "favorite": false,
+      "createdAt": 1784438177130,
+      "updatedAt": 1784438177130
+    },
+    {
+      "id": "wf_seed_3",
+      "title": "Refactor Proposal",
+      "category": "review",
+      "desc": "Get a concrete refactor plan with tradeoffs, not just rewritten code.",
+      "template": "You are refactoring the following {{language}} code for {{goal}} (e.g. readability, testability, performance).\n\nCode:\n{{code}}\n\nConstraints: {{constraints}}\n\n1. Identify the 2-3 biggest structural issues.\n2. Propose a refactor plan as discrete, independently-shippable steps.\n3. For each step, note the risk level and what could break.\n4. Only show full rewritten code for the first step; describe the rest.",
+      "example": "A 200-line function with \"improve testability\" as the goal — returns a 3-step plan with risk notes, code only for step one.",
+      "practices": [
+        "Ask for a plan before a full rewrite — big diffs are hard to review safely",
+        "Request risk levels per step so you can stop after the safe ones"
+      ],
+      "tags": [
+        "refactor",
+        "architecture",
+        "review"
+      ],
+      "favorite": false,
+      "createdAt": 1784438176130,
+      "updatedAt": 1784438176130
+    },
+    {
+      "id": "wf_seed_4",
+      "title": "System Design Doc Draft",
+      "category": "architecture",
+      "desc": "Turn a rough feature idea into a structured design doc skeleton.",
+      "template": "Act as a systems architect. Draft a design doc for: {{feature_name}}\n\nContext: {{context}}\nRequirements: {{requirements}}\nNon-goals: {{non_goals}}\n\nStructure the doc with: Problem statement, Proposed approach, Alternatives considered (with tradeoffs), Data model / API sketch, Risks & open questions. Keep each section under 150 words — this is a first draft to react to, not a final spec.",
+      "example": "Feature: \"rate limiting for public API\" — returns a short doc with 2 alternatives (token bucket vs sliding window) and their tradeoffs.",
+      "practices": [
+        "List non-goals explicitly — it stops the AI from over-scoping the design",
+        "Ask for alternatives with tradeoffs, not just one proposed approach"
+      ],
+      "tags": [
+        "architecture",
+        "design-doc",
+        "planning"
+      ],
+      "favorite": false,
+      "createdAt": 1784438175130,
+      "updatedAt": 1784438175130
+    },
+    {
+      "id": "wf_seed_5",
+      "title": "Tradeoff Analysis (ADR)",
+      "category": "architecture",
+      "desc": "Compare technical options in Architecture Decision Record format.",
+      "template": "Help me write an Architecture Decision Record comparing these options for {{decision_topic}}:\nOptions: {{options}}\n\nContext / constraints: {{context}}\n\nFor each option, cover: how it works here, pros, cons, and long-term maintenance cost. End with a recommendation and the specific conditions under which you'd choose differently.",
+      "example": "\"Postgres vs DynamoDB for this service\" — returns a pros/cons table and a recommendation tied to the stated read/write pattern.",
+      "practices": [
+        "Name the real constraint (team size, existing infra) — it changes the right answer",
+        "Ask for the conditions that would flip the recommendation, not just one answer"
+      ],
+      "tags": [
+        "architecture",
+        "decision",
+        "adr"
+      ],
+      "favorite": false,
+      "createdAt": 1784438174130,
+      "updatedAt": 1784438174130
+    },
+    {
+      "id": "wf_seed_6",
+      "title": "Script Generator",
+      "category": "automation",
+      "desc": "Generate a small, safe automation script with explicit guardrails.",
+      "template": "Write a {{language}} script that {{task}}.\n\nInput: {{input_description}}\nOutput: {{output_description}}\nEnvironment: {{environment}}\n\nRequirements:\n- Handle the obvious failure cases (missing files, empty input, etc.) explicitly\n- No destructive operations (delete/overwrite) without a --dry-run flag first\n- Add brief comments explaining non-obvious steps\nKeep it to a single file unless I ask otherwise.",
+      "example": "\"Bash script that renames files matching a pattern\" — returns a script with a --dry-run flag and explicit error handling.",
+      "practices": [
+        "Always ask for a dry-run mode on anything that touches files",
+        "Describe input/output shape precisely — vague specs produce scripts you have to rewrite"
+      ],
+      "tags": [
+        "automation",
+        "scripting",
+        "tooling"
+      ],
+      "favorite": false,
+      "createdAt": 1784438173130,
+      "updatedAt": 1784438173130
+    },
+    {
+      "id": "wf_seed_7",
+      "title": "Repetitive Task Automator",
+      "category": "automation",
+      "desc": "Turn a manual, repeated task into a reusable tool or snippet.",
+      "template": "I do this manually and want to automate it: {{task_description}}\n\nFrequency: {{frequency}}\nCurrent manual steps: {{manual_steps}}\nConstraints: {{constraints}}\n\nPropose the simplest automation that removes the manual steps (script, alias, config, or tool — your choice). Explain why you picked that approach over the alternatives, then give the implementation.",
+      "example": "\"Manually formatting PR descriptions from commit messages, daily\" — returns a git alias or small script plus a one-line reason it beats a full app.",
+      "practices": [
+        "Mention frequency — daily tasks justify more setup than monthly ones",
+        "Let the AI pick the automation type; over-specifying the format wastes its judgment"
+      ],
+      "tags": [
+        "automation",
+        "productivity",
+        "tooling"
+      ],
+      "favorite": false,
+      "createdAt": 1784438172131,
+      "updatedAt": 1784438172131
+    },
+    {
+      "id": "wf_seed_8",
+      "title": "New Framework Onboarding",
+      "category": "learning",
+      "desc": "Get a fast, practical ramp-up on an unfamiliar framework or tool.",
+      "template": "I'm an experienced {{background}} developer learning {{framework}} for the first time.\n\nGoal: {{goal}} (e.g. ship a small feature, pass a review, evaluate for adoption)\nTime available: {{time_available}}\n\nGive me: the 5 core concepts I actually need (skip the rest), one thing that trips up people from my background specifically, and a minimal working example I can run today.",
+      "example": "\"React developer learning Svelte, to evaluate for adoption, 2 hours\" — returns 5 core concepts and one React-specific gotcha.",
+      "practices": [
+        "Name your existing background — it lets the AI skip what you already know",
+        "Set a time budget so the answer matches how deep you can actually go today"
+      ],
+      "tags": [
+        "learning",
+        "framework",
+        "onboarding"
+      ],
+      "favorite": false,
+      "createdAt": 1784438171131,
+      "updatedAt": 1784438171131
+    },
+    {
+      "id": "wf_seed_9",
+      "title": "Concept Deep Dive",
+      "category": "learning",
+      "desc": "Understand a specific technical concept at the right depth, with a check for understanding.",
+      "template": "Explain {{concept}} to me at a {{depth}} level (e.g. intuition only / working knowledge / implementation detail).\n\nWhy I need it: {{context}}\n\nStructure: a one-paragraph intuitive explanation, then the mechanics, then one realistic example from my context above. End with 2 questions to check whether I actually understood it.",
+      "example": "\"Explain event loop, working knowledge, because I keep hitting race conditions in Node\" — returns intuition, mechanics, a Node-specific example, and 2 check questions.",
+      "practices": [
+        "Specify depth explicitly — \"explain X\" alone often returns either too shallow or too academic",
+        "State why you need it so the example lands in your actual context"
+      ],
+      "tags": [
+        "learning",
+        "concepts",
+        "deep-dive"
+      ],
+      "favorite": false,
+      "createdAt": 1784438170131,
+      "updatedAt": 1784438170131
+    },
+    {
+      "id": "wf_seed_10",
+      "title": "Context Capsule for Tool Switch",
+      "category": "handoff",
+      "desc": "Carry full context when moving a task from one AI tool to another, without retyping everything.",
+      "template": "Summarize this conversation/task as a portable context capsule I can paste into another AI tool.\n\nInclude:\n- The overall goal\n- Key decisions already made and why\n- Current state / what's been tried\n- What's still unresolved\n- Any constraints that must carry over\n\nKeep it under 200 words and written so a different AI model can pick up the task with no other context.",
+      "example": "Used at the end of a long Claude debugging session to hand the exact state off to ChatGPT or Copilot without losing decisions already made.",
+      "practices": [
+        "Run this before switching tools, not after — it captures state while it's fresh",
+        "Ask for constraints explicitly; they're the thing most often lost in translation between tools"
+      ],
+      "tags": [
+        "handoff",
+        "context",
+        "multi-tool"
+      ],
+      "favorite": false,
+      "createdAt": 1784438169131,
+      "updatedAt": 1784438169131
+    },
+    {
+      "id": "wf_seed_11",
+      "title": "Session Handoff Summary",
+      "category": "handoff",
+      "desc": "Close out a work session with a summary your future self (or another tool) can resume from instantly.",
+      "template": "Write a handoff summary for this session on {{task_name}}.\n\nStructure:\n- Status: {{status}} (e.g. blocked, in progress, done pending review)\n- What was completed\n- What remains, in priority order\n- Any open questions or decisions needed from me\n- The exact next action to take when I resume\n\nWrite it for someone with zero memory of this session.",
+      "example": "End-of-day summary for a migration task — next session opens with a precise \"next action\" instead of re-reading the whole thread.",
+      "practices": [
+        "Write this at the end of every focus block, not just end of day",
+        "Always request an explicit \"next action\" line — it's the highest-value part"
+      ],
+      "tags": [
+        "handoff",
+        "context",
+        "focus"
+      ],
+      "favorite": false,
+      "createdAt": 1784438168131,
+      "updatedAt": 1784438168131
+    }
+  ],
+  "settings": {
+    "theme": "dark",
+    "defaultModel": "Mixed: Claude + ChatGPT"
+  },
+  "exportedAt": "2026-07-19T13:36:08.976Z"
+}
