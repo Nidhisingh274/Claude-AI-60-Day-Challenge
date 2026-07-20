@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Defend Your Experience</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<style>
+/* ============================================================
+   TOKEN SYSTEM
+   Concept: the interrogation room. A single lamp over the desk,
+   a case file, a recorder that never quite sits still.
+   ============================================================ */
+:root{
+  --bg: #0a0c0f;
+  --bg-elevated: #121519;
+  --surface: #191d23;
+  --surface-hover: #21262e;
+  --border: rgba(236,234,227,0.07);
+  --border-strong: rgba(236,234,227,0.16);
+  --text: #ECEAE3;
+  --text-muted: #979aa3;
+  --text-faint: #575b64;
+  --amber: #E8A33D;
+  --amber-soft: rgba(232,163,61,0.16);
+  --amber-glow: rgba(232,163,61,0.4);
+  --red: #E15D46;
+  --red-soft: rgba(225,93,70,0.14);
+  --green: #4CB47C;
+  --green-soft: rgba(76,180,124,0.14);
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+  --radius: 14px;
+  --radius-sm: 8px;
+  --ease: cubic-bezier(.22,1,.36,1);
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    radial-gradient(ellipse 900px 500px at 50% -10%, rgba(232,163,61,0.07), transparent 60%),
+    var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important;}
+}
+::selection{background:var(--amber-soft); color:var(--amber);}
+button{font-family:inherit;}
+textarea, input{font-family:inherit; color:var(--text);}
+a{color:var(--amber);}
+:focus-visible{outline:2px solid var(--amber); outline-offset:2px; border-radius:4px;}
+::-webkit-scrollbar{width:10px; height:10px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border-strong); border-radius:8px;}
+
+/* ---------- Shell ---------- */
+#app{max-width:1240px; margin:0 auto; padding:0 24px 80px;}
+
+.topbar{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:22px 0; border-bottom:1px solid var(--border);
+  margin-bottom:0;
+}
+.brand{display:flex; align-items:center; gap:10px;}
+.brand-mark{
+  width:30px; height:30px; border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #ffd98a, var(--amber) 55%, #8a5c1c 100%);
+  box-shadow:0 0 18px var(--amber-glow);
+  flex-shrink:0;
+}
+.brand-text{font-family:var(--font-mono); font-size:12.5px; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-muted);}
+.brand-text b{color:var(--text); font-weight:600;}
+.nav-actions{display:flex; gap:10px; align-items:center;}
+.icon-btn{
+  background:transparent; border:1px solid var(--border-strong); color:var(--text-muted);
+  border-radius:var(--radius-sm); padding:8px 14px; font-size:12.5px; cursor:pointer;
+  font-family:var(--font-mono); letter-spacing:0.03em; transition:all .18s var(--ease);
+}
+.icon-btn:hover{color:var(--text); border-color:var(--text-muted); background:var(--surface);}
+
+.view{display:none; animation:viewIn .5s var(--ease);}
+.view.active{display:block;}
+@keyframes viewIn{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+
+/* ---------- Landing ---------- */
+.hero{
+  padding:96px 0 56px; text-align:left; max-width:760px;
+}
+.hero-eyebrow{
+  font-family:var(--font-mono); font-size:12.5px; letter-spacing:0.16em; text-transform:uppercase;
+  color:var(--amber); margin-bottom:22px; display:flex; align-items:center; gap:10px;
+}
+.hero-eyebrow::before{content:''; width:20px; height:1px; background:var(--amber);}
+.hero h1{
+  font-family:var(--font-display); font-weight:600; font-size:clamp(40px,6vw,68px);
+  line-height:1.04; margin:0 0 22px; letter-spacing:-0.01em;
+}
+.hero h1 em{font-style:italic; font-weight:400; color:var(--amber);}
+.hero p{font-size:17.5px; line-height:1.65; color:var(--text-muted); max-width:560px; margin:0 0 40px;}
+.hero-actions{display:flex; gap:14px; flex-wrap:wrap;}
+
+.btn{
+  font-family:var(--font-body); font-weight:600; font-size:14.5px; padding:14px 26px;
+  border-radius:999px; border:1px solid transparent; cursor:pointer; transition:all .2s var(--ease);
+  display:inline-flex; align-items:center; gap:8px;
+}
+.btn-primary{background:var(--amber); color:#1a1206; box-shadow:0 0 0 0 rgba(232,163,61,0); }
+.btn-primary:hover{transform:translateY(-1px); box-shadow:0 8px 24px -6px var(--amber-glow);}
+.btn-primary:disabled{opacity:.5; cursor:not-allowed; transform:none; box-shadow:none;}
+.btn-ghost{background:transparent; border-color:var(--border-strong); color:var(--text);}
+.btn-ghost:hover{border-color:var(--text-muted); background:var(--surface);}
+.btn-sm{padding:9px 16px; font-size:13px;}
+.btn-danger-outline{background:transparent; border-color:rgba(225,93,70,0.4); color:var(--red);}
+.btn-danger-outline:hover{background:var(--red-soft);}
+
+.how-it-works{
+  display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border);
+  border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-top:24px;
+}
+.how-card{background:var(--bg-elevated); padding:26px 24px;}
+.how-card .tag{font-family:var(--font-mono); font-size:11.5px; color:var(--text-faint); letter-spacing:0.1em;}
+.how-card h3{font-family:var(--font-display); font-size:19px; font-weight:600; margin:10px 0 8px;}
+.how-card p{font-size:13.8px; color:var(--text-muted); line-height:1.55; margin:0;}
+
+/* ---------- Upload ---------- */
+.stage{max-width:760px; margin:64px auto 0;}
+.stage-eyebrow{font-family:var(--font-mono); font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-faint); margin-bottom:10px;}
+.stage h2{font-family:var(--font-display); font-size:32px; font-weight:600; margin:0 0 10px;}
+.stage-sub{color:var(--text-muted); font-size:15px; line-height:1.6; margin:0 0 34px; max-width:560px;}
+
+.dropzone{
+  border:1.5px dashed var(--border-strong); border-radius:var(--radius); padding:44px 28px;
+  text-align:center; transition:all .2s var(--ease); cursor:pointer; background:var(--bg-elevated);
+}
+.dropzone.drag{border-color:var(--amber); background:var(--amber-soft);}
+.dropzone svg{opacity:.5; margin-bottom:14px;}
+.dropzone p{margin:4px 0; color:var(--text-muted); font-size:14px;}
+.dropzone .file-hint{font-family:var(--font-mono); font-size:11.5px; color:var(--text-faint); margin-top:8px;}
+.dropzone .filename{color:var(--amber); font-weight:600;}
+
+.divider-or{display:flex; align-items:center; gap:14px; margin:26px 0; color:var(--text-faint); font-family:var(--font-mono); font-size:11.5px; letter-spacing:0.1em;}
+.divider-or::before, .divider-or::after{content:''; flex:1; height:1px; background:var(--border);}
+
+textarea.paste-box{
+  width:100%; min-height:160px; background:var(--bg-elevated); border:1px solid var(--border-strong);
+  border-radius:var(--radius-sm); color:var(--text); padding:16px; font-size:14.5px; line-height:1.6;
+  resize:vertical; transition:border-color .15s;
+}
+textarea.paste-box:focus{border-color:var(--amber);}
+
+.audience-select{margin-top:34px;}
+.audience-select label.group-label{display:block; font-family:var(--font-mono); font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-faint); margin-bottom:12px;}
+.audience-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px;}
+.audience-opt{
+  border:1px solid var(--border-strong); border-radius:var(--radius-sm); padding:14px 16px; cursor:pointer;
+  background:var(--bg-elevated); transition:all .15s var(--ease);
+}
+.audience-opt:hover{border-color:var(--text-muted);}
+.audience-opt.selected{border-color:var(--amber); background:var(--amber-soft);}
+.audience-opt .a-title{font-weight:600; font-size:14px; margin-bottom:3px;}
+.audience-opt .a-desc{font-size:12.5px; color:var(--text-muted); line-height:1.4;}
+
+.stage-footer{margin-top:34px; display:flex; align-items:center; gap:16px;}
+
+/* ---------- Loading ---------- */
+.loading-block{text-align:center; padding:90px 20px;}
+.lamp{
+  width:70px; height:70px; margin:0 auto 26px; border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #ffe3ab, var(--amber) 60%, #6b430f 100%);
+  box-shadow:0 0 50px 10px var(--amber-glow);
+  animation:pulseLamp 1.8s ease-in-out infinite;
+}
+@keyframes pulseLamp{0%,100%{transform:scale(1); box-shadow:0 0 40px 8px var(--amber-glow);} 50%{transform:scale(1.08); box-shadow:0 0 60px 16px var(--amber-glow);}}
+.loading-block p{font-family:var(--font-mono); font-size:13px; color:var(--text-muted); letter-spacing:0.02em;}
+
+/* ---------- Error banner ---------- */
+.error-banner{
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  background:var(--red-soft); border:1px solid rgba(225,93,70,0.35); color:#ffb8a8;
+  padding:14px 18px; border-radius:var(--radius-sm); font-size:13.5px; margin:20px 0;
+}
+.error-banner .msg{line-height:1.5;}
+.error-banner .msg b{display:block; color:var(--red); font-family:var(--font-mono); font-size:11.5px; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:4px;}
+
+/* ---------- Interview layout ---------- */
+.interview-shell{display:grid; grid-template-columns:1fr 320px; gap:26px; margin-top:28px; align-items:start;}
+@media (max-width:920px){.interview-shell{grid-template-columns:1fr;}}
+
+.session-header{
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;
+  padding:16px 0 22px;
+}
+.session-header .left{display:flex; align-items:center; gap:14px;}
+.session-title{font-family:var(--font-display); font-size:22px; font-weight:600;}
+.mode-pill{
+  font-family:var(--font-mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase;
+  padding:5px 11px; border-radius:999px; border:1px solid var(--border-strong); color:var(--text-muted);
+}
+.progress-track{
+  height:5px; background:var(--surface); border-radius:99px; overflow:hidden; margin-top:6px; width:220px;
+}
+.progress-fill{height:100%; background:linear-gradient(90deg, var(--red), var(--amber), var(--green)); border-radius:99px; transition:width .5s var(--ease);}
+
+/* spotlight card */
+.spotlight-wrap{position:relative;}
+.spotlight-glow{
+  position:absolute; top:-60px; left:50%; transform:translateX(-50%); width:520px; height:220px;
+  background:radial-gradient(ellipse at top, var(--amber-glow), transparent 70%); opacity:.5; pointer-events:none; filter:blur(10px);
+}
+.spotlight-card{
+  position:relative; background:linear-gradient(180deg, var(--bg-elevated), var(--surface));
+  border:1px solid var(--border-strong); border-radius:var(--radius); padding:30px 30px 26px;
+  box-shadow:0 30px 60px -30px rgba(0,0,0,0.6);
+}
+.claim-tag{
+  font-family:var(--font-mono); font-size:11px; letter-spacing:0.06em; color:var(--amber);
+  background:var(--amber-soft); display:inline-block; padding:5px 11px; border-radius:999px; margin-bottom:16px;
+}
+.q-number{font-family:var(--font-mono); font-size:11.5px; color:var(--text-faint); margin-bottom:8px;}
+.question-text{font-family:var(--font-display); font-size:23px; line-height:1.4; font-weight:500; margin:0 0 22px;}
+
+canvas#polygraphCanvas{width:100%; height:44px; display:block; margin-bottom:18px; opacity:.85;}
+
+textarea.answer-box{
+  width:100%; min-height:120px; background:var(--bg); border:1px solid var(--border-strong);
+  border-radius:var(--radius-sm); color:var(--text); padding:15px; font-size:14.5px; line-height:1.6;
+  resize:vertical; transition:border-color .15s;
+}
+textarea.answer-box:focus{border-color:var(--amber);}
+.answer-actions{display:flex; align-items:center; justify-content:space-between; margin-top:14px; gap:12px; flex-wrap:wrap;}
+.char-hint{font-family:var(--font-mono); font-size:11.5px; color:var(--text-faint);}
+
+.scoring-flash{
+  margin-top:18px; padding:14px 16px; border-radius:var(--radius-sm); border:1px solid var(--border-strong);
+  background:var(--bg); animation:flashIn .4s var(--ease);
+}
+@keyframes flashIn{from{opacity:0; transform:translateY(-6px);} to{opacity:1; transform:translateY(0);}}
+.scoring-flash .sf-top{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
+.verdict-badge{font-family:var(--font-mono); font-size:11px; letter-spacing:0.06em; text-transform:uppercase; padding:3px 10px; border-radius:999px;}
+.verdict-well-defended{background:var(--green-soft); color:var(--green);}
+.verdict-needs-evidence{background:var(--amber-soft); color:var(--amber);}
+.verdict-vague{background:var(--amber-soft); color:var(--amber);}
+.verdict-inconsistent{background:var(--red-soft); color:var(--red);}
+.scoring-flash p{font-size:13.5px; color:var(--text-muted); line-height:1.5; margin:0;}
+
+/* transcript */
+.transcript{margin-top:34px;}
+.transcript h3{font-family:var(--font-mono); font-size:11.5px; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-faint); margin:0 0 16px;}
+.t-entry{padding:16px 0; border-top:1px solid var(--border);}
+.t-entry:first-child{border-top:none;}
+.t-q{font-size:14px; color:var(--text-muted); margin-bottom:8px; display:flex; gap:10px;}
+.t-q .who{font-family:var(--font-mono); font-size:10.5px; color:var(--text-faint); text-transform:uppercase; flex-shrink:0; padding-top:2px;}
+.t-a{font-size:14px; color:var(--text); margin-bottom:8px; padding-left:24px;}
+.t-a .who{font-family:var(--font-mono); font-size:10.5px; color:var(--amber); text-transform:uppercase;}
+
+/* sidebar case file */
+.case-file{
+  background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius); padding:22px 20px;
+  position:sticky; top:20px;
+}
+.case-file h3{font-family:var(--font-mono); font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-faint); margin:0 0 4px;}
+.case-file .cf-sub{font-size:12px; color:var(--text-faint); margin:0 0 18px;}
+.claim-row{padding:12px 0; border-top:1px solid var(--border); cursor:default;}
+.claim-row:first-of-type{border-top:none;}
+.claim-row .c-text{font-size:13px; line-height:1.4; margin-bottom:8px; color:var(--text);}
+.claim-row .c-meta{display:flex; align-items:center; gap:8px; margin-bottom:6px;}
+.c-cat{font-family:var(--font-mono); font-size:10px; letter-spacing:0.04em; color:var(--text-faint); text-transform:uppercase;}
+.c-bar-track{height:5px; background:var(--surface); border-radius:99px; overflow:hidden;}
+.c-bar-fill{height:100%; border-radius:99px; transition:width .6s var(--ease), background .4s;}
+.c-score{font-family:var(--font-mono); font-size:10.5px; color:var(--text-faint); margin-top:4px;}
+.c-untested{opacity:.55;}
+
+.end-session-btn{width:100%; margin-top:18px;}
+
+/* ---------- Report ---------- */
+.report-hero{text-align:center; padding:60px 0 30px;}
+.report-hero .re-eyebrow{font-family:var(--font-mono); font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-faint); margin-bottom:14px;}
+.gauge-wrap{width:180px; height:180px; margin:0 auto 20px; position:relative;}
+.gauge-score{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;}
+.gauge-score .num{font-family:var(--font-display); font-size:48px; font-weight:700;}
+.gauge-score .lbl{font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.1em; color:var(--text-faint); text-transform:uppercase; margin-top:2px;}
+.report-summary{max-width:600px; margin:0 auto; color:var(--text-muted); font-size:15.5px; line-height:1.65;}
+
+.priorities{max-width:700px; margin:36px auto 0; display:grid; gap:10px;}
+.priority-item{
+  display:flex; gap:14px; align-items:flex-start; background:var(--bg-elevated); border:1px solid var(--border);
+  border-radius:var(--radius-sm); padding:16px 18px;
+}
+.priority-item .p-num{font-family:var(--font-mono); color:var(--amber); font-size:13px; flex-shrink:0; padding-top:1px;}
+.priority-item p{margin:0; font-size:14px; line-height:1.55;}
+
+.report-claims{max-width:800px; margin:48px auto 0;}
+.report-claims h3{font-family:var(--font-mono); font-size:11.5px; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-faint); margin:0 0 18px; text-align:center;}
+.report-claim-card{
+  background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius-sm);
+  padding:18px 20px; margin-bottom:12px;
+}
+.rc-top{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:8px; flex-wrap:wrap;}
+.rc-claim-text{font-size:14.5px; font-weight:500; max-width:75%;}
+.rc-rec{font-size:13.5px; color:var(--text-muted); line-height:1.55; margin:8px 0 0;}
+
+.closing-note{
+  max-width:600px; margin:44px auto 0; text-align:center; font-family:var(--font-display); font-style:italic;
+  font-size:18px; line-height:1.6; color:var(--amber); padding:0 20px;
+}
+.report-actions{display:flex; justify-content:center; gap:12px; margin-top:44px; flex-wrap:wrap;}
+
+/* ---------- History ---------- */
+.history-list{max-width:760px; margin:40px auto 0; display:grid; gap:12px;}
+.history-item{
+  background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius-sm);
+  padding:18px 20px; display:flex; align-items:center; justify-content:space-between; gap:16px; cursor:pointer;
+  transition:border-color .15s;
+}
+.history-item:hover{border-color:var(--border-strong);}
+.hi-left .hi-title{font-weight:600; font-size:14.5px; margin-bottom:4px;}
+.hi-left .hi-meta{font-family:var(--font-mono); font-size:11.5px; color:var(--text-faint);}
+.hi-score{font-family:var(--font-mono); font-size:20px; font-weight:600;}
+
+.empty-state{text-align:center; padding:80px 20px; color:var(--text-muted);}
+.empty-state svg{opacity:.35; margin-bottom:18px;}
+.empty-state p{font-size:14.5px; max-width:340px; margin:0 auto;}
+
+.footer-note{text-align:center; margin-top:70px; font-family:var(--font-mono); font-size:11px; color:var(--text-faint); letter-spacing:0.04em;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-text"><b>DEFEND</b> YOUR EXPERIENCE</div>
+    </div>
+    <div class="nav-actions" id="navActions"></div>
+  </div>
+
+  <!-- LANDING -->
+  <section class="view" id="view-landing">
+    <div class="hero">
+      <div class="hero-eyebrow">Mock cross-examination</div>
+      <h1>Anyone can write<br>a claim. <em>Can you<br>defend it?</em></h1>
+      <p>Upload the story you tell about yourself — resume, LinkedIn, portfolio, research, performance review, startup pitch. This isn't a resume reviewer. It's a skeptical interviewer who reads every line and asks: prove it.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary" id="btnStart">Start a case file</button>
+        <button class="btn btn-ghost" id="btnHistoryLanding" style="display:none;">View past sessions</button>
+      </div>
+    </div>
+    <div class="how-it-works">
+      <div class="how-card">
+        <div class="tag">THE FILE</div>
+        <h3>Extract the claims</h3>
+        <p>Every achievement, number, and responsibility in your document becomes something you'll need to stand behind under questioning.</p>
+      </div>
+      <div class="how-card">
+        <div class="tag">THE INTERROGATION</div>
+        <h3>Adaptive follow-ups</h3>
+        <p>Each answer shapes the next question. Vague or unverified claims get pressed harder — exactly like a real interviewer would.</p>
+      </div>
+      <div class="how-card">
+        <div class="tag">THE VERDICT</div>
+        <h3>A defense report</h3>
+        <p>Walk away knowing exactly which stories are airtight, which need evidence, and how to fix them before the real thing.</p>
+      </div>
+    </div>
+    <div class="footer-note">NO DATA LEAVES THIS SESSION UNLESS YOU EXPORT IT · POWERED BY GROQ · RUNS ENTIRELY IN THIS DOCUMENT</div>
+  </section>
+
+  <!-- UPLOAD -->
+  <section class="view" id="view-upload">
+    <div class="stage">
+      <div class="stage-eyebrow">Step 1 of 2</div>
+      <h2>Open the case file</h2>
+      <p class="stage-sub">Drop in a document, or paste the text directly. Plain text works best (.txt, .md) — for PDFs or Word docs, open them and paste the text below.</p>
+
+      <div class="dropzone" id="dropzone">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#ECEAE3" stroke-width="1.4"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+        <p id="dropzoneText">Drag a file here, or click to browse</p>
+        <div class="file-hint">.txt · .md · .pdf · .docx</div>
+        <input type="file" id="fileInput" accept=".txt,.md,.rtf,.pdf,.doc,.docx" style="display:none;">
+      </div>
+
+      <div class="divider-or">OR PASTE TEXT</div>
+      <textarea class="paste-box" id="pasteBox" placeholder="Paste your resume, LinkedIn about section, project write-up, research abstract, performance review — anything describing what you did and what you achieved."></textarea>
+
+      <div class="audience-select">
+        <label class="group-label">Who are you preparing to face?</label>
+        <div class="audience-grid" id="audienceGrid">
+          <div class="audience-opt" data-mode="technical">
+            <div class="a-title">Technical interviewer</div>
+            <div class="a-desc">Digs into depth, tradeoffs, and what you'd do differently.</div>
+          </div>
+          <div class="audience-opt" data-mode="hiring">
+            <div class="a-title">Hiring manager</div>
+            <div class="a-desc">Tests judgment, ownership, and impact on the team.</div>
+          </div>
+          <div class="audience-opt" data-mode="hr">
+            <div class="a-title">HR / recruiter</div>
+            <div class="a-desc">Probes consistency, motivation, and behavior.</div>
+          </div>
+          <div class="audience-opt selected" data-mode="panel">
+            <div class="a-title">Full panel — all angles</div>
+            <div class="a-desc">Rotates between technical, managerial, and behavioral pressure.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="audience-select" style="margin-top:28px;">
+        <label class="group-label" for="groqKeyInput">Groq API Key</label>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <input
+            type="password"
+            id="groqKeyInput"
+            placeholder="gsk_..."
+            autocomplete="off"
+            spellcheck="false"
+            style="flex:1; background:var(--bg-elevated); border:1px solid var(--border-strong); border-radius:var(--radius-sm); color:var(--text); padding:12px 14px; font-size:14px; font-family:var(--font-mono); letter-spacing:0.04em; transition:border-color .15s;"
+            oninput="this.style.borderColor = this.value.startsWith('gsk_') ? 'var(--green)' : this.value.length > 0 ? 'var(--red)' : 'var(--border-strong)'"
+            onfocus="this.style.borderColor='var(--amber)'"
+            onblur="this.style.borderColor = this.value.startsWith('gsk_') ? 'var(--green)' : this.value.length > 0 ? 'var(--red)' : 'var(--border-strong)'"
+          >
+          <button class="icon-btn" onclick="document.getElementById('groqKeyInput').type = document.getElementById('groqKeyInput').type==='password'?'text':'password'; this.textContent = document.getElementById('groqKeyInput').type==='password'?'Show':'Hide';" style="flex-shrink:0;">Show</button>
+        </div>
+        <p style="font-family:var(--font-mono); font-size:11px; color:var(--text-faint); margin:8px 0 0; line-height:1.6;">
+          Free key from <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a> — key stays in your browser, never sent anywhere else.
+        </p>
+      </div>
+
+      <div id="uploadError"></div>
+
+      <div class="stage-footer">
+        <button class="btn btn-primary" id="btnBuildCase">Build my case file</button>
+        <button class="btn btn-ghost" id="btnBackLanding">Back</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOADING (claims extraction) -->
+  <section class="view" id="view-extracting">
+    <div class="loading-block">
+      <div class="lamp"></div>
+      <p id="extractingLabel">READING THE FILE…</p>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section class="view" id="view-interview">
+    <div class="session-header">
+      <div class="left">
+        <div>
+          <div class="session-title">Cross-Examination</div>
+          <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%;"></div></div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span class="mode-pill" id="modePill">PANEL</span>
+        <button class="btn btn-sm btn-danger-outline" id="btnEndSession">End &amp; get report</button>
+      </div>
+    </div>
+
+    <div id="interviewError"></div>
+
+    <div class="interview-shell">
+      <div>
+        <div class="spotlight-wrap">
+          <div class="spotlight-glow"></div>
+          <div class="spotlight-card">
+            <div class="claim-tag" id="claimTag">Re: opening statement</div>
+            <div class="q-number" id="qNumber">QUESTION 1</div>
+            <div class="question-text" id="questionText">—</div>
+            <canvas id="polygraphCanvas"></canvas>
+            <textarea class="answer-box" id="answerBox" placeholder="Answer as you would in the room. Be specific — numbers, decisions, names of tools, what went wrong."></textarea>
+            <div class="answer-actions">
+              <span class="char-hint" id="charHint">0 characters</span>
+              <div style="display:flex; gap:10px;">
+                <button class="btn btn-ghost btn-sm" id="btnSkip">Skip this one</button>
+                <button class="btn btn-primary btn-sm" id="btnSubmitAnswer">Submit answer</button>
+              </div>
+            </div>
+            <div id="scoringSlot"></div>
+          </div>
+        </div>
+
+        <div class="transcript" id="transcript" style="display:none;">
+          <h3>Transcript</h3>
+          <div id="transcriptList"></div>
+        </div>
+      </div>
+
+      <div class="case-file">
+        <h3>Case file</h3>
+        <p class="cf-sub" id="cfSub">Claims extracted from your document</p>
+        <div id="claimsList"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REPORT -->
+  <section class="view" id="view-report">
+    <div class="report-hero">
+      <div class="re-eyebrow">Defense report</div>
+      <div class="gauge-wrap">
+        <svg viewBox="0 0 180 180" width="180" height="180">
+          <circle cx="90" cy="90" r="78" fill="none" stroke="var(--surface)" stroke-width="12"/>
+          <circle id="gaugeArc" cx="90" cy="90" r="78" fill="none" stroke="var(--amber)" stroke-width="12" stroke-linecap="round" stroke-dasharray="490" stroke-dashoffset="490" transform="rotate(-90 90 90)"/>
+        </svg>
+        <div class="gauge-score">
+          <div class="num" id="gaugeNum">0</div>
+          <div class="lbl">Readiness</div>
+        </div>
+      </div>
+      <p class="report-summary" id="reportSummary"></p>
+    </div>
+
+    <div class="priorities" id="priorityList"></div>
+
+    <div class="report-claims">
+      <h3>Claim by claim</h3>
+      <div id="reportClaims"></div>
+    </div>
+
+    <p class="closing-note" id="closingNote"></p>
+
+    <div class="report-actions">
+      <button class="btn btn-primary" id="btnExportMd">Export as Markdown</button>
+      <button class="btn btn-ghost" id="btnPrint">Print report</button>
+      <button class="btn btn-ghost" id="btnNewSession">Start a new case</button>
+    </div>
+  </section>
+
+  <!-- HISTORY -->
+  <section class="view" id="view-history">
+    <div class="stage" style="max-width:760px;">
+      <div class="stage-eyebrow">Session history</div>
+      <h2>Past cases</h2>
+      <p class="stage-sub">Every completed session is saved locally in this browser.</p>
+    </div>
+    <div id="historyContent"></div>
+  </section>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = {
+  view: 'landing',
+  audienceMode: 'panel',
+  resumeText: '',
+  claims: [],           // {id,text,category,riskLevel,confidence(null|0-100),verdict,questionsAsked,feedback[]}
+  transcript: [],        // {q, a, claimId, scoring}
+  currentQuestion: null, // {claimId, text}
+  qCount: 0,
+  sessionId: null,
+  startedAt: null,
+  report: null,
+  targetAmplitude: 6,
+  groqApiKey: null,
+};
+
+if(window.pdfjsLib){
+  try{ pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"; }catch(e){}
+}
+
+const AUDIENCE_LABEL = { technical:'TECHNICAL', hiring:'HIRING MANAGER', hr:'HR / RECRUITER', panel:'PANEL' };
+const AUDIENCE_PERSONA = {
+  technical: "You are a sharp technical interviewer. You dig into architecture, technical depth, tradeoffs made, what alternatives were considered, and what the candidate would do differently with hindsight. You are unimpressed by buzzwords and want mechanism, not outcome.",
+  hiring: "You are a hiring manager evaluating whether you'd trust this person with real ownership. You probe judgment, decision-making under ambiguity, how they handled disagreement, and impact on the team and business — not just individual output.",
+  hr: "You are an HR / recruiter conducting a behavioral screen. You probe motivation, consistency between what's claimed and how they describe it, how they handle conflict and feedback, and whether the story holds together emotionally as well as factually.",
+  panel: "You are a full interview panel. Rotate your questioning angle across turns between deep technical scrutiny, managerial judgment, and behavioral consistency — like different panelists taking turns, so the pressure varies in character."
+};
+
+/* ============================================================
+   DOM helpers
+   ============================================================ */
+const $ = (id) => document.getElementById(id);
+function showView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  $('view-'+name).classList.add('active');
+  state.view = name;
+  window.scrollTo({top:0, behavior:'smooth'});
+  renderNav();
+}
+function renderNav(){
+  const nav = $('navActions');
+  nav.innerHTML = '';
+  if(state.view !== 'landing'){
+    const home = document.createElement('button');
+    home.className = 'icon-btn'; home.textContent = 'Home';
+    home.onclick = ()=> showView('landing');
+    nav.appendChild(home);
+  }
+  if(hasHistory() && state.view !== 'history'){
+    const hist = document.createElement('button');
+    hist.className = 'icon-btn'; hist.textContent = 'History';
+    hist.onclick = ()=> { renderHistory(); showView('history'); };
+    nav.appendChild(hist);
+  }
+}
+
+/* ============================================================
+   SESSION STORAGE (persistent, via window.storage — NOT localStorage,
+   which is unsupported inside Claude's artifact sandbox)
+   ============================================================ */
+state.historyCache = null;      // array of session summaries, kept in sync in memory
+state.storageAvailable = !!(window.storage && window.storage.get && window.storage.set);
+
+async function loadSessionsIndex(){
+  if(!state.storageAvailable) return [];
+  try{
+    const r = await window.storage.get('sessions_index', false);
+    return r && r.value ? JSON.parse(r.value) : [];
+  }catch(e){
+    return []; // key doesn't exist yet, or storage unavailable
+  }
+}
+async function saveSessionsIndex(list){
+  if(!state.storageAvailable) return;
+  try{ await window.storage.set('sessions_index', JSON.stringify(list.slice(0,30)), false); }
+  catch(e){ /* non-fatal: history just won't persist this run */ }
+}
+function hasHistory(){
+  return !!(state.historyCache && state.historyCache.length > 0);
+}
+async function initHistory(){
+  state.historyCache = await loadSessionsIndex();
+  renderNav();
+  if(state.view === 'landing') $('btnHistoryLanding').style.display = hasHistory() ? 'inline-flex' : 'none';
+}
+async function saveSessionToHistory(){
+  const entry = {
+    id: state.sessionId,
+    date: new Date().toISOString(),
+    audienceMode: state.audienceMode,
+    overallScore: state.report ? state.report.overallScore : null,
+    claimsCount: state.claims.length,
+    excerpt: (state.resumeLabel || state.resumeText.slice(0,80) || 'Untitled session')
+  };
+  state.historyCache = state.historyCache || [];
+  state.historyCache.unshift(entry);
+  await saveSessionsIndex(state.historyCache);
+  if(state.storageAvailable){
+    try{
+      await window.storage.set('session:'+state.sessionId, JSON.stringify({
+        claims: state.claims, transcript: state.transcript, report: state.report,
+        audienceMode: state.audienceMode
+      }), false);
+    }catch(e){ /* index still saved; full detail may be unavailable on reopen */ }
+  }
+  renderNav();
+}
+function renderHistory(){
+  const list = state.historyCache || [];
+  const el = $('historyContent');
+  if(!state.storageAvailable){
+    el.innerHTML = `<div class="empty-state">
+      <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#ECEAE3" stroke-width="1.2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v5"/></svg>
+      <p>Persistent storage isn't available in this environment, so past sessions won't be saved between visits. Everything still works within this session.</p>
+    </div>`;
+    return;
+  }
+  if(list.length===0){
+    el.innerHTML = `<div class="empty-state">
+      <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#ECEAE3" stroke-width="1.2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v5"/></svg>
+      <p>No sessions yet. Once you finish a defense report, it'll show up here.</p>
+    </div>`;
+    return;
+  }
+  el.innerHTML = '<div class="history-list">' + list.map(s=>{
+    const d = new Date(s.date);
+    const score = s.overallScore!==null ? s.overallScore : '—';
+    return `<div class="history-item" data-id="${s.id}">
+      <div class="hi-left">
+        <div class="hi-title">${escapeHtml(s.excerpt)}${s.excerpt.length>=80?'…':''}</div>
+        <div class="hi-meta">${d.toLocaleDateString()} · ${AUDIENCE_LABEL[s.audienceMode]||''} · ${s.claimsCount} claims</div>
+      </div>
+      <div class="hi-score" style="color:${scoreColor(s.overallScore)}">${score}</div>
+    </div>`;
+  }).join('') + '</div>';
+  el.querySelectorAll('.history-item').forEach(item=>{
+    item.onclick = async ()=>{
+      try{
+        const r = await window.storage.get('session:'+item.dataset.id, false);
+        const data = r && r.value ? JSON.parse(r.value) : null;
+        if(data && data.report){
+          state.claims = data.claims; state.transcript = data.transcript; state.report = data.report;
+          renderReport(); showView('report');
+        }
+      }catch(e){
+        el.insertAdjacentHTML('afterbegin', `<div class="error-banner"><div class="msg"><b>Couldn't load that session</b>Its detail may no longer be available.</div></div>`);
+      }
+    };
+  });
+}
+
+function escapeHtml(s){
+  return (s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function scoreColor(score){
+  if(score===null||score===undefined) return 'var(--text-faint)';
+  if(score>=70) return 'var(--green)';
+  if(score>=40) return 'var(--amber)';
+  return 'var(--red)';
+}
+
+/* ============================================================
+   GROQ API (OpenAI-compatible) — llama-3.3-70b-versatile
+   Uses JSON mode (response_format) to force well-formed, complete
+   structured output and avoid mid-response truncation/hallucination.
+   ============================================================ */
+const GROQ_MODEL = "llama-3.3-70b-versatile";
+const GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
+
+async function callGroq(systemPrompt, userPrompt, maxTokens){
+  maxTokens = maxTokens || 1200;
+  if(!state.groqApiKey){
+    const e = new Error('NO_API_KEY'); e.code = 'NO_API_KEY'; throw e;
+  }
+  let lastErr = null;
+  let tokens = maxTokens;
+  for(let attempt=0; attempt<3; attempt++){
+    try{
+      const resp = await fetch(GROQ_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + state.groqApiKey
+        },
+        body: JSON.stringify({
+          model: GROQ_MODEL,
+          temperature: 0.35,
+          max_tokens: tokens,
+          response_format: { type: "json_object" },
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt }
+          ]
+        })
+      });
+      if(resp.status === 401 || resp.status === 403){
+        const e = new Error('BAD_API_KEY'); e.code = 'BAD_API_KEY'; throw e;
+      }
+      if(resp.status === 429 || resp.status >= 500){
+        lastErr = new Error('RATE_LIMIT_OR_SERVER');
+        await new Promise(r=>setTimeout(r, 900*(attempt+1)));
+        continue;
+      }
+      if(!resp.ok){
+        throw new Error('API_ERROR_'+resp.status);
+      }
+      const data = await resp.json();
+      const choice = (data.choices||[])[0];
+      const text = choice && choice.message ? (choice.message.content||'').trim() : '';
+      // If the model got cut off mid-response, retry once with a bigger budget
+      // instead of returning a broken/incomplete answer.
+      if(choice && choice.finish_reason === 'length' && attempt < 2){
+        tokens = Math.min(tokens * 2, 4000);
+        continue;
+      }
+      if(!text) throw new Error('EMPTY_RESPONSE');
+      return text;
+    }catch(e){
+      if(e.code === 'NO_API_KEY' || e.code === 'BAD_API_KEY') throw e;
+      lastErr = e;
+      if(attempt<2) await new Promise(r=>setTimeout(r, 500*(attempt+1)));
+    }
+  }
+  throw lastErr || new Error('UNKNOWN');
+}
+function parseJson(text){
+  let cleaned = text.replace(/```json/gi,'').replace(/```/g,'').trim();
+  const start = cleaned.indexOf('{');
+  const end = cleaned.lastIndexOf('}');
+  if(start>=0 && end>=0) cleaned = cleaned.slice(start, end+1);
+  return JSON.parse(cleaned);
+}
+function showErrorBanner(containerId, message, onRetry){
+  const el = $(containerId);
+  const isLocalFile = window.location.protocol === 'file:';
+  const hint = isLocalFile
+    ? "It looks like this file was opened directly from your downloads, not inside Claude's chat. This app only works when opened inside Claude — click the file preview in the chat instead of opening the downloaded copy."
+    : message;
+  el.innerHTML = `<div class="error-banner">
+    <div class="msg"><b>Connection dropped</b>${escapeHtml(hint)}</div>
+    ${isLocalFile ? '' : '<button class="btn btn-sm btn-ghost" id="__retryBtn">Retry</button>'}
+  </div>`;
+  if(!isLocalFile){
+    $('__retryBtn').onclick = ()=>{ el.innerHTML=''; onRetry(); };
+  }
+}
+
+/* ============================================================
+   LANDING / NAV
+   ============================================================ */
+$('btnStart').onclick = ()=> showView('upload');
+$('btnHistoryLanding').onclick = ()=> { renderHistory(); showView('history'); };
+$('btnBackLanding').onclick = ()=> showView('landing');
+
+/* ============================================================
+   UPLOAD VIEW
+   ============================================================ */
+const dropzone = $('dropzone');
+const fileInput = $('fileInput');
+dropzone.onclick = ()=> fileInput.click();
+['dragenter','dragover'].forEach(ev=> dropzone.addEventListener(ev, e=>{ e.preventDefault(); dropzone.classList.add('drag'); }));
+['dragleave','drop'].forEach(ev=> dropzone.addEventListener(ev, e=>{ e.preventDefault(); dropzone.classList.remove('drag'); }));
+dropzone.addEventListener('drop', e=>{
+  const file = e.dataTransfer.files[0];
+  if(file) readFile(file);
+});
+fileInput.onchange = ()=>{ if(fileInput.files[0]) readFile(fileInput.files[0]); };
+
+function showUploadError(msg){
+  $('uploadError').innerHTML = `<div class="error-banner"><div class="msg"><b>Couldn't read that file</b>${escapeHtml(msg)}</div></div>`;
+}
+function clearUploadError(){ $('uploadError').innerHTML = ''; }
+
+function setPastedText(text, filename){
+  const trimmed = (text||'').trim();
+  if(trimmed.length < 20){
+    showUploadError('Not much text came through from "'+filename+'". Try pasting the content directly instead.');
+    return;
+  }
+  $('pasteBox').value = trimmed;
+  $('dropzoneText').innerHTML = 'Loaded: <span class="filename">'+escapeHtml(filename)+'</span>';
+}
+
+async function readFile(file){
+  clearUploadError();
+  const ext = (file.name.split('.').pop()||'').toLowerCase();
+  $('dropzoneText').textContent = 'Reading ' + file.name + '…';
+  try{
+    if(ext==='pdf'){
+      const text = await extractPdfText(file);
+      setPastedText(text, file.name);
+    } else if(ext==='docx'){
+      const text = await extractDocxText(file);
+      setPastedText(text, file.name);
+    } else if(ext==='doc'){
+      showUploadError('Old .doc format can\'t be read in the browser. Save it as .docx, or paste the text directly.');
+      $('dropzoneText').textContent = 'Drag a file here, or click to browse';
+    } else {
+      // plain text, markdown, rtf, or anything else — read as text
+      const text = await file.text();
+      setPastedText(text, file.name);
+    }
+  }catch(e){
+    showUploadError('Something went wrong reading that file. Try pasting the text directly instead.');
+    $('dropzoneText').textContent = 'Drag a file here, or click to browse';
+  }
+}
+
+async function extractPdfText(file){
+  if(!window.pdfjsLib) throw new Error('PDF_LIB_UNAVAILABLE');
+  const buf = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+  let text = '';
+  const maxPages = Math.min(pdf.numPages, 12);
+  for(let i=1; i<=maxPages; i++){
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    text += content.items.map(it=>it.str).join(' ') + '\n\n';
+    if(text.length > 9000) break;
+  }
+  return text;
+}
+
+async function extractDocxText(file){
+  if(!window.mammoth) throw new Error('DOCX_LIB_UNAVAILABLE');
+  const buf = await file.arrayBuffer();
+  const result = await mammoth.extractRawText({ arrayBuffer: buf });
+  return result.value;
+}
+
+document.querySelectorAll('.audience-opt').forEach(opt=>{
+  opt.onclick = ()=>{
+    document.querySelectorAll('.audience-opt').forEach(o=>o.classList.remove('selected'));
+    opt.classList.add('selected');
+    state.audienceMode = opt.dataset.mode;
+  };
+});
+
+$('btnBuildCase').onclick = ()=>{
+  const text = $('pasteBox').value.trim();
+  const key = $('groqKeyInput').value.trim();
+
+  if(!key){
+    $('uploadError').innerHTML = `<div class="error-banner"><div class="msg"><b>Groq API key missing</b>Get a free key from <a href="https://console.groq.com/keys" target="_blank" rel="noopener" style="color:var(--amber)">console.groq.com/keys</a> and paste it above.</div></div>`;
+    $('groqKeyInput').focus();
+    return;
+  }
+  if(!key.startsWith('gsk_')){
+    $('uploadError').innerHTML = `<div class="error-banner"><div class="msg"><b>Invalid Groq API key</b>Keys start with <code style="font-family:var(--font-mono); font-size:12px;">gsk_</code> — double check you copied it correctly.</div></div>`;
+    $('groqKeyInput').focus();
+    return;
+  }
+  state.groqApiKey = key;
+
+  if(!state.imageData && text.length < 40){
+    $('uploadError').innerHTML = `<div class="error-banner"><div class="msg"><b>Not quite enough to work with</b>Paste more of your experience — a resume section, a project write-up, at least a few sentences with real detail — or upload a file/image.</div></div>`;
+    return;
+  }
+  $('uploadError').innerHTML = '';
+  state.resumeText = text.slice(0, 7000);
+  state.resumeLabel = state.imageData ? 'Document image upload' : state.resumeText.slice(0,80);
+  state.sessionId = 's_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+  state.startedAt = Date.now();
+  showView('extracting');
+  extractClaims();
+};
+
+/* ============================================================
+   EXTRACT CLAIMS
+   ============================================================ */
+async function extractClaims(){
+  $('extractingLabel').textContent = 'READING THE FILE…';
+  const system = `You are a skeptical, expert interviewer preparing to cross-examine a candidate on every claim in their experience document. Extract the most meaningful, defendable claims a sharp interviewer would want to probe: achievements, responsibilities, metrics, decisions, scope of ownership. Ignore boilerplate like contact info or section headers. Return ONLY valid JSON with no markdown fences and no commentary, in this exact shape:
+{"claims":[{"id":"c1","text":"<claim condensed to one clear sentence, in third person>","category":"<short 1-2 word category like Leadership, Metric, Technical, Scope, Ownership>","riskLevel":"vague"|"specific"|"quantified"}]}
+Extract between 6 and 9 claims, prioritizing the ones most worth pressure-testing. riskLevel "vague" = no evidence or numbers given, "specific" = has concrete detail but no measurable outcome, "quantified" = includes a real number or measurable result.`;
+  // Groq's text models don't support image input — if imageData exists,
+  // fall back to the pasted text (user would have typed/pasted from the image).
+  if(state.imageData && state.resumeText.length < 40){
+    $('extractingLabel').textContent = '';
+    showErrorBanner('view-extracting', 'Image upload isn\'t supported with Groq. Please paste the text from your document instead.', ()=>{ showView('upload'); });
+    return;
+  }
+  const userContent = `Audience context: ${AUDIENCE_PERSONA[state.audienceMode]}\n\nDocument to extract claims from:\n"""\n${state.resumeText}\n"""`;
+  try{
+    const raw = await callGroq(system, userContent, 1200);
+    const parsed = parseJson(raw);
+    if(!parsed.claims || parsed.claims.length===0) throw new Error('EMPTY');
+    state.claims = parsed.claims.map((c,i)=>({
+      id: c.id || ('c'+(i+1)),
+      text: c.text,
+      category: c.category || 'Claim',
+      riskLevel: c.riskLevel || 'specific',
+      confidence: null,
+      verdict: null,
+      questionsAsked: 0,
+      feedback: []
+    }));
+    $('extractingLabel').textContent = 'OPENING THE INTERVIEW…';
+    await requestNextTurn(null);
+    renderInterview();
+    showView('interview');
+  }catch(e){
+    $('extractingLabel').textContent = '';
+    if(e.code === 'BAD_API_KEY'){
+      showErrorBanner('view-extracting', ' Your Groq API key was rejected (401). Go back and double-check it.', ()=>{ showView('upload'); });
+    } else {
+      showErrorBanner('view-extracting', ' The claim extraction didn\'t come through cleanly. This sometimes happens under load.', ()=>{
+        $('extractingLabel').textContent = 'READING THE FILE…';
+        extractClaims();
+      });
+    }
+  }
+}
+
+/* ============================================================
+   INTERVIEW TURN LOGIC
+   ============================================================ */
+function claimsSummary(){
+  return state.claims.map(c=>({
+    id:c.id, text:c.text, category:c.category, riskLevel:c.riskLevel,
+    confidence:c.confidence, questionsAsked:c.questionsAsked
+  }));
+}
+function recentTranscript(n){
+  return state.transcript.slice(-n).map(t=>({question:t.q, answer:t.a, claimId:t.claimId}));
+}
+
+async function requestNextTurn(previousAnswer){
+  const system = `${AUDIENCE_PERSONA[state.audienceMode]}
+You are role-playing this interviewer persona, cross-examining a candidate on the claims listed below during a mock defense session. If a previous question and answer are provided, first score that answer. Then generate the next question, honing in on the claim that is weakest, least defended, or not yet tested. Make the question sharp, specific, and reference the candidate's own words back at them — never a generic templated interview question. Push for numbers, specifics, named tools or people, obstacles faced, alternatives considered, or what they'd do differently. Do not re-question a claim already scored 85 or above unless every claim has been tested at least once. Vary phrasing so it doesn't feel scripted.
+Return ONLY valid JSON, no markdown fences, in this exact shape:
+{"scoring": null_or_object_with_claimId_confidence_0to100_verdict_and_feedback, "nextQuestion": {"claimId":"...", "text":"<the question, asked directly to the candidate, no preamble like 'Great, next question'>"}}
+Valid verdict values: "well-defended", "needs-evidence", "vague", "inconsistent".
+feedback must be one or two blunt, specific, coaching sentences aimed directly at the candidate — not generic praise.`;
+
+  const userPrompt = `Claims (current state):\n${JSON.stringify(claimsSummary())}\n\nRecent exchanges:\n${JSON.stringify(recentTranscript(3))}\n\n${previousAnswer ? `Most recent question asked: "${state.currentQuestion.text}" (about claim ${state.currentQuestion.claimId})\nCandidate's answer: "${previousAnswer}"` : 'This is the opening question of the session — no answer yet. Set scoring to null.'}`;
+
+  const raw = await callGroq(system, userPrompt, 1200);
+  const parsed = parseJson(raw);
+
+  if(parsed.scoring){
+    const claim = state.claims.find(c=>c.id===parsed.scoring.claimId);
+    if(claim){
+      claim.confidence = parsed.scoring.confidence;
+      claim.verdict = parsed.scoring.verdict;
+      claim.feedback.push(parsed.scoring.feedback);
+    }
+    if(state.transcript.length>0){
+      state.transcript[state.transcript.length-1].scoring = parsed.scoring;
+    }
+  }
+
+  const nq = parsed.nextQuestion;
+  const targetClaim = state.claims.find(c=>c.id===nq.claimId) || state.claims[0];
+  targetClaim.questionsAsked += 1;
+  state.currentQuestion = { claimId: targetClaim.id, text: nq.text };
+  state.qCount += 1;
+
+  return parsed.scoring;
+}
+
+/* ============================================================
+   RENDER: INTERVIEW
+   ============================================================ */
+function renderInterview(){
+  $('modePill').textContent = AUDIENCE_LABEL[state.audienceMode];
+  const targetClaim = state.claims.find(c=>c.id===state.currentQuestion.claimId);
+  $('claimTag').textContent = 'Re: "' + (targetClaim ? truncate(targetClaim.text, 70) : '') + '"';
+  $('qNumber').textContent = 'QUESTION ' + state.qCount;
+  $('questionText').textContent = state.currentQuestion.text;
+  $('answerBox').value = '';
+  $('charHint').textContent = '0 characters';
+  $('scoringSlot').innerHTML = '';
+  updateProgress();
+  renderClaimsList();
+  renderTranscript();
+  state.targetAmplitude = 6;
+}
+function truncate(s,n){ return s.length>n ? s.slice(0,n-1)+'…' : s; }
+
+function updateProgress(){
+  const tested = state.claims.filter(c=>c.confidence!==null);
+  const pct = Math.round((tested.length / state.claims.length) * 100);
+  $('progressFill').style.width = pct + '%';
+}
+
+function renderClaimsList(){
+  const sorted = [...state.claims].sort((a,b)=>{
+    const av = a.confidence===null ? -1 : a.confidence;
+    const bv = b.confidence===null ? -1 : b.confidence;
+    return av - bv;
+  });
+  $('claimsList').innerHTML = sorted.map(c=>{
+    const untested = c.confidence===null;
+    const pct = untested ? 0 : c.confidence;
+    const color = untested ? 'var(--text-faint)' : (pct>=70?'var(--green)': pct>=40?'var(--amber)':'var(--red)');
+    return `<div class="claim-row ${untested?'c-untested':''}">
+      <div class="c-text">${escapeHtml(c.text)}</div>
+      <div class="c-meta"><span class="c-cat">${escapeHtml(c.category)}</span></div>
+      <div class="c-bar-track"><div class="c-bar-fill" style="width:${pct}%; background:${color};"></div></div>
+      <div class="c-score">${untested ? 'Not yet tested' : pct + ' / 100 · ' + (c.verdict||'')}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderTranscript(){
+  if(state.transcript.length===0){ $('transcript').style.display='none'; return; }
+  $('transcript').style.display='block';
+  $('transcriptList').innerHTML = [...state.transcript].reverse().map(t=>{
+    const badge = t.scoring ? `<span class="verdict-badge verdict-${t.scoring.verdict}">${t.scoring.verdict.replace('-',' ')}</span>` : '';
+    return `<div class="t-entry">
+      <div class="t-q"><span class="who">Q</span><span>${escapeHtml(t.q)}</span></div>
+      <div class="t-a"><span class="who">A</span> ${escapeHtml(t.a)}</div>
+      ${badge ? `<div style="padding-left:24px;">${badge}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+/* ---- polygraph canvas ---- */
+const canvas = $('polygraphCanvas');
+const ctx = canvas.getContext('2d');
+let phase = 0, curAmp = 6;
+function resizeCanvas(){ canvas.width = canvas.clientWidth * devicePixelRatio; canvas.height = canvas.clientHeight * devicePixelRatio; }
+window.addEventListener('resize', resizeCanvas);
+setTimeout(resizeCanvas, 50);
+function drawPolygraph(){
+  requestAnimationFrame(drawPolygraph);
+  if(!canvas.clientWidth) return;
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0,0,w,h);
+  curAmp += (state.targetAmplitude - curAmp) * 0.06;
+  phase += 0.12;
+  ctx.beginPath();
+  ctx.lineWidth = 1.8 * devicePixelRatio;
+  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--amber').trim() || '#E8A33D';
+  ctx.shadowColor = 'rgba(232,163,61,0.6)';
+  ctx.shadowBlur = 6*devicePixelRatio;
+  const mid = h/2;
+  const jag = Math.max(0, curAmp-8) * 0.6;
+  for(let x=0;x<=w;x+=4*devicePixelRatio){
+    const t = x/w*Math.PI*6 + phase;
+    const noise = jag ? (Math.random()-0.5)*jag*devicePixelRatio : 0;
+    const y = mid + Math.sin(t)*curAmp*devicePixelRatio*0.6 + noise;
+    if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+}
+drawPolygraph();
+
+$('answerBox').addEventListener('input', ()=>{
+  const len = $('answerBox').value.length;
+  $('charHint').textContent = len + ' characters';
+  state.targetAmplitude = len>0 ? 16 : 6;
+});
+
+/* ---- submit / skip ---- */
+$('btnSubmitAnswer').onclick = ()=> submitAnswer(false);
+$('btnSkip').onclick = ()=> submitAnswer(true);
+
+async function submitAnswer(isSkip){
+  const answerBox = $('answerBox');
+  const val = isSkip ? "(Candidate chose not to answer this one.)" : answerBox.value.trim();
+  if(!isSkip && val.length < 3){ return; }
+
+  const q = state.currentQuestion;
+  $('btnSubmitAnswer').disabled = true;
+  $('btnSkip').disabled = true;
+  $('btnSubmitAnswer').textContent = 'Weighing that…';
+  $('interviewError').innerHTML = '';
+
+  state.transcript.push({ q: q.text, a: val, claimId: q.claimId, scoring: null });
+
+  try{
+    const scoring = await requestNextTurn(val);
+    state.targetAmplitude = scoring ? mapConfidenceToAmplitude(scoring.confidence) : 6;
+    if(scoring){
+      $('scoringSlot').innerHTML = `<div class="scoring-flash">
+        <div class="sf-top"><span class="verdict-badge verdict-${scoring.verdict}">${scoring.verdict.replace('-',' ')}</span></div>
+        <p>${escapeHtml(scoring.feedback)}</p>
+      </div>`;
+      await new Promise(r=>setTimeout(r, 1400));
+    }
+    renderInterview();
+  }catch(e){
+    showErrorBanner('interviewError', ' Couldn\'t reach the interviewer for the next question. Your answer is saved — try again.', ()=>{
+      submitAnswer(isSkip);
+    });
+  }finally{
+    $('btnSubmitAnswer').disabled = false;
+    $('btnSkip').disabled = false;
+    $('btnSubmitAnswer').textContent = 'Submit answer';
+  }
+}
+function mapConfidenceToAmplitude(conf){
+  if(conf===undefined || conf===null) return 6;
+  if(conf>=80) return 4;
+  if(conf>=60) return 8;
+  if(conf>=40) return 16;
+  return 24;
+}
+
+$('btnEndSession').onclick = ()=> generateReport();
+
+/* ============================================================
+   REPORT
+   ============================================================ */
+async function generateReport(){
+  showView('extracting');
+  $('extractingLabel').textContent = 'CLOSING THE CASE…';
+  const system = `Generate a final Defense Report evaluating how well the candidate defended each claim in this mock cross-examination. Be honest, specific and actionable — this is coaching, not flattery. Claims never questioned should be marked "not-tested" with a recommendation on how to prepare for them anyway. Return ONLY valid JSON, no markdown fences, in this exact shape:
+{"overallScore": 0-100, "summary":"<2-3 sentence honest overall assessment written directly to the candidate>", "claims":[{"id":"...", "verdict":"well-defended"|"needs-work"|"not-tested", "recommendation":"<one specific, actionable sentence>"}], "topPriorities":["<up to 3 short, specific, actionable priorities>"], "closingNote":"<1-2 sentence honest but encouraging closing note>"}`;
+  const userPrompt = `Audience mode: ${AUDIENCE_LABEL[state.audienceMode]}\n\nClaims with final confidence scores:\n${JSON.stringify(state.claims.map(c=>({id:c.id, text:c.text, confidence:c.confidence, verdict:c.verdict, feedback:c.feedback})))}\n\nFull transcript:\n${JSON.stringify(state.transcript.map(t=>({q:t.q,a:t.a})))}`;
+
+  try{
+    const raw = await callGroq(system, userPrompt, 1500);
+    const parsed = parseJson(raw);
+    state.report = parsed;
+    await saveSessionToHistory();
+    renderReport();
+    showView('report');
+  }catch(e){
+    $('extractingLabel').textContent = '';
+    showErrorBanner('view-extracting', ' The report didn\'t come through. Nothing from your session is lost.', ()=>{
+      $('extractingLabel').textContent = 'CLOSING THE CASE…';
+      generateReport();
+    });
+  }
+}
+
+function renderReport(){
+  const r = state.report;
+  const score = r.overallScore;
+  $('gaugeNum').textContent = score;
+  $('gaugeNum').style.color = scoreColor(score);
+  const circumference = 490;
+  const offset = circumference - (circumference * Math.min(score,100)/100);
+  const arc = $('gaugeArc');
+  arc.style.stroke = scoreColor(score);
+  setTimeout(()=>{ arc.style.transition = 'stroke-dashoffset 1s ease'; arc.setAttribute('stroke-dashoffset', offset); }, 100);
+  $('reportSummary').textContent = r.summary;
+
+  $('priorityList').innerHTML = (r.topPriorities||[]).map((p,i)=>`
+    <div class="priority-item"><span class="p-num">0${i+1}</span><p>${escapeHtml(p)}</p></div>
+  `).join('');
+
+  $('reportClaims').innerHTML = (r.claims||[]).map(rc=>{
+    const claim = state.claims.find(c=>c.id===rc.id);
+    const verdictClass = rc.verdict==='well-defended' ? 'verdict-well-defended' : rc.verdict==='not-tested' ? 'verdict-vague' : 'verdict-needs-evidence';
+    return `<div class="report-claim-card">
+      <div class="rc-top">
+        <div class="rc-claim-text">${escapeHtml(claim ? claim.text : '')}</div>
+        <span class="verdict-badge ${verdictClass}">${rc.verdict.replace('-',' ')}</span>
+      </div>
+      <p class="rc-rec">${escapeHtml(rc.recommendation)}</p>
+    </div>`;
+  }).join('');
+
+  $('closingNote').textContent = '"' + r.closingNote + '"';
+}
+
+$('btnExportMd').onclick = ()=>{
+  const r = state.report;
+  let md = `# Defense Report\n\n**Overall readiness: ${r.overallScore}/100**\n\n${r.summary}\n\n## Top priorities\n`;
+  (r.topPriorities||[]).forEach(p=> md += `- ${p}\n`);
+  md += `\n## Claim by claim\n`;
+  (r.claims||[]).forEach(rc=>{
+    const claim = state.claims.find(c=>c.id===rc.id);
+    md += `\n### ${claim?claim.text:''}\n**Verdict:** ${rc.verdict}\n\n${rc.recommendation}\n`;
+  });
+  md += `\n---\n${r.closingNote}\n`;
+  const blob = new Blob([md], {type:'text/markdown'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'defense-report.md';
+  a.click();
+};
+$('btnPrint').onclick = ()=> window.print();
+$('btnNewSession').onclick = ()=>{
+  state.resumeText=''; state.resumeLabel=''; state.imageData=null; state.claims=[]; state.transcript=[]; state.currentQuestion=null;
+  state.qCount=0; state.sessionId=null; state.report=null;
+  $('pasteBox').value=''; $('pasteBox').placeholder='Paste your resume, LinkedIn about section, project write-up, research abstract, performance review — anything describing what you did and what you achieved.';
+  $('dropzoneText').textContent='Drag a file here, or click to browse';
+  $('imgPreview').style.display='none';
+  $('uploadError').innerHTML='';
+  showView('upload');
+};
+
+/* init */
+showView('landing');
+initHistory();
+
+})();
+</script>
+</body>
+</html>
