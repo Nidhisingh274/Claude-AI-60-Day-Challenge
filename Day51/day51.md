@@ -1,5 +1,5 @@
 # Day 1 — Product Discovery & Sprint Planning
-### AB Talks 60-Day Claude AI Challenge — 10-Day Capstone
+### AB Talks 60-Day Claude AI Challenge (10-Day Capstone)
 
 **Participant:** Nidhi Singh
 **Task:** Kick off the 10-day capstone — go from no idea to a fully scoped, deployable v1.0 plan using Claude as a structured product-discovery partner.
